@@ -74,8 +74,8 @@ function save() {
                         </div>
                         <div class="form-group">
                             <label class="form-label">Planned Hours (h/Day)</label>
-                            <input class="form-input" type="number" step="0.5" min="0" max="24"
-                                v-model.number="form.plannedHours" />
+                            <input class="form-input" type="number" step="0.5" min="0" max="24" v-model.number="form.plannedHours" />
+                            <span class="preview-hint">incl. {{ form.defaultBreak + form.additionalBreaks }}min Break</span>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Start Time</label>
@@ -105,7 +105,7 @@ function save() {
                     <div v-if="showPreview" class="preview-bar">
                         <span class="form-label">Preview Actual:</span>
                         <strong>{{ previewIst }}</strong>
-                        <span class="preview-hint">incl. {{ form.value.defaultBreak + form.value.additionalBreaks }}min Break</span>
+                        <span class="preview-hint">incl. {{ form.defaultBreak + form.additionalBreaks }}min Break</span>
                     </div>
                 </div>
 
