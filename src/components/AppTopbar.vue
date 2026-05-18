@@ -14,12 +14,18 @@ const { showToast } = useToast()
 
 const titles = {
     '/tracking': 'Month Overview',
+    '/diagrams': 'Diagrams & Stats',
     '/settings': 'Settings'
 }
 
 function handleExport() {
     store.exportJSON()
     showToast('Export successful.', 'ok')
+}
+
+function handleCSV() {
+    store.exportCSV()
+    showToast('CSV export successful.', 'ok')
 }
 
 function handleImport() {
@@ -70,6 +76,15 @@ function onFileChange(event) {
                         <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                     Export
+                </button>
+                <button class="btn btn-secondary btn-sm" @click="handleCSV">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    CSV
                 </button>
             </template>
             <button class="theme-btn" @click="emit('toggle-theme')">

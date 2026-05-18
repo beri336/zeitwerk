@@ -149,6 +149,48 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         url.click()
     }
 
+    function exportCSV() {
+        const pad = num => String(num).padStart(2, '0')
+        const headers = [
+            'Date', 'Weekday', 'KW', 'Start', 'End',
+            'Default Break (min)', 'Additional Breaks (min)',
+            'Actual (h)', 'Planned (h)', 'Difference (h)', 'Notes'
+        ]
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+        const rows = entries.value
+            .sort((entryA, entryB) => entryA.datum.localeCompare(entryB.datum))
+            .map(entry => {
+                const actual = calcActualHours(entry)
+                const planned = entry.plannedDay || settings.value.hoursPerDay
+                const date = new Date(entry.datum + 'T00:00:00')
+
+                return [
+                    `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`,
+                    days[date.getDay()],
+                    getKW(entry.date),
+                    entry.start || '',
+                    entry.end || '',
+                    entry.defaultBreak || 0,
+                    entry.additionalBreaks || 0,
+                    actual.toFixed(2),
+                    planned.toFixed(2),
+                    (actual - planned).toFixed(2),
+                    entry.notes || ''
+                ].map(v => `"${v}"`).join(';')
+            })
+
+        const csv = [headers.map(h => `"${h}"`).join(';'), ...rows].join('\n')
+        const bom = '\uFEFF' // UTF-8 BOM für Excel
+        const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
+        const url = document.createElement('a')
+        
+        url.href = URL.createObjectURL(blob)
+        url.download = `zeitwerk_${currYear.value}_${pad(currMonth.value + 1)}.csv`
+        url.click()
+    }
+
     function importJSON(data) {
         if (!data.entries)
             throw new Error('Ungültiges Format')
