@@ -34,7 +34,7 @@ const monthlyData = computed(() => {
         })
 
         const actual = monthEntries.reduce((a, entry) => a + calcActualHours(entry), 0)
-        const planned = monthEntries.reduce((a, entry) => a + (entry.plannedDay || store.settings.hoursPerDay), 0)
+        const planned = monthEntries.reduce((a, entry) => a + (entry.plannedHours || store.settings.hoursPerDay), 0)
 
         results.push({ label: MONTH_NAMES[month].slice(0, 3), diff: parseFloat((actual - planned).toFixed(2)), ist: parseFloat(actual.toFixed(2)), soll: parseFloat(planned.toFixed(2)) })
     }

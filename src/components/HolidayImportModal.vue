@@ -101,6 +101,16 @@ function doImport() {
                     </div>
                 </div>
 
+                <!-- Auto-hint -->
+                <div class="auto-hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    Holidays are automatically added when you change the state in the settings.
+                </div>
+
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @click="close">Cancel</button>
                     <button class="btn btn-primary" :disabled="preview.length === 0" @click="doImport">
@@ -182,5 +192,19 @@ function doImport() {
 .holiday-status {
     display: flex;
     justify-content: flex-end;
+}
+
+/* Auto-hint */
+.auto-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-blue-highlight);
+    color: var(--color-blue);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-4);
+    line-height: 1.5;
 }
 </style>

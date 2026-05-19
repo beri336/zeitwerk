@@ -1,7 +1,7 @@
 <!-- src/views/SettingsView.vue -->
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { STATES } from '@/composables/useHolidays'
@@ -12,13 +12,28 @@ const { showToast } = useToast()
 
 const form = reactive({ ...store.settings })
 
+// Save state change immediately + Toast
+watch(
+    () => form.state,
+    (newVal, oldVal) => {
+        if (!oldVal || newVal === oldVal)
+            return
+        
+        store.saveSettings({ state: newVal })
+        showToast(
+            `State changed to  ${STATES[newVal]} - Holidays updated.`,
+            'ok'
+        )
+    }
+)
+
 function save() {
     store.saveSettings({ ...form })
     showToast('Settings saved.', 'ok')
 }
 
 function reset() {
-    Object.assign(form, { hoursPerDay: 8, hoursPerWeek: 40, defaultBreak: 30, workDays: 5 })
+    Object.assign(form, { hoursPerDay: 8, hoursPerWeek: 40, defaultBreak: 30, workDays: 5, state: 'BW' })
     store.saveSettings({ ...form })
     showToast('Settings reset.', 'ok')
 }
@@ -59,7 +74,7 @@ function reset() {
                     </div>
                     <div class="form-group">
                         <label class="form-label">States</label>
-                        <select class="form-input" v-model="form.states">
+                        <select class="form-input" v-model="form.state">
                             <option v-for="(name, code) in STATES" :key="code" :value="code">
                                 {{ name }}
                             </option>

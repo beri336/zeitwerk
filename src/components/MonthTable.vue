@@ -49,9 +49,21 @@ function actualVariant(entry) {
     return ''
 }
 
-function handleDelete(id) {
-    store.deleteEntry(id)
+// Delete handler with confirmation
+const pendingDelete = ref(null)
+
+function askDelete(id) {
+    pendingDelete.value = id
+}
+
+function confirmDelete() {
+    store.deleteEntry(pendingDelete.value)
     showToast('Entry deleted.', 'ok')
+    pendingDelete.value = null
+}
+
+function cancelDelete() {
+    pendingDelete.value = null
 }
 
 // v-focus directive via defineOptions
@@ -94,7 +106,7 @@ function handleDelete(id) {
                         <th class="num">Actual (Day)</th>
                         <th class="num">Planned (Day)</th>
                         <th>Notes</th>
-                        <th></th>
+                        <th class="actions-header">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -156,7 +168,7 @@ function handleDelete(id) {
                             </td>
 
                             <!-- Row actions -->
-                            <td>
+                            <td class="actions-cell">
                                 <div class="row-actions">
                                     <button class="btn btn-ghost btn-sm" @click="emit('edit', entry)"
                                         title="Edit">
@@ -166,8 +178,18 @@ function handleDelete(id) {
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
                                     </button>
-                                    <button class="btn btn-ghost btn-sm" @click="handleDelete(entry.id)" title="Delete"
-                                        style="color:var(--color-text-faint)">
+
+                                    <!-- Delete: normal button or confirmation -->
+                                    <template v-if="pendingDelete === entry.id">
+                                        <button class="btn btn-danger btn-sm" @click="confirmDelete" title="Confirm">
+                                            ✓
+                                        </button>
+                                        <button class="btn btn-ghost btn-sm" @click="cancelDelete" title="Cancel">
+                                            ✕
+                                        </button>
+                                    </template>
+                                    <button v-else class="btn btn-ghost btn-sm" @click="askDelete(entry.id)"
+                                        title="Delete" style="color:var(--color-text-faint)">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <polyline points="3 6 5 6 21 6" />
@@ -262,11 +284,29 @@ function handleDelete(id) {
     white-space: nowrap;
 }
 
+.data-table th.actions-header {
+    text-align: center;
+    min-width: 100px;
+    position: sticky;
+    right: 0;
+    background: var(--color-surface-offset);
+    border-left: 1px solid var(--color-border);
+    z-index: 3;
+}
+
 .data-table td {
     padding: var(--space-2) var(--space-3);
     border-bottom: 1px solid var(--color-divider);
     font-variant-numeric: tabular-nums lining-nums;
     vertical-align: middle;
+}
+
+.data-table td.actions-cell {
+    position: sticky;
+    right: 0;
+    background: var(--color-surface);
+    border-left: 1px solid var(--color-border);
+    z-index: 2;
 }
 
 .data-table tr:last-child td {
@@ -275,6 +315,55 @@ function handleDelete(id) {
 
 .data-table tr:hover td {
     background: var(--color-surface-offset);
+}
+
+.row-actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    min-width: 100px;
+}
+
+.actions-cell {
+    min-width: 100px;
+    text-align: center;
+}
+
+.row-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.row-actions button:hover {
+    background: var(--color-surface-offset);
+    border-color: var(--color-border);
+}
+
+.row-actions button svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+}
+
+.row-actions button:hover svg {
+    color: var(--color-text);
+}
+
+.row-actions button.btn-danger {
+    color: var(--color-error);
+}
+
+.row-actions button.btn-danger svg {
+    color: var(--color-error);
 }
 
 .editable {
@@ -358,7 +447,8 @@ function handleDelete(id) {
     transition: opacity var(--transition);
 }
 
-tr:hover .row-actions {
+:deep(tr:hover) .row-actions {
+    /* Force :deep() so that scoped CSS matches the tr selector */
     opacity: 1;
 }
 
@@ -400,5 +490,16 @@ tr:hover .row-actions {
     font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+/* Button delete confirmation */
+.btn-danger {
+    background: var(--color-error-highlight);
+    color: var(--color-error);
+}
+
+.btn-danger:hover {
+    background: var(--color-error);
+    color: var(--color-text-inverse);
 }
 </style>

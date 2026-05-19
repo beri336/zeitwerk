@@ -35,6 +35,7 @@ watch(() => props.modelValue, open => {
         form.value = props.editEntry
             ? { typ: `work`, ...props.editEntry }
             : { ...defaultForm(), date: props.prefillDate ?? today() }
+        pendingDelete.value = false
     }
 })
 
@@ -45,8 +46,6 @@ const previewIst = computed(() => {
     if (!showPreview.value) return '—'
     return formatHours(calcActualHours(form.value))
 })
-
-function close() { emit('update:modelValue', false) }
 
 function save() {
     if (!form.value.date) {
@@ -62,6 +61,29 @@ function save() {
         showToast('Entry added.', 'ok')
     }
     close()
+}
+
+const pendingDelete = ref(false)
+
+function askDelete() {
+    pendingDelete.value = true
+}
+
+function cancelDelete() {
+    pendingDelete.value = false
+}
+
+function deleteAndClose() {
+    if (!props.editEntry) return
+    store.deleteEntry(props.editEntry.id)
+    showToast('Deleted entry.', 'ok')
+    close()
+}
+
+// Reset on closing
+function close() {
+    pendingDelete.value = false
+    emit('update:modelValue', false)
 }
 </script>
 
@@ -133,8 +155,37 @@ function save() {
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @click="close">Cancel</button>
-                    <button class="btn btn-primary" @click="save">{{ editEntry ? 'Update' : 'Add' }}</button>
+                    <template v-if="editEntry">
+                        <!-- Confirmation status -->
+                        <template v-if="pendingDelete">
+                            <span class="delete-confirm-label">Are you sure you want to delete this?</span>
+                            <button class="btn btn-danger btn-sm" @click="deleteAndClose">
+                                Yes, delete
+                            </button>
+                            <button class="btn btn-secondary btn-sm" @click="cancelDelete">
+                                Cancel
+                            </button>
+                        </template>
+
+                        <!-- Normal condition -->
+                        <button v-else class="btn btn-ghost btn-sm delete-btn" @click="askDelete"
+                            style="margin-right:auto">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14H6L5 6" />
+                                <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+                            </svg>
+                            Delete
+                        </button>
+                    </template>
+
+                    <template v-if="!pendingDelete">
+                        <button class="btn btn-secondary" @click="close">Cancel</button>
+                        <button class="btn btn-primary" @click="save">
+                            {{ editEntry ? 'Update' : 'Add' }}
+                        </button>
+                    </template>
                 </div>
             </div>
         </div>
@@ -199,5 +250,21 @@ function save() {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     grid-column: 1 / -1;
+}
+
+/* Delete Button */
+.delete-btn {
+    color: var(--color-text-faint);
+}
+
+.delete-btn:hover {
+    color: var(--color-error);
+}
+
+.delete-confirm-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-error);
+    margin-right: auto;
 }
 </style>

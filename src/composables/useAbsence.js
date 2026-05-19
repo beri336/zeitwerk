@@ -54,6 +54,6 @@ export function getAbsenceType(key) {
 export function effectiveActualFallback(entry, defaultPlanned) {
     const type = getAbsenceType(entry.typ ?? 'work')
     if (!type.counter)
-        return entry.plannedDay ?? defaultPlanned
+        return entry.plannedHours ?? defaultPlanned
     return null
 }
