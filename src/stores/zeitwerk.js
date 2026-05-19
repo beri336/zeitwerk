@@ -90,10 +90,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
                 id: Date.now() + i,
                 date: h.date,
                 typ: 'publicholiday',
-                start: '',
-                end: '',
-                defaultBreak: 0,
-                additionalBreaks: 0,
+                timeEntries: [], // public holidays have no time entries
                 plannedHours: settings.value.hoursPerDay,
                 notes: h.name
             })
@@ -181,7 +178,15 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     // CRUD
     function addEntry(data) {
-        entries.value.push({ id: Date.now(), ...data })
+        entries.value.push({
+            id: Date.now(),
+            date: '',
+            typ: 'work',
+            timeEntries: [{ start: '', end: '', pause: 0 }],
+            plannedHours: settings.value.hoursPerDay,
+            notes: '',
+            ...data  // overrides what is found from modal
+        })
         persist()
     }
 
@@ -268,32 +273,35 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     function exportCSV() {
         const pad = num => String(num).padStart(2, '0')
         const headers = [
-            'Date', 'Weekday', 'KW', 'Start', 'End',
-            'Default Break (min)', 'Additional Breaks (min)',
-            'Actual (h)', 'Planned (h)', 'Difference (h)', 'Notes'
+            'Date', 'Weekday', 'KW', 'Typ',
+            'Time Blocks', 'Actual (h)', 'Planned (h)', 'Difference (h)', 'Notes'
         ]
 
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
         const rows = entries.value
-            .sort((entryA, entryB) => entryA.date.localeCompare(entryB.date))
-            .map(entry => {
-                const actual = effectiveActualHours(entry)
-                const planned = entry.plannedHours || settings.value.hoursPerDay
-                const date = new Date(entry.date + 'T00:00:00')
+            .sort((a, b) => a.datum.localeCompare(b.datum))
+            .map(e => {
+                const ist = calcIstH(e)
+                const soll = e.sollTag || settings.value.tagsstunden
+                const dt = new Date(e.datum + 'T00:00:00')
+
+                // time-entries blocks as a readable string: “08:00–12:00 (30 min), 16:00–20:00 (0 min)”
+                const bloecke = (e.timeEntries ?? [])
+                    .filter(b => b.start && b.end)
+                    .map(b => `${b.start}–${b.end} (${b.pause ?? 0}min)`)
+                    .join(', ') || '—'
 
                 return [
-                    `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`,
-                    days[date.getDay()],
-                    getKW(entry.date),
-                    entry.start || '',
-                    entry.end || '',
-                    entry.defaultBreak || 0,
-                    entry.additionalBreaks || 0,
+                    `${pad(dt.getDate())}.${pad(dt.getMonth() + 1)}.${dt.getFullYear()}`,
+                    days[dt.getDay()],
+                    getKW(e.datum),
+                    e.typ || 'work',
+                    bloecke,
                     actual.toFixed(2),
                     planned.toFixed(2),
                     (actual - planned).toFixed(2),
-                    entry.notes || ''
+                    e.notes || ''
                 ].map(v => `"${v}"`).join(';')
             })
 
@@ -330,13 +338,10 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             }
 
             entries.value.push({
-                id: Date.now() + added, // unique within the loop
+                id: Date.now() + i,
                 date: h.date,
                 typ: 'publicholiday',
-                start: '',
-                end: '',
-                defaultBreak: 0,
-                additionalBreaks: 0,
+                timeEntries: [],
                 plannedHours: settings.value.hoursPerDay,
                 notes: h.name
             })

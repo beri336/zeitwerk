@@ -31,8 +31,20 @@ export function calcActualMin(entry) {
     return Math.max(0, diff)
 }
 
+// Calculates actual hours from time entries
 export function calcActualHours(entry) {
-    return minToHour(calcActualMin(entry))
+    if (!Array.isArray(entry.timeEntries) || entry.timeEntries.length === 0)
+        return 0
+
+    return entry.timeEntries.reduce((sum, block) => {
+        if (!block.start || !block.end)
+            return sum
+        const [sh, sm] = block.start.split(':').map(Number)
+        const [eh, em] = block.end.split(':').map(Number)
+        const mins = (eh * 60 + em) - (sh * 60 + sm) - (block.pause ?? 0)
+
+        return sum + Math.max(0, mins / 60)
+    }, 0)
 }
 
 export function formatHours(h) {

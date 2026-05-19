@@ -38,7 +38,7 @@ function rowStyle(entry) {
 }
 
 function actualVariant(entry) {
-    const Actual = calcActualHours(entry)
+    const Actual = store.effectiveActualHours(entry)
     const planned = entry.plannedHours || store.settings.hoursPerDay
 
     if (Actual >= planned - 0.1)
@@ -99,10 +99,8 @@ function cancelDelete() {
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Default Break</th>
-                        <th>Additional Breaks</th>
+                        <th>Time Entries</th>
+                        <th>Pauses</th>
                         <th class="num">Actual (Day)</th>
                         <th class="num">Planned (Day)</th>
                         <th>Notes</th>
@@ -127,36 +125,26 @@ function cancelDelete() {
                             </td>
 
                             <!-- Inline editable cells -->
-                            <td class="editable" @click="startEdit(entry, 'start')">
-                                <input v-if="editCell?.id === entry.id && editCell?.field === 'start'" type="time"
-                                    class="inline-input" v-model="editCell.value" @blur="saveEdit(entry)"
-                                    @keyup.enter="saveEdit(entry)" @keyup.escape="cancelEdit" autofocus />
-                                <span v-else>{{ entry.start || '—' }}</span>
+                            <td>
+                                <div class="time-stack">
+                                    <span v-for="(b, i) in (entry.timeEntries ?? [])" :key="i" class="time-line">
+                                        {{ b.start || '—' }}–{{ b.end || '—' }}
+                                    </span>
+                                    <span v-if="!entry.timeEntries?.length">—</span>
+                                </div>
                             </td>
-                            <td class="editable" @click="startEdit(entry, 'end')">
-                                <input v-if="editCell?.id === entry.id && editCell?.field === 'end'" type="time"
-                                    class="inline-input" v-model="editCell.value" @blur="saveEdit(entry)"
-                                    @keyup.enter="saveEdit(entry)" @keyup.escape="cancelEdit" autofocus />
-                                <span v-else>{{ entry.end || '—' }}</span>
-                            </td>
-                            <td class="editable" @click="startEdit(entry, 'defaultBreak')">
-                                <input v-if="editCell?.id === entry.id && editCell?.field === 'defaultBreak'"
-                                    type="number" min="0" class="inline-input" style="width:60px"
-                                    v-model.number="editCell.value" @blur="saveEdit(entry)"
-                                    @keyup.enter="saveEdit(entry)" @keyup.escape="cancelEdit" autofocus />
-                                <span v-else>{{ entry.defaultBreak }}min</span>
-                            </td>
-                            <td class="editable" @click="startEdit(entry, 'additionalBreaks')">
-                                <input v-if="editCell?.id === entry.id && editCell?.field === 'additionalBreaks'"
-                                    type="number" min="0" class="inline-input" style="width:60px"
-                                    v-model.number="editCell.value" @blur="saveEdit(entry)"
-                                    @keyup.enter="saveEdit(entry)" @keyup.escape="cancelEdit" autofocus />
-                                <span v-else>{{ entry.additionalBreaks > 0 ? entry.additionalBreaks + 'min' : '—' }}</span>
+
+                            <!-- Pauses: sum of all entries -->
+                            <td>
+                                {{entry.timeEntries?.length
+                                    ? entry.timeEntries.reduce((s, b) => s + (b.pause ?? 0), 0) + 'min'
+                                : '—'
+                                }}
                             </td>
 
                             <!-- Actual Hours -->
-                            <td class="num"><span :class="actualVariant(entry)">{{ formatHours(calcActualHours(entry)) }}</span></td>
-                            <td class="num">{{ formatHours(entry.plannedHours) }}</td>
+                            <td class="num"><span :class="actualVariant(entry)">{{ formatHours(store.effectiveActualHours(entry)) }}</span></td>
+                            <td class="num">{{ formatHours(entry.plannedHours || store.settings.hoursPerDay) }}</td>
 
                             <!-- Notes -->
                             <td class="editable" @click="startEdit(entry, 'notes')" style="max-width:180px">
@@ -501,5 +489,19 @@ function cancelDelete() {
 .btn-danger:hover {
     background: var(--color-error);
     color: var(--color-text-inverse);
+}
+
+/* Time entries stack */
+.time-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.time-line {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-xs);
+    white-space: nowrap;
 }
 </style>

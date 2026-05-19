@@ -20,10 +20,7 @@ const { showToast } = useToast()
 const defaultForm = () => ({
     date: today(),
     typ: 'work',
-    start: '',
-    end: '',
-    defaultBreak: store.settings.defaultBreak,
-    additionalBreaks: 0,
+    timeEntries: [{ start: '', end: '', pause: store.settings.defaultBreak }],
     plannedHours: store.settings.hoursPerDay,
     notes: ''
 })
@@ -31,22 +28,50 @@ const defaultForm = () => ({
 const form = ref(defaultForm())
 
 watch(() => props.modelValue, open => {
-    if (open) {
-        form.value = props.editEntry
-            ? { typ: `work`, ...props.editEntry }
-            : { ...defaultForm(), date: props.prefillDate ?? today() }
-        pendingDelete.value = false
-    }
+    if (!open)
+        return
+
+    form.value = props.editEntry
+        ? { ...props.editEntry }
+        : { ...defaultForm(), date: props.prefillDate ?? today() }
 })
 
 const currentType = computed(() => getAbsenceType(form.value.typ ?? 'work'))
 const showTimeFields = computed(() => currentType.value.counter)
-const showPreview = computed(() => showTimeFields.value && form.value.start && form.value.end)
-const previewIst = computed(() => {
-    if (!showPreview.value) return '—'
-    return formatHours(calcActualHours(form.value))
-})
+const previewActual = computed(() => calcActualHours(form.value))
 
+// timeEntries helper
+function addBlock() {
+    form.value.timeEntries.push({ start: '', end: '', pause: 0 })
+}
+
+function removeBlock(index) {
+    if (form.value.timeEntries.length <= 1)
+        return
+    form.value.timeEntries.splice(index, 1)
+}
+
+// Delete with confirmation + Toast
+const pendingDelete = ref(false)
+
+function askDelete() { pendingDelete.value = true }
+function cancelDelete() { pendingDelete.value = false }
+
+function deleteAndClose() {
+    if (!props.editEntry)
+        return
+    store.deleteEntry(props.editEntry.id)
+    showToast('Deleted entry.', 'ok')
+    close()
+}
+
+// Reset on closing
+function close() {
+    pendingDelete.value = false
+    emit('update:modelValue', false)
+}
+
+// Save new or updated entry
 function save() {
     if (!form.value.date) {
         showToast('Please select a date.', 'error')
@@ -61,29 +86,6 @@ function save() {
         showToast('Entry added.', 'ok')
     }
     close()
-}
-
-const pendingDelete = ref(false)
-
-function askDelete() {
-    pendingDelete.value = true
-}
-
-function cancelDelete() {
-    pendingDelete.value = false
-}
-
-function deleteAndClose() {
-    if (!props.editEntry) return
-    store.deleteEntry(props.editEntry.id)
-    showToast('Deleted entry.', 'ok')
-    close()
-}
-
-// Reset on closing
-function close() {
-    pendingDelete.value = false
-    emit('update:modelValue', false)
 }
 </script>
 
@@ -103,6 +105,7 @@ function close() {
                 </div>
 
                 <div class="modal-body">
+                    <!-- Type selector -->
                     <div class="typ-selector">
                         <button v-for="(t, key) in ABSENCE_TYPES" :key="key" class="typ-btn"
                             :class="{ active: form.typ === key }" :style="form.typ === key
@@ -112,80 +115,122 @@ function close() {
                             <span>{{ t.label }}</span>
                         </button>
                     </div>
-                    <div class="form-grid">
+
+                    <div class="form-grid" style="margin-top:var(--space-4)">
+                        <!-- Date + Actual -->
                         <div class="form-group">
                             <label class="form-label">Date *</label>
                             <input class="form-input" type="date" v-model="form.date" />
                         </div>
                         <div class="form-group">
                             <label class="form-label">Planned Hours (h/Day)</label>
-                            <input class="form-input" type="number" step="0.5" min="0" max="24" v-model.number="form.plannedHours" />
-                            <span class="preview-hint">incl. {{ form.defaultBreak + form.additionalBreaks }}min Break</span>
+                            <input class="form-input" type="number" step="0.5" min="0" max="24"
+                                v-model.number="form.plannedHours" />
                         </div>
-                        <div v-if="showTimeFields" class="form-group">
-                            <label class="form-label">Start Time</label>
-                            <input class="form-input" type="time" v-model="form.start" />
+
+                        <!-- TimeEntry - only on Work/ Homeoffice -->
+                        <template v-if="showTimeFields">
+                            <div class="form-group full">
+                                <label class="form-label">Time Entries</label>
+
+                                <div class="time-blocks">
+                                    <div v-for="(block, idx) in form.timeEntries" :key="idx" class="time-block">
+                                        <span class="block-label">Block {{ idx + 1 }}</span>
+
+                                        <div class="block-fields">
+                                            <div class="form-group">
+                                                <label class="form-label">Start</label>
+                                                <input class="form-input" type="time" v-model="block.start" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">End</label>
+                                                <input class="form-input" type="time" v-model="block.end" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Pause (min)</label>
+                                                <input class="form-input" type="number" min="0" max="240"
+                                                    v-model.number="block.pause" />
+                                            </div>
+                                        </div>
+
+                                        <button v-if="form.timeEntries.length > 1"
+                                            class="btn btn-ghost btn-sm block-remove" @click="removeBlock(idx)"
+                                            title="Remove Entry">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18" />
+                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-secondary btn-sm add-block-btn" @click="addBlock">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                    </svg>
+                                    Zeitblock hinzufügen
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Out-of-Office Message -->
+                        <div v-else class="form-group full">
+                            <div class="absence-hint">
+                                <span>{{ currentType.icon }}</span>
+                                <span>{{ currentType.label }} — Actual is automatically interpreted as Planned ({{
+                                    form.plannedDay }}h)</span>
+                            </div>
                         </div>
-                        <div v-if="showTimeFields" class="form-group">
-                            <label class="form-label">End Time</label>
-                            <input class="form-input" type="time" v-model="form.end" />
-                        </div>
-                        <div v-if="showTimeFields" class="form-group">
-                            <label class="form-label">Default Break (min)</label>
-                            <input class="form-input" type="number" min="0" max="120"
-                                v-model.number="form.defaultBreak" />
-                        </div>
-                        <div v-if="showTimeFields" class="form-group">
-                            <label class="form-label">Additional Breaks (min)</label>
-                            <input class="form-input" type="number" min="0" max="240"
-                                v-model.number="form.additionalBreaks" />
-                        </div>
+
+                        <!-- Notes -->
                         <div class="form-group full">
                             <label class="form-label">Notes</label>
                             <input class="form-input" type="text" maxlength="200" v-model="form.notes"
-                                placeholder="e.g. Homeoffice, Vacation, Illness…" />
+                                :placeholder="`e.g., ${currentType.label}${form.typ === 'vacation' ? ', approved' : ''}`" />
+                        </div>
+
+                        <!-- Preview Total-Actual -->
+                        <div v-if="showTimeFields && previewIst > 0" class="preview-bar">
+                            <span class="form-label">Preview Actual total:</span>
+                            <strong>{{ formatHours(previewActual) }}</strong>
+                            <span class="preview-hint">
+                                over {{form.timeEntries.filter(b => b.start && b.end).length}} entries
+                            </span>
                         </div>
                     </div>
 
-                    <div v-if="showPreview" class="preview-bar">
-                        <span class="form-label">Preview Actual:</span>
-                        <strong>{{ previewIst }}</strong>
-                        <span class="preview-hint">incl. {{ form.defaultBreak + form.additionalBreaks }}min Break</span>
-                    </div>
-                </div>
+                    <div class="modal-footer">
+                        <template v-if="editEntry">
+                            <!-- Confirmation status -->
+                            <template v-if="pendingDelete">
+                                <span class="delete-confirm-label">Are you sure you want to delete this?</span>
+                                <button class="btn btn-danger btn-sm" @click="deleteAndClose">Yes, delete</button>
+                                <button class="btn btn-secondary btn-sm" @click="cancelDelete">Cancel</button>
+                            </template>
 
-                <div class="modal-footer">
-                    <template v-if="editEntry">
-                        <!-- Confirmation status -->
-                        <template v-if="pendingDelete">
-                            <span class="delete-confirm-label">Are you sure you want to delete this?</span>
-                            <button class="btn btn-danger btn-sm" @click="deleteAndClose">
-                                Yes, delete
-                            </button>
-                            <button class="btn btn-secondary btn-sm" @click="cancelDelete">
-                                Cancel
+                            <!-- Normal condition -->
+                            <button v-else class="btn btn-ghost btn-sm delete-btn" @click="askDelete"
+                                style="margin-right:auto">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6l-1 14H6L5 6" />
+                                    <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+                                </svg>
+                                Delete
                             </button>
                         </template>
 
-                        <!-- Normal condition -->
-                        <button v-else class="btn btn-ghost btn-sm delete-btn" @click="askDelete"
-                            style="margin-right:auto">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <polyline points="3 6 5 6 21 6" />
-                                <path d="M19 6l-1 14H6L5 6" />
-                                <path d="M10 11v6M14 11v6M9 6V4h6v2" />
-                            </svg>
-                            Delete
-                        </button>
-                    </template>
-
-                    <template v-if="!pendingDelete">
-                        <button class="btn btn-secondary" @click="close">Cancel</button>
-                        <button class="btn btn-primary" @click="save">
-                            {{ editEntry ? 'Update' : 'Add' }}
-                        </button>
-                    </template>
+                        <template v-if="!pendingDelete">
+                            <button class="btn btn-secondary" @click="close">Cancel</button>
+                            <button class="btn btn-primary" @click="save">
+                                {{ editEntry ? 'Update' : 'Add' }}
+                            </button>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
@@ -249,7 +294,59 @@ function close() {
     border-radius: var(--radius-md);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
-    grid-column: 1 / -1;
+}
+
+/* Time Blocks */
+.time-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.time-block {
+    position: relative;
+    padding: var(--space-4);
+    background: var(--color-surface-offset);
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+}
+
+.block-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+}
+
+.block-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-3);
+}
+
+.block-remove {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    color: var(--color-text-faint);
+}
+
+.block-remove:hover {
+    color: var(--color-error);
+}
+
+/* Add Button */
+.add-block-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    border-style: dashed;
 }
 
 /* Delete Button */
