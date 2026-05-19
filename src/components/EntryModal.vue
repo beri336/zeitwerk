@@ -9,7 +9,8 @@ import { ABSENCE_TYPES, getAbsenceType } from '@/composables/useAbsence'
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
-    editEntry: { type: Object, default: null }
+    editEntry: { type: Object, default: null },
+    prefillDate: { type: String, default: null }
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -30,12 +31,20 @@ const defaultForm = () => ({
 const form = ref(defaultForm())
 
 watch(() => props.modelValue, open => {
-    if (open)
-        form.value = props.editEntry ? { ...props.editEntry } : defaultForm()
+    if (open) {
+        form.value = props.editEntry
+            ? { typ: `work`, ...props.editEntry }
+            : { ...defaultForm(), date: props.prefillDate ?? today() }
+    }
 })
 
 const currentType = computed(() => getAbsenceType(form.value.typ ?? 'work'))
 const showTimeFields = computed(() => currentType.value.counter)
+const showPreview = computed(() => showTimeFields.value && form.value.start && form.value.end)
+const previewIst = computed(() => {
+    if (!showPreview.value) return '—'
+    return formatHours(calcActualHours(form.value))
+})
 
 function close() { emit('update:modelValue', false) }
 
@@ -91,20 +100,20 @@ function save() {
                             <input class="form-input" type="number" step="0.5" min="0" max="24" v-model.number="form.plannedHours" />
                             <span class="preview-hint">incl. {{ form.defaultBreak + form.additionalBreaks }}min Break</span>
                         </div>
-                        <div class="form-group">
+                        <div v-if="showTimeFields" class="form-group">
                             <label class="form-label">Start Time</label>
                             <input class="form-input" type="time" v-model="form.start" />
                         </div>
-                        <div class="form-group">
+                        <div v-if="showTimeFields" class="form-group">
                             <label class="form-label">End Time</label>
                             <input class="form-input" type="time" v-model="form.end" />
                         </div>
-                        <div class="form-group">
+                        <div v-if="showTimeFields" class="form-group">
                             <label class="form-label">Default Break (min)</label>
                             <input class="form-input" type="number" min="0" max="120"
                                 v-model.number="form.defaultBreak" />
                         </div>
-                        <div class="form-group">
+                        <div v-if="showTimeFields" class="form-group">
                             <label class="form-label">Additional Breaks (min)</label>
                             <input class="form-input" type="number" min="0" max="240"
                                 v-model.number="form.additionalBreaks" />

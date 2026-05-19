@@ -14,6 +14,7 @@ const { showToast } = useToast()
 
 const titles = {
     '/tracking': 'Month Overview',
+    '/calender': 'Calender',
     '/diagrams': 'Diagrams & Stats',
     '/settings': 'Settings'
 }
