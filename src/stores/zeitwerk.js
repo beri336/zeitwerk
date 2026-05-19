@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { calcActualHours, getKW, MONTH_NAMES } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
+import { getHolidaysForMonth } from '@/composables/useHolidays'
 
 const STORAGE_KEY = 'zeitwerk_data'
 
@@ -26,7 +27,8 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         hoursPerDay: 8,
         hoursPerWeek: 40,
         defaultBreak: 30,
-        workDays: 5
+        workDays: 5,
+        state: 'BW'
     })
 
     const currYear = ref(new Date().getFullYear())
@@ -216,6 +218,36 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         return calcActualHours(entry)
     }
 
+    // Enter holidays as entries for a month (manually via a modal window)
+    function importHolidays(year, month) {
+        const holidays = getHolidaysForMonth(year, month, settings.value.state)
+        let added = 0
+        let skipped = 0
+
+        holidays.forEach(h => {
+            const exists = entries.value.find(e => e.date === h.date)
+            if (exists) {
+                skipped++; return
+            }
+
+            entries.value.push({
+                id: Date.now() + added, // unique within the loop
+                date: h.date,
+                typ: 'publicholiday',
+                start: '',
+                end: '',
+                defaultBreak: 0,
+                additionalBreaks: 0,
+                plannedHours: settings.value.hoursPerDay,
+                notes: h.name
+            })
+            added++
+        })
+
+        persist()
+        return { added, skipped, total: holidays.length }
+    }
+
     return {
         entries, settings, currYear, currMonth,
         currMonthLabel, entriesForMonth, weekGroups,
@@ -225,6 +257,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         saveSettings,
         prevMonth, nextMonth,
         exportJSON, importJSON, exportCSV,
-        effectiveActualHours
+        effectiveActualHours, importHolidays
     }
 })

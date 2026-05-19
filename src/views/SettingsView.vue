@@ -4,6 +4,7 @@
 import { reactive } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
+import { STATES } from '@/composables/useHolidays'
 
 const store = useZeitwerkStore()
 
@@ -55,6 +56,15 @@ function reset() {
                         <input class="form-input" type="number" step="1" min="1" max="7"
                             v-model.number="form.workDays" />
                         <span class="form-hint">e.g., 5 for Mon–Fri</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">States</label>
+                        <select class="form-input" v-model="form.states">
+                            <option v-for="(name, code) in STATES" :key="code" :value="code">
+                                {{ name }}
+                            </option>
+                        </select>
+                        <span class="form-hint">For automatic holiday detection</span>
                     </div>
                 </div>
                 <div class="settings-actions">

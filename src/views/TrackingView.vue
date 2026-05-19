@@ -8,11 +8,13 @@ import KpiCard from '@/components/KpiCard.vue'
 import MonthTable from '@/components/MonthTable.vue'
 import EntryModal from '@/components/EntryModal.vue'
 import AbsenceLegend from '@/components/AbsenceLegend.vue'
+import HolidayImportModal from '@/components/HolidayImportModal.vue'
 
 const store = useZeitwerkStore()
 
 const showModal = ref(false)
 const editEntry = ref(null)
+const showHolidayModal = ref(false)
 
 function openAdd() {
     editEntry.value = null
@@ -83,6 +85,9 @@ const monthActualVariant = computed(() => {
 
         <!-- Modal -->
         <EntryModal v-model="showModal" :edit-entry="editEntry" />
+
+        <!-- Holiday Import -->
+        <HolidayImportModal v-model="showHolidayModal" />
     </main>
 </template>
 
