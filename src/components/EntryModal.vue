@@ -5,6 +5,7 @@ import { ref, watch, computed } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { calcActualHours, formatHours, today } from '@/composables/useTime'
+import { ABSENCE_TYPES, getAbsenceType } from '@/composables/useAbsence'
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
@@ -17,6 +18,7 @@ const { showToast } = useToast()
 
 const defaultForm = () => ({
     date: today(),
+    typ: 'work',
     start: '',
     end: '',
     defaultBreak: store.settings.defaultBreak,
@@ -32,14 +34,17 @@ watch(() => props.modelValue, open => {
         form.value = props.editEntry ? { ...props.editEntry } : defaultForm()
 })
 
-const previewIst = computed(() => formatHours(calcActualHours(form.value)))
-
-const showPreview = computed(() => form.value.start && form.value.end)
+const currentType = computed(() => getAbsenceType(form.value.typ ?? 'work'))
+const showTimeFields = computed(() => currentType.value.counter)
 
 function close() { emit('update:modelValue', false) }
 
 function save() {
-    if (!form.value.date) { showToast('Date is required.', 'err'); return }
+    if (!form.value.date) {
+        showToast('Please select a date.', 'error')
+        return
+    }
+
     if (props.editEntry) {
         store.updateEntry(props.editEntry.id, form.value)
         showToast('Entry updated.', 'ok')
@@ -67,6 +72,15 @@ function save() {
                 </div>
 
                 <div class="modal-body">
+                    <div class="typ-selector">
+                        <button v-for="(t, key) in ABSENCE_TYPES" :key="key" class="typ-btn"
+                            :class="{ active: form.typ === key }" :style="form.typ === key
+                                ? `background:${t.highlight};color:${t.color};border-color:${t.color}`
+                                : ''" @click="form.typ = key">
+                            <span>{{ t.icon }}</span>
+                            <span>{{ t.label }}</span>
+                        </button>
+                    </div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Date *</label>
@@ -111,8 +125,7 @@ function save() {
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @click="close">Cancel</button>
-                    <button class="btn btn-primary" @click="save">{{ editEntry ? 'Update' : 'Add'
-                    }}</button>
+                    <button class="btn btn-primary" @click="save">{{ editEntry ? 'Update' : 'Add' }}</button>
                 </div>
             </div>
         </div>
@@ -133,5 +146,49 @@ function save() {
 .preview-hint {
     font-size: var(--text-xs);
     color: var(--color-text-faint);
+}
+
+/* Type-Selector */
+.typ-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.typ-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    background: var(--color-surface-offset);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.typ-btn:hover {
+    background: var(--color-surface-dynamic);
+    color: var(--color-text);
+}
+
+.typ-btn.active {
+    font-weight: 600;
+}
+
+/* Out-of-Office Message */
+.absence-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-offset);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    grid-column: 1 / -1;
 }
 </style>

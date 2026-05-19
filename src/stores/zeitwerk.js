@@ -2,7 +2,8 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { calcActualHours, getKW, MONTH_NAMES, today } from '@/composables/useTime'
+import { calcActualHours, getKW, MONTH_NAMES } from '@/composables/useTime'
+import { getAbsenceType } from '@/composables/useAbsence'
 
 const STORAGE_KEY = 'zeitwerk_data'
 
@@ -66,14 +67,14 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             }
 
             group.entries.push(entry)
-            group.actual += calcActualHours(entry)
+            group.actual += effectiveActualHours(entry)
             group.planned += entry.plannedDay || settings.value.hoursPerDay
         })
         groups.forEach(g => g.actualDiff = g.actual - g.planned)
         return groups
     })
 
-    const monthActual = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + calcActualHours(entry), 0))
+    const monthActual = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + effectiveActualHours(entry), 0))
     const monthPlanned = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + (entry.plannedDay || settings.value.hoursPerDay), 0))
     const monthDiff = computed(() => monthActual.value - monthPlanned.value)
 
@@ -149,6 +150,20 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         url.click()
     }
 
+    function importJSON(data) {
+        if (!data.entries)
+            throw new Error('Ungültiges Format')
+
+        entries.value = data.entries
+
+        if (data.settings)
+            settings.value = data.settings
+
+        persist()
+        return data.entries.length
+    }
+
+    // Export as CSV for Excel, with semicolon as separator and UTF-8 BOM
     function exportCSV() {
         const pad = num => String(num).padStart(2, '0')
         const headers = [
@@ -160,11 +175,11 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
         const rows = entries.value
-            .sort((entryA, entryB) => entryA.datum.localeCompare(entryB.datum))
+            .sort((entryA, entryB) => entryA.date.localeCompare(entryB.date))
             .map(entry => {
-                const actual = calcActualHours(entry)
+                const actual = effectiveActualHours(entry)
                 const planned = entry.plannedDay || settings.value.hoursPerDay
-                const date = new Date(entry.datum + 'T00:00:00')
+                const date = new Date(entry.date + 'T00:00:00')
 
                 return [
                     `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`,
@@ -191,17 +206,14 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         url.click()
     }
 
-    function importJSON(data) {
-        if (!data.entries)
-            throw new Error('Ungültiges Format')
+    // Helpers
+    // Returns actual hours worked — if absent = target
+    function effectiveActualHours(entry) {
+        const type = getAbsenceType(entry.typ ?? 'work')
+        if (!type.counter)
+            return entry.plannedDay ?? settings.value.hoursPerDay
         
-        entries.value = data.entries
-        
-        if (data.settings)
-            settings.value = data.settings
-        
-        persist()
-        return data.entries.length
+        return calcActualHours(entry)
     }
 
     return {
@@ -212,6 +224,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         addEntry, updateEntry, deleteEntry, patchEntryField,
         saveSettings,
         prevMonth, nextMonth,
-        exportJSON, importJSON
+        exportJSON, importJSON, exportCSV,
+        effectiveActualHours
     }
 })

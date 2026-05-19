@@ -7,6 +7,7 @@ import { formatHours, getKW, today } from '@/composables/useTime'
 import KpiCard from '@/components/KpiCard.vue'
 import MonthTable from '@/components/MonthTable.vue'
 import EntryModal from '@/components/EntryModal.vue'
+import AbsenceLegend from '@/components/AbsenceLegend.vue'
 
 const store = useZeitwerkStore()
 
@@ -67,6 +68,7 @@ const monthActualVariant = computed(() => {
 
         <!-- Add Button -->
         <div class="add-bar">
+            <AbsenceLegend />
             <button class="btn btn-primary" @click="openAdd">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -103,6 +105,8 @@ const monthActualVariant = computed(() => {
 
 .add-bar {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
 }
 </style>

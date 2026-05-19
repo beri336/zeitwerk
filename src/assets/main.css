@@ -28,6 +28,8 @@
     --color-warning-highlight: #ddcfc6;
     --color-blue: #006494;
     --color-blue-highlight: #c6d8e4;
+    --color-gold: #d19900;
+    --color-gold-highlight: #f5ecc8;
 
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
@@ -81,6 +83,9 @@
     --color-warning-highlight: #564942;
     --color-blue: #5591c7;
     --color-blue-highlight: #3a4550;
+    --color-gold: #e8af34;
+    --color-gold-highlight: #4d4332;
+
     --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
     --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
     --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);

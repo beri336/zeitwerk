@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { calcActualHours, formatHours, formatDate } from '@/composables/useTime'
+import { getAbsenceType } from '@/composables/useAbsence'
 
 const emit = defineEmits(['edit'])
 
@@ -26,6 +27,15 @@ function saveEdit(entry) {
 }
 
 function cancelEdit() { editCell.value = null }
+
+function rowStyle(entry) {
+    const type = getAbsenceType(entry.typ ?? 'work')
+    if (entry.typ && entry.typ !== 'work') {
+        return `border-left: 3px solid ${type.color}`
+    }
+    
+    return ''
+}
 
 function actualVariant(entry) {
     const Actual = calcActualHours(entry)
@@ -90,9 +100,19 @@ function handleDelete(id) {
                 <tbody>
                     <template v-for="(group, gi) in store.weekGroups" :key="group.kw">
                         <!-- Entry rows -->
-                        <tr v-for="(entry, ei) in group.entries" :key="entry.id"
-                            :class="{ 'week-separator': ei === 0 && gi > 0 }">
-                            <td>{{ formatDate(entry.date) }}</td>
+                        <tr v-for="(entry, ei) in group.entries"
+                            :key="entry.id"
+                            :class="{ 'week-separator': ei === 0 && gi > 0 }"
+                            :style="rowStyle(entry)">
+                            <td>
+                                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                                    <span v-if="entry.typ && entry.typ !== 'work'" class="typ-chip"
+                                        :style="`background:${getAbsenceType(entry.typ).highlight};color:${getAbsenceType(entry.typ).color}`">
+                                        {{ getAbsenceType(entry.typ).icon }} {{ getAbsenceType(entry.typ).label }}
+                                    </span>
+                                    <span>{{ formatDate(entry.date) }}</span>
+                                </div>
+                            </td>
 
                             <!-- Inline editable cells -->
                             <td class="editable" @click="startEdit(entry, 'start')">
@@ -367,5 +387,18 @@ tr:hover .row-actions {
 .empty-state p {
     max-width: 36ch;
     font-size: var(--text-sm);
+}
+
+/* Absence type chip */
+.typ-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 </style>
