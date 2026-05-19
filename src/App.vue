@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import AppTopbar from '@/components/AppTopbar.vue'
 import ToastList from '@/components/ToastList.vue'
+import PwaUpdatePrompt from '@/components/PwaUpdatePrompt.vue'
 
 const isDark = ref(false)
 
@@ -30,4 +31,5 @@ function applyTheme() {
   <AppTopbar :is-dark="isDark" @toggle-theme="toggleTheme" />
   <RouterView />
   <ToastList />
+  <PwaUpdatePrompt />
 </template>

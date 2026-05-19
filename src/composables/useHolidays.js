@@ -1,7 +1,7 @@
 // src/composables/useHolidays.js
 
-// Alle gesetzlichen Feiertage für Deutschland — alle 16 Bundesländer
-// Berechnung basiert auf dem Ostersonntag (Gaußsche Formel)
+// All public holidays in Germany — all 16 federal states
+// Calculation based on Easter Sunday (Gauss's formula)
 
 export const STATES = {
     BW: 'Baden-Württemberg',
@@ -57,7 +57,7 @@ function format(date) {
 
 // Returns all holidays for a given year and state
 // { date: ‘YYYY-MM-DD’, name: string, nationwide: boolean }
-export function getHolidays(year, bundesland) {
+export function getHolidays(year, state) {
     const os = easterSunday(year) // Easter Sunday
 
     // Movable holidays relative to Easter
@@ -103,7 +103,7 @@ export function getHolidays(year, bundesland) {
     // State-specific additions
     const extra = []
 
-    const has = (...codes) => codes.includes(bundesland)
+    const has = (...codes) => codes.includes(state)
 
     // Heilige Drei Könige: BW, BY, ST
     if (has('BW', 'BY', 'ST'))
@@ -154,8 +154,8 @@ function getBussUndBettag(year) {
 }
 
 // Filters holidays for a specific month
-export function getHolidaysForMonth(year, month, bundesland) {
-    return getHolidays(year, bundesland).filter(h => {
+export function getHolidaysForMonth(year, month, state) {
+    return getHolidays(year, state).filter(h => {
         const d = new Date(h.date)
         
         return d.getFullYear() === year && d.getMonth() === month
