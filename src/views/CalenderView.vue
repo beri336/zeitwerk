@@ -269,5 +269,9 @@ const workdays = computed(() =>
         padding: var(--space-3);
         gap: var(--space-4);
     }
+
+    .cal-day__gross {
+        font-size: 11px;
+    }
 }
 </style>

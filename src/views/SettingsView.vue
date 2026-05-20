@@ -81,6 +81,20 @@ function reset() {
                         </select>
                         <span class="form-hint">For automatic holiday detection</span>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Gross monthly salary (Brutto)</label>
+                        <input class="form-input" type="number" step="1" min="1" max="10000"
+                            v-model.number="form.grossMonthlySalary" />
+                        <span class="form-hint">e.g., 3000 for 3000€/Month</span>
+                        <span class="form-hint">Used to calculate gross hourly and daily earnings</span>
+                    </div>
+                    <div class="form-group full" v-if="store.grossHourlyRate > 0">
+                        <label class="form-label">Preview</label>
+                        <div class="salary-preview">
+                            <span>{{ store.grossHourlyRate.toFixed(2) }} €/h gross</span>
+                            <span>{{ store.grossDailyRate.toFixed(2) }} €/day gross</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="settings-actions">
                     <button class="btn btn-primary" @click="save">Save</button>
@@ -99,6 +113,20 @@ function reset() {
     flex-direction: column;
     gap: var(--space-5);
     /* kein grid-column, kein overflow-y — App.vue steuert das */
+}
+
+.salary-preview {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 .settings-card {

@@ -142,7 +142,20 @@ function cancelDelete() {
                             </td>
 
                             <!-- Actual Hours -->
-                            <td class="num"><span :class="actualVariant(entry)">{{ formatHours(store.effectiveActualHours(entry)) }}</span></td>
+                            <td class="num">
+                                <div class="day-metric">
+                                    <span :class="actualVariant(entry)">
+                                        {{ formatHours(store.effectiveActualHours(entry)) }}
+                                    </span>
+                                    <span v-if="store.grossHourlyRate > 0" class="day-gross">
+                                        {{ new Intl.NumberFormat('de-DE', {
+                                            style: 'currency',
+                                            currency: 'EUR',
+                                            maximumFractionDigits: 2
+                                        }).format(store.grossEarnedForEntry(entry)) }}
+                                    </span>
+                                </div>
+                            </td>
                             <td class="num">{{ formatHours(entry.plannedHours || store.settings.hoursPerDay) }}</td>
 
                             <!-- Notes -->
@@ -338,6 +351,20 @@ function cancelDelete() {
 .actions-cell {
     min-width: 72px;
     text-align: center;
+}
+
+.day-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.day-gross {
+    font-size: 11px;
+    color: var(--color-success);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 .row-actions button {

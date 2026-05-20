@@ -14,7 +14,8 @@ const DEFAULT_SETTINGS = {
     hoursPerWeek: 40,
     defaultBreak: 30,
     workDays: 5,
-    state: 'BW'
+    state: 'BW',
+    grossMonthlySalary: 0
 }
 
 function loadStorage() {
@@ -375,6 +376,32 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         return { added, skipped, total: holidays.length }
     }
 
+    // Calculate gross salary based on gross monthly salary and hours worked
+    const grossHourlyRate = computed(() => {
+        const monthly = Number(settings.value.grossMonthlySalary || 0)
+        const weeklyHours = Number(settings.value.hoursPerWeek || 0)
+
+        if (!monthly || !weeklyHours)
+            return 0
+
+        return (monthly * 12) / (weeklyHours * 52)
+    })
+
+    const grossDailyRate = computed(() => {
+        const dayHours = Number(settings.value.hoursPerDay || 0)
+        if (!dayHours)
+            return 0
+
+        return grossHourlyRate.value * dayHours
+    })
+
+    function grossEarnedForEntry(entry) {
+        if (!entry)
+            return 0
+
+        return grossHourlyRate.value * effectiveActualHours(entry)
+    }
+
     return {
         entries, settings, currYear, currMonth,
         currMonthLabel, entriesForMonth, weekGroups,
@@ -384,6 +411,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         saveSettings,
         prevMonth, nextMonth,
         exportJSON, importJSON, exportCSV,
-        effectiveActualHours, importHolidays, syncHolidays
+        effectiveActualHours, importHolidays, syncHolidays,
+        grossHourlyRate, grossDailyRate, grossEarnedForEntry,
     }
 })

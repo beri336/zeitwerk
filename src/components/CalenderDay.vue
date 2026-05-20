@@ -46,6 +46,19 @@ const progressColor = computed(() => {
 })
 
 const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
+
+// Calculate salary
+const grossEarned = computed(() =>
+    entry.value ? store.grossEarnedForEntry(entry.value) : 0
+)
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: 2
+    }).format(value)
+}
 </script>
 
 <template>
@@ -67,6 +80,10 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 
         <div v-if="entry" class="cal-day__body">
             <div class="cal-day__ist">{{ formatHours(actual) }}</div>
+
+            <div v-if="entry && store.grossHourlyRate > 0" class="cal-day__gross">
+                {{ formatCurrency(grossEarned) }}
+            </div>
 
             <div v-if="entry?.timeEntries?.length" class="cal-day__time">
                 {{ entry.timeEntries[0].start }}–{{ entry.timeEntries[entry.timeEntries.length - 1].end }}
@@ -126,6 +143,14 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
         inset 0 0 0 2px var(--color-gold),
         0 0 0 4px color-mix(in oklch, var(--color-gold) 22%, transparent);
     animation: todayPulse 1.4s ease;
+}
+
+.cal-day__gross {
+    font-size: 12px;
+    color: var(--color-success);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
 }
 
 @keyframes todayPulse {
@@ -261,6 +286,10 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
     .cal-day__num {
         width: 24px;
         height: 24px;
+    }
+
+    .cal-day__gross {
+        font-size: 11px;
     }
 }
 </style>
