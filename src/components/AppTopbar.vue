@@ -15,7 +15,8 @@ const titles = {
     '/tracking': 'Month Overview',
     '/calender': 'Calender',
     '/diagrams': 'Diagrams & Stats',
-    '/settings': 'Settings'
+    '/settings': 'Settings',
+    '/year': 'Year Overview'
 }
 
 function handleExport() {
