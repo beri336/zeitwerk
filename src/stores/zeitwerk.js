@@ -449,9 +449,17 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // Export as CSV for Excel, with semicolon as separator and UTF-8 BOM
-    function exportCSV() {
-        console.log('exportCSV called')
+    function exportCSV({ fromYear, fromMonth, toYear = fromYear, toMonth = fromMonth } = {}) {
         const pad = num => String(num).padStart(2, '0')
+        const quote = value => `"${String(value ?? '').replace(/"/g, '""')}"`
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+        const start = new Date(fromYear, fromMonth, 1)
+        const end = new Date(toYear, toMonth + 1, 0)
+
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+            throw new Error('Invalid export range')
+        }
 
         const headers = [
             'Date',
@@ -459,50 +467,79 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             'KW',
             'Type',
             'Time Blocks',
+            'First Start',
+            'Last End',
+            'Break (min)',
             'Actual (h)',
             'Planned (h)',
             'Difference (h)',
+            'Gross Hourly Rate',
+            'Gross Earned',
             'Notes'
         ]
 
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        const rows = []
+        const cursor = new Date(start)
 
-        const rows = [...entries.value]
-            .sort((a, b) => a.date.localeCompare(b.date))
-            .map(entry => {
-                const actual = effectiveActualHours(entry)
-                const planned = entry.plannedHours ?? settings.value.hoursPerDay
-                const dt = new Date(entry.date + 'T00:00:00')
+        while (cursor <= end) {
+            const yyyy = cursor.getFullYear()
+            const mm = pad(cursor.getMonth() + 1)
+            const dd = pad(cursor.getDate())
+            const isoDate = `${yyyy}-${mm}-${dd}`
 
-                const blocks = (entry.timeEntries ?? [])
-                    .filter(block => block.start && block.end)
-                    .map(block => `${block.start}–${block.end} (${block.pause ?? 0}min)`)
-                    .join(', ') || '—'
+            const entry = entries.value.find(item => item.date === isoDate) ?? null
+            const dt = new Date(`${isoDate}T00:00:00`)
 
-                return [
-                    `${pad(dt.getDate())}.${pad(dt.getMonth() + 1)}.${dt.getFullYear()}`,
-                    days[dt.getDay()],
-                    getKW(entry.date),
-                    entry.typ || 'on-site',
-                    blocks,
-                    actual.toFixed(2),
-                    planned.toFixed(2),
-                    (actual - planned).toFixed(2),
-                    entry.notes || ''
-                ]
-                    .map(value => `"${String(value).replace(/"/g, '""')}"`)
-                    .join(';')
-            })
+            const actualValue = entry ? effectiveActualHours(entry) : null
+            const plannedValue = entry ? (entry.plannedHours ?? settings.value.hoursPerDay) : null
+            const diffValue = entry ? (actualValue - plannedValue) : null
+            const breakMinutes = entry ? getBreakMinutes(entry) : null
+            const grossEarned = entry ? grossEarnedForEntry(entry) : null
 
-        const csv = [headers.map(h => `"${h}"`).join(';'), ...rows].join('\n')
+            const validBlocks = entry ? getValidTimeBlocks(entry) : []
+            const firstStart = validBlocks.length ? validBlocks[0].start : ''
+            const lastEnd = validBlocks.length ? validBlocks[validBlocks.length - 1].end : ''
+
+            const timeBlocks = entry
+                ? (entry.timeEntries ?? [])
+                    .filter(block => block.start || block.end)
+                    .map(block => `${block.start || ''}–${block.end || ''} (${block.pause ?? 0}min)`)
+                    .join(', ')
+                : ''
+
+            rows.push([
+                `${dd}.${mm}.${yyyy}`,
+                days[dt.getDay()],
+                getKW(isoDate),
+                entry?.typ || '',
+                timeBlocks,
+                firstStart,
+                lastEnd,
+                breakMinutes == null ? '' : String(breakMinutes),
+                actualValue == null ? '' : actualValue.toFixed(2),
+                plannedValue == null ? '' : plannedValue.toFixed(2),
+                diffValue == null ? '' : diffValue.toFixed(2),
+                grossHourlyRate.value ? grossHourlyRate.value.toFixed(2) : '',
+                grossEarned == null ? '' : grossEarned.toFixed(2),
+                entry?.notes || ''
+            ].map(quote).join(';'))
+
+            cursor.setDate(cursor.getDate() + 1)
+        }
+
+        const csv = [headers.map(quote).join(';'), ...rows].join('\n')
         const bom = '\uFEFF'
         const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
 
         const objectUrl = URL.createObjectURL(blob)
         const link = document.createElement('a')
-
         link.href = objectUrl
-        link.download = `zeitwerk_${currYear.value}_${pad(currMonth.value + 1)}.csv`
+
+        const rangeLabel = fromYear === toYear && fromMonth === toMonth
+            ? `${fromYear}_${pad(fromMonth + 1)}`
+            : `${fromYear}_${pad(fromMonth + 1)}-to-${toYear}_${pad(toMonth + 1)}`
+
+        link.download = `zeitwerk_${rangeLabel}.csv`
         link.style.display = 'none'
 
         document.body.appendChild(link)

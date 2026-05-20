@@ -1,8 +1,10 @@
 <!-- src/components/AppTopbar.vue -->
 <script setup>
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
+import ExportCsvModal from '@/components/ExportCsvModal.vue'
 
 const props = defineProps({ isDark: Boolean })
 const emit = defineEmits(['toggle-theme'])
@@ -10,13 +12,14 @@ const emit = defineEmits(['toggle-theme'])
 const route = useRoute()
 const store = useZeitwerkStore()
 const { showToast } = useToast()
+const showCsvModal = ref(false)
 
 const titles = {
     '/tracking': 'Month Overview',
+    '/year': 'Year Overview',
     '/calender': 'Calender',
     '/diagrams': 'Diagrams & Stats',
     '/settings': 'Settings',
-    '/year': 'Year Overview'
 }
 
 function handleExport() {
@@ -28,9 +31,23 @@ function handleExport() {
     }
 }
 
+/* CSV Export */
 function handleCSV() {
+    showCsvModal.value = true
+}
+
+function handleCsvConfirm({ from, to }) {
     try {
-        const ok = store.exportCSV()
+        const [fromYear, fromMonth] = from.split('-').map(Number)
+        const [toYear, toMonth] = to.split('-').map(Number)
+
+        const ok = store.exportCSV({
+            fromYear,
+            fromMonth: fromMonth - 1,
+            toYear,
+            toMonth: toMonth - 1
+        })
+
         showToast(ok ? 'CSV export successful.' : 'CSV export failed.', ok ? 'ok' : 'err')
     } catch (error) {
         console.error(error)
@@ -118,6 +135,8 @@ function onFileChange(event) {
 
         <input type="file" id="importFileInput" accept=".json" style="display:none" @change="onFileChange" />
     </header>
+    
+    <ExportCsvModal v-model="showCsvModal" @confirm="handleCsvConfirm" />
 </template>
 
 <style scoped>
