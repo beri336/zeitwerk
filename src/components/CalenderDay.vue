@@ -10,6 +10,7 @@ const props = defineProps({
     date: { type: String, required: true }, // 'YYYY-MM-DD'
     isToday: { type: Boolean, default: false },
     isOutside: { type: Boolean, default: false }, // other month
+    flashToday: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['click'])
@@ -32,7 +33,6 @@ const planned = computed(() =>
     entry.value ? (entry.value.plannedHours ?? store.settings.hoursPerDay) : store.settings.hoursPerDay
 )
 
-// Prozentualer Fortschritt für den Balken (max 100%)
 const progress = computed(() =>
     planned.value > 0 ? Math.min(100, (actual.value / planned.value) * 100) : 0
 )
@@ -49,14 +49,15 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 </script>
 
 <template>
-    <div class="cal-day" :class="{
+    <button class="cal-day" :class="{
         'cal-day--today': isToday,
         'cal-day--outside': isOutside,
         'cal-day--entry': !!entry,
-        'cal-day--absence': entry && entry.typ && entry.typ !== 'work'
+        'cal-day--absence': entry && entry.typ && entry.typ !== 'work',
+        'cal-day--flash': flashToday
     }" :style="entry && entry.typ && entry.typ !== 'work'
-        ? `--day-accent:${type.color};--day-bg:${type.highlight}`
-        : ''" @click="emit('click', date)">
+            ? `--day-accent:${type.color};--day-bg:${type.highlight}`
+            : ''" :data-cal-date="date" type="button" @click="emit('click', date)">
         <div class="cal-day__header">
             <span class="cal-day__num">{{ dayNum }}</span>
             <span v-if="entry?.typ && entry.typ !== 'work'" class="cal-day__icon">
@@ -76,11 +77,10 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
             </div>
         </div>
 
-        <!-- Progress bar -->
         <div class="cal-day__bar-track">
             <div class="cal-day__bar-fill" :style="`width:${entry ? progress : 0}%;background:${progressColor}`" />
         </div>
-    </div>
+    </button>
 </template>
 
 <style scoped>
@@ -96,12 +96,13 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
     flex-direction: column;
     gap: var(--space-1);
     transition:
-        background var(--transition-interactive),
-        border-color var(--transition-interactive),
-        box-shadow var(--transition-interactive),
-        transform var(--transition-interactive);
+        background var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform var(--transition);
     overflow: hidden;
     min-width: 44px;
+    text-align: left;
 }
 
 .cal-day:hover {
@@ -117,8 +118,37 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 }
 
 .cal-day--today {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-primary-highlight);
+    box-shadow: inset 0 0 0 2px var(--color-gold);
+}
+
+.cal-day--flash {
+    box-shadow:
+        inset 0 0 0 2px var(--color-gold),
+        0 0 0 4px color-mix(in oklch, var(--color-gold) 22%, transparent);
+    animation: todayPulse 1.4s ease;
+}
+
+@keyframes todayPulse {
+    0% {
+        transform: scale(1);
+        box-shadow:
+            inset 0 0 0 2px var(--color-gold),
+            0 0 0 0 color-mix(in oklch, var(--color-gold) 30%, transparent);
+    }
+
+    35% {
+        transform: scale(1.015);
+        box-shadow:
+            inset 0 0 0 2px var(--color-gold),
+            0 0 0 6px color-mix(in oklch, var(--color-gold) 22%, transparent);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow:
+            inset 0 0 0 2px var(--color-gold),
+            0 0 0 0 color-mix(in oklch, var(--color-gold) 0%, transparent);
+    }
 }
 
 .cal-day--today .cal-day__num {
@@ -142,7 +172,6 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
     border-color: var(--day-accent, var(--color-border));
 }
 
-/* Header */
 .cal-day__header {
     display: flex;
     align-items: center;
@@ -169,7 +198,6 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
     line-height: 1;
 }
 
-/* Body */
 .cal-day__body {
     flex: 1;
     display: flex;
@@ -187,7 +215,6 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 
 .cal-day__time {
     font-size: 12px;
-    /* statt 10px */
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
     line-height: 1.2;
@@ -195,14 +222,12 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 
 .cal-day__note {
     font-size: 12px;
-    /* statt 10px */
     color: var(--color-text-faint);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Fortschrittsbalken */
 .cal-day__bar-track {
     position: absolute;
     bottom: 0;
@@ -218,7 +243,6 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
     transition: width 0.4s ease;
 }
 
-/* Mobile Devices Optimization */
 @media (max-width: 768px) {
     .cal-day {
         min-height: 72px;
