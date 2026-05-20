@@ -30,8 +30,8 @@ function saveEdit(entry) {
 function cancelEdit() { editCell.value = null }
 
 function rowStyle(entry) {
-    const type = getAbsenceType(entry.typ ?? 'work')
-    if (entry.typ && entry.typ !== 'work') {
+    const type = getAbsenceType(entry.typ ?? 'on-site')
+    if (entry.typ && entry.typ !== 'on-site') {
         return `border-left: 3px solid ${type.color}`
     }
     
@@ -117,7 +117,7 @@ function cancelDelete() {
                             :class="{ 'week-separator': ei === 0 && gi > 0 }">
                             <td>
                                 <div style="display:flex;align-items:center;gap:var(--space-2);">
-                                    <span v-if="entry.typ && entry.typ !== 'work'" class="typ-chip"
+                                    <span v-if="entry.typ && entry.typ !== 'on-site'" class="typ-chip"
                                         :style="`background:${getAbsenceType(entry.typ).highlight};color:${getAbsenceType(entry.typ).color}`">
                                         {{ getAbsenceType(entry.typ).icon }} {{ getAbsenceType(entry.typ).label }}
                                     </span>

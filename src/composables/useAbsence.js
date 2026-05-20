@@ -1,12 +1,19 @@
 // src/composables/useAbsence.js
 
 export const ABSENCE_TYPES = {
-    work: {
-        label: 'Work',
+    'on-site': {
+        label: 'On Site',
         color: 'var(--color-primary)',
         highlight: 'var(--color-primary-highlight)',
         counter: true,   // counts as actual time
         icon: '💼'
+    },
+    homeoffice: {
+        label: 'Homeoffice',
+        color: 'var(--color-success)',
+        highlight: 'var(--color-success-highlight)',
+        counter: true,
+        icon: '🏠'
     },
     vacation: {
         label: 'Vacation',
@@ -29,13 +36,6 @@ export const ABSENCE_TYPES = {
         counter: false,
         icon: '🎉'
     },
-    homeoffice: {
-        label: 'Homeoffice',
-        color: 'var(--color-success)',
-        highlight: 'var(--color-success-highlight)',
-        counter: true,
-        icon: '🏠'
-    },
     other: {
         label: 'Other',
         color: 'var(--color-text-muted)',
@@ -52,7 +52,7 @@ export function getAbsenceType(key) {
 // Helper: for absent entries without times, return planned hours when the absence type
 // does not count toward actuals; otherwise return null to indicate normal calculation.
 export function effectiveActualFallback(entry, defaultPlanned) {
-    const type = getAbsenceType(entry.typ ?? 'work')
+    const type = getAbsenceType(entry.typ ?? 'on-site')
     if (!type.counter)
         return entry.plannedHours ?? defaultPlanned
     return null

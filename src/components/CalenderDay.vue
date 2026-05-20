@@ -22,7 +22,7 @@ const entry = computed(() =>
 )
 
 const type = computed(() =>
-    entry.value ? getAbsenceType(entry.value.typ ?? 'work') : null
+    entry.value ? getAbsenceType(entry.value.typ ?? 'on-site') : null
 )
 
 const actual = computed(() =>
@@ -66,14 +66,14 @@ function formatCurrency(value) {
         'cal-day--today': isToday,
         'cal-day--outside': isOutside,
         'cal-day--entry': !!entry,
-        'cal-day--absence': entry && entry.typ && entry.typ !== 'work',
+        'cal-day--absence': entry && entry.typ && entry.typ !== 'on-site',
         'cal-day--flash': flashToday
-    }" :style="entry && entry.typ && entry.typ !== 'work'
+    }" :style="entry && entry.typ && entry.typ !== 'on-site'
             ? `--day-accent:${type.color};--day-bg:${type.highlight}`
             : ''" :data-cal-date="date" type="button" @click="emit('click', date)">
         <div class="cal-day__header">
             <span class="cal-day__num">{{ dayNum }}</span>
-            <span v-if="entry?.typ && entry.typ !== 'work'" class="cal-day__icon">
+            <span v-if="entry?.typ && entry.typ !== 'on-site'" class="cal-day__icon">
                 {{ type.icon }}
             </span>
         </div>

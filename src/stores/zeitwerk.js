@@ -213,7 +213,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         entries.value.push({
             id: Date.now(),
             date: '',
-            typ: 'work',
+            typ: 'on-site',
             timeEntries: [{ start: '', end: '', pause: 0 }],
             plannedHours: settings.value.hoursPerDay,
             notes: '',
@@ -264,7 +264,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const nowIso = new Date().toISOString()
         const start = nowTimeString()
 
-        entry.typ = 'work'
+        entry.typ = 'on-site'
         entry.timeEntries = entry.timeEntries ?? []
 
         entry.timeEntries.push({
@@ -474,7 +474,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
                     `${pad(dt.getDate())}.${pad(dt.getMonth() + 1)}.${dt.getFullYear()}`,
                     days[dt.getDay()],
                     getKW(entry.date),
-                    entry.typ || 'work',
+                    entry.typ || 'on-site',
                     blocks,
                     actual.toFixed(2),
                     planned.toFixed(2),
@@ -510,7 +510,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     // Helpers
     // Returns actual hours worked — if absent = target
     function effectiveActualHours(entry) {
-        const type = getAbsenceType(entry.typ ?? 'work')
+        const type = getAbsenceType(entry.typ ?? 'on-site')
         if (!type.counter)
             return entry.plannedHours ?? settings.value.hoursPerDay
 
@@ -598,7 +598,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             entry = {
                 id: Date.now(),
                 date: today,
-                typ: 'work',
+                typ: 'on-site',
                 timeEntries: [],
                 plannedHours: settings.value.hoursPerDay,
                 notes: ''

@@ -11,7 +11,7 @@ const stats = computed(() => {
     const counts = {}
 
     store.entriesForMonth.forEach(entry => {
-        const type = entry.typ ?? 'work'
+        const type = entry.typ ?? 'on-site'
         counts[type] = (counts[type] ?? 0) + 1
     })
 

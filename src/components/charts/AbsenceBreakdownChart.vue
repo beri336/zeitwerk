@@ -17,7 +17,7 @@ const store = useZeitwerkStore()
 const breakdown = computed(() => {
     const map = new Map()
     for (const entry of store.entriesForMonth) {
-        const type = entry.typ || 'work'
+        const type = entry.typ || 'on-site'
         map.set(type, (map.get(type) || 0) + 1)
     }
     return Array.from(map.entries())
