@@ -112,8 +112,7 @@ function cancelDelete() {
                         <!-- Entry rows -->
                         <tr v-for="(entry, ei) in group.entries"
                             :key="entry.id"
-                            :class="{ 'week-separator': ei === 0 && gi > 0 }"
-                            :style="rowStyle(entry)">
+                            :class="{ 'week-separator': ei === 0 && gi > 0 }">
                             <td>
                                 <div style="display:flex;align-items:center;gap:var(--space-2);">
                                     <span v-if="entry.typ && entry.typ !== 'work'" class="typ-chip"
@@ -191,13 +190,14 @@ function cancelDelete() {
 
                         <!-- Week total row -->
                         <tr class="week-total-row">
-                            <td colspan="5" style="padding-left:var(--space-3)">
+                            <td colspan="4" style="padding-left:var(--space-3)">
                                 <span class="week-label">KW {{ group.kw }} · Week Total</span>
                             </td>
-                            <td class="num" :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">{{ formatHours(group.actual) }}
-                            </td>
                             <td class="num">{{ formatHours(group.planned) }}</td>
-                            <td colspan="2" class="num" :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">
+                            <td class="num" :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">
+                                {{ formatHours(group.actual) }}
+                            </td>
+                            <td class="num" :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">
                                 {{ group.ActualDiff >= 0 ? '+' : '' }}{{ formatHours(group.ActualDiff) }}
                             </td>
                         </tr>
@@ -207,10 +207,12 @@ function cancelDelete() {
                 <!-- Month total row -->
                 <tfoot>
                     <tr class="month-total-row">
-                        <td colspan="5">Month Total</td>
-                        <td class="num" :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">{{ formatHours(store.monthActual) }}</td>
+                        <td colspan="4">Month Total</td>
                         <td class="num">{{ formatHours(store.monthPlanned) }}</td>
-                        <td colspan="2" class="num" :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">
+                        <td class="num" :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">
+                            {{ formatHours(store.monthActual) }}
+                        </td>
+                        <td class="num" :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">
                             {{ store.monthDiff >= 0 ? '+' : '' }}{{ formatHours(store.monthDiff) }}
                         </td>
                     </tr>
@@ -249,11 +251,16 @@ function cancelDelete() {
 
 .table-scroll {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
 }
 
 .data-table {
     width: 100%;
     font-size: var(--text-xs);
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 920px;
 }
 
 .data-table thead {
@@ -261,7 +268,7 @@ function cancelDelete() {
 }
 
 .data-table th {
-    padding: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-3);
     text-align: left;
     font-size: var(--text-xs);
     font-weight: 600;
@@ -270,23 +277,32 @@ function cancelDelete() {
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--color-border);
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--color-surface-offset);
 }
 
 .data-table th.actions-header {
     text-align: center;
-    min-width: 100px;
+    min-width: 72px;
     position: sticky;
     right: 0;
     background: var(--color-surface-offset);
     border-left: 1px solid var(--color-border);
-    z-index: 3;
+    z-index: 4;
 }
 
 .data-table td {
-    padding: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-3);
     border-bottom: 1px solid var(--color-divider);
     font-variant-numeric: tabular-nums lining-nums;
     vertical-align: middle;
+    background: var(--color-surface);
+    transition:
+        background var(--transition-interactive),
+        border-color var(--transition-interactive),
+        color var(--transition-interactive);
 }
 
 .data-table td.actions-cell {
@@ -294,7 +310,7 @@ function cancelDelete() {
     right: 0;
     background: var(--color-surface);
     border-left: 1px solid var(--color-border);
-    z-index: 2;
+    z-index: 3;
 }
 
 .data-table tr:last-child td {
@@ -305,15 +321,22 @@ function cancelDelete() {
     background: var(--color-surface-offset);
 }
 
+.data-table tr:hover td.actions-cell {
+    background: var(--color-surface-offset);
+}
+
 .row-actions {
     display: flex;
-    gap: var(--space-2);
+    gap: var(--space-1);
     justify-content: center;
-    min-width: 100px;
+    align-items: center;
+    min-width: 72px;
+    opacity: 1;
+    transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .actions-cell {
-    min-width: 100px;
+    min-width: 72px;
     text-align: center;
 }
 
@@ -321,28 +344,32 @@ function cancelDelete() {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: var(--space-2);
+    width: 28px;
+    height: 28px;
+    padding: var(--space-1);
     border-radius: var(--radius-md);
     border: 1px solid transparent;
     background: transparent;
     cursor: pointer;
     transition: all 0.2s ease;
+    opacity: 0.72;
 }
 
-.row-actions button:hover {
-    background: var(--color-surface-offset);
+.row-actions button:hover,
+.row-actions button:focus-visible {
+    opacity: 1;
+    background: var(--color-surface-2);
     border-color: var(--color-border);
 }
 
 .row-actions button svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     color: var(--color-text-muted);
 }
 
-.row-actions button:hover svg {
+.row-actions button:hover svg,
+.row-actions button:focus-visible svg {
     color: var(--color-text);
 }
 
@@ -358,8 +385,8 @@ function cancelDelete() {
     cursor: pointer;
 }
 
-.editable:hover {
-    background: var(--color-primary-highlight) !important;
+td.editable:hover {
+    background: var(--color-primary-highlight);
 }
 
 .num {
@@ -402,6 +429,7 @@ function cancelDelete() {
 
 .inline-input:focus {
     box-shadow: 0 0 0 2px var(--color-primary-highlight);
+    border-color: var(--color-primary);
 }
 
 .week-separator td {
@@ -410,7 +438,9 @@ function cancelDelete() {
 
 .week-total-row td {
     font-weight: 600;
-    background: var(--color-surface-2);
+    background: var(--color-surface-offset);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
 }
@@ -421,23 +451,19 @@ function cancelDelete() {
 }
 
 .month-total-row td {
-    background: var(--color-surface-offset);
-    border-top: 2px solid var(--color-border);
+    background: color-mix(in oklch, var(--color-primary) 6%, var(--color-surface-offset));
+    border-top: 2px solid var(--color-primary-highlight);
     font-weight: 700;
     font-size: var(--text-sm);
     padding: var(--space-3);
 }
 
-.row-actions {
-    display: flex;
-    gap: var(--space-1);
-    opacity: 0;
-    transition: opacity var(--transition);
+tr[data-absence="true"] td {
+    background: color-mix(in oklch, var(--color-primary-highlight) 30%, var(--color-surface));
 }
 
-:deep(tr:hover) .row-actions {
-    /* Force :deep() so that scoped CSS matches the tr selector */
-    opacity: 1;
+tr[data-absence="true"]:hover td {
+    background: var(--color-surface-offset);
 }
 
 .empty-state {
@@ -475,9 +501,10 @@ function cancelDelete() {
     padding: 1px var(--space-2);
     border-radius: var(--radius-full);
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
+    border: 1px solid color-mix(in oklch, currentColor 18%, transparent);
 }
 
 /* Button delete confirmation */
@@ -503,5 +530,120 @@ function cancelDelete() {
     font-variant-numeric: tabular-nums;
     font-size: var(--text-xs);
     white-space: nowrap;
+}
+
+.time-stack span+span {
+    color: var(--color-text-muted);
+}
+
+/* Mobile Devices Optimizations */
+@media (max-width: 900px) {
+    .table-header {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .table-badges {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: var(--space-2) var(--space-3);
+    }
+}
+
+/* Nur Desktop/Hover-Geräte bekommen Hover-Optik */
+@media (hover: hover) {
+    .data-table tr:hover td {
+        background: var(--color-surface-offset);
+    }
+
+    .data-table tr:hover td.actions-cell {
+        background: var(--color-surface-offset);
+    }
+
+    .row-actions button:hover,
+    .row-actions button:focus-visible {
+        opacity: 1;
+        background: var(--color-surface-2);
+        border-color: var(--color-border);
+    }
+}
+
+/* Touch-Geräte: keine Hover-Abhängigkeit */
+@media (hover: none) {
+    .row-actions button {
+        opacity: 1;
+    }
+
+    .row-actions button:active {
+        background: var(--color-surface-2);
+        border-color: var(--color-border);
+    }
+}
+
+/* Tablet / kleinere Laptops */
+@media (max-width: 900px) {
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .table-badges {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .data-table {
+        min-width: 760px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: var(--space-2) var(--space-2);
+    }
+
+    .cell-truncate {
+        max-width: 120px;
+    }
+}
+
+/* Richtig kleine Screens */
+@media (max-width: 640px) {
+    .table-wrap {
+        border-radius: var(--radius-md);
+    }
+
+    .data-table {
+        min-width: 680px;
+        font-size: 12px;
+    }
+
+    .data-table th.actions-header,
+    .data-table td.actions-cell {
+        position: static;
+        min-width: auto;
+        width: auto;
+        border-left: none;
+        background: inherit;
+    }
+
+    .row-actions {
+        min-width: auto;
+        justify-content: flex-end;
+    }
+
+    .row-actions button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .cell-truncate {
+        max-width: 100px;
+    }
 }
 </style>

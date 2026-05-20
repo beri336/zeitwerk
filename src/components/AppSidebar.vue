@@ -1,5 +1,4 @@
 <!-- src/components/AppSidebar.vue -->
-
 <script setup>
 import { useRoute } from 'vue-router'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
@@ -9,7 +8,6 @@ const store = useZeitwerkStore()
 </script>
 
 <template>
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-logo">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="sidebar-logo-icon">
@@ -22,7 +20,6 @@ const store = useZeitwerkStore()
             <span class="sidebar-logo-text">Zeitwerk</span>
         </div>
 
-        <!-- Navigation -->
         <nav class="sidebar-section">
             <div class="sidebar-section-label">Navigation</div>
             <RouterLink to="/tracking" class="sidebar-item" :class="{ active: route.path === '/tracking' }">
@@ -64,7 +61,6 @@ const store = useZeitwerkStore()
             </RouterLink>
         </nav>
 
-        <!-- Month Navigation -->
         <div class="sidebar-month">
             <div class="sidebar-month-label">Month</div>
             <div class="month-nav">
@@ -86,7 +82,7 @@ const store = useZeitwerkStore()
 
 <style scoped>
 .sidebar {
-    grid-row: 1 / -1;
+    /* grid-row: 1 / -1 entfernt — App.vue übernimmt Grid-Zuweisung */
     background: var(--color-surface);
     border-right: 1px solid var(--color-border);
     display: flex;

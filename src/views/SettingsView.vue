@@ -93,9 +93,12 @@ function reset() {
 
 <style scoped>
 .main {
-    grid-column: 2;
-    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    /* kein grid-column, kein overflow-y — App.vue steuert das */
 }
 
 .settings-card {
@@ -131,5 +134,12 @@ function reset() {
     margin-top: var(--space-6);
     display: flex;
     gap: var(--space-3);
+}
+
+@media (max-width: 767px) {
+    .main {
+        padding: var(--space-3);
+        gap: var(--space-3);
+    }
 }
 </style>

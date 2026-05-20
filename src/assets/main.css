@@ -172,10 +172,9 @@ textarea {
 
 /* Layout */
 #app {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    grid-template-rows: auto 1fr;
     height: 100dvh;
+    width: 100%;
+    overflow: hidden;
 }
 
 /* Shared Buttons */
@@ -321,9 +320,12 @@ textarea {
     box-shadow: var(--shadow-lg);
     width: 100%;
     max-width: 560px;
-    max-height: 90vh;
+    max-height: min(90dvh, 90svh);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    /* NEU:
+       verhindert, dass Header/Footer aus dem Container rauslaufen */
 }
 
 .modal-header {
@@ -332,6 +334,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 .modal-title {
@@ -343,6 +346,9 @@ textarea {
     padding: var(--space-6);
     overflow-y: auto;
     flex: 1;
+    min-height: 0;
+    /* NEU:
+       wichtig für scrollbare Inhalte im Flex-Modal */
 }
 
 .modal-footer {
@@ -351,6 +357,41 @@ textarea {
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* Mobile Modal */
+@media (max-width: 767px) {
+    .modal-backdrop {
+        align-items: flex-end;
+        padding: var(--space-2);
+        padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+    }
+
+    .modal {
+        max-width: 100%;
+        width: 100%;
+        max-height: 92dvh;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .modal-header {
+        padding: var(--space-4);
+    }
+
+    .modal-body {
+        padding: var(--space-4);
+    }
+
+    .modal-footer {
+        padding: var(--space-4);
+        padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+        flex-wrap: wrap;
+    }
+
+    .modal-footer>* {
+        flex: 1 1 100%;
+    }
 }
 
 /* Toast */

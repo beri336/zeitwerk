@@ -66,9 +66,11 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 
         <div v-if="entry" class="cal-day__body">
             <div class="cal-day__ist">{{ formatHours(actual) }}</div>
-            <div v-if="entry.start" class="cal-day__time">
-                {{ entry.start }}–{{ entry.end }}
+
+            <div v-if="entry?.timeEntries?.length" class="cal-day__time">
+                {{ entry.timeEntries[0].start }}–{{ entry.timeEntries[entry.timeEntries.length - 1].end }}
             </div>
+
             <div v-if="entry.notes" class="cal-day__note">
                 {{ entry.notes }}
             </div>
@@ -84,22 +86,34 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 <style scoped>
 .cal-day {
     position: relative;
-    min-height: 88px;
+    min-height: 96px;
     padding: var(--space-2);
     border-radius: var(--radius-md);
-    border: 1px solid var(--color-divider);
+    border: 1px solid var(--color-border);
     background: var(--color-surface);
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    gap: var(--space-1);
+    transition:
+        background var(--transition-interactive),
+        border-color var(--transition-interactive),
+        box-shadow var(--transition-interactive),
+        transform var(--transition-interactive);
     overflow: hidden;
+    min-width: 44px;
 }
 
 .cal-day:hover {
     border-color: var(--color-primary);
     box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+.cal-day:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--color-primary-highlight);
 }
 
 .cal-day--today {
@@ -115,8 +129,12 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 
 .cal-day--outside {
     background: var(--color-surface-offset);
-    opacity: 0.45;
-    pointer-events: none;
+    opacity: 0.5;
+}
+
+.cal-day--outside .cal-day__body,
+.cal-day--outside .cal-day__bar-track {
+    opacity: 0.6;
 }
 
 .cal-day--absence {
@@ -161,19 +179,23 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
 
 .cal-day__ist {
     font-size: var(--text-xs);
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-text);
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
 }
 
 .cal-day__time {
-    font-size: 10px;
+    font-size: 12px;
+    /* statt 10px */
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
 }
 
 .cal-day__note {
-    font-size: 10px;
+    font-size: 12px;
+    /* statt 10px */
     color: var(--color-text-faint);
     white-space: nowrap;
     overflow: hidden;
@@ -194,5 +216,27 @@ const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
     height: 100%;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     transition: width 0.4s ease;
+}
+
+/* Mobile Devices Optimization */
+@media (max-width: 768px) {
+    .cal-day {
+        min-height: 72px;
+        padding: var(--space-2);
+    }
+
+    .cal-day__time,
+    .cal-day__note {
+        display: none;
+    }
+
+    .cal-day__ist {
+        font-size: 12px;
+    }
+
+    .cal-day__num {
+        width: 24px;
+        height: 24px;
+    }
 }
 </style>

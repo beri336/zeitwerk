@@ -238,6 +238,13 @@ function save() {
 </template>
 
 <style scoped>
+.modal-content {
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
 .preview-bar {
     margin-top: var(--space-4);
     padding: var(--space-3);
@@ -363,5 +370,20 @@ function save() {
     font-weight: 500;
     color: var(--color-error);
     margin-right: auto;
+}
+
+/* Mobile Devices Optimization */
+/* Auf Mobile volle Breite */
+@media (max-width: 767px) {
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-height: 92dvh;
+    }
 }
 </style>
