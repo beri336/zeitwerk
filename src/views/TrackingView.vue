@@ -34,6 +34,15 @@ const monthActualVariant = computed(() => {
     if (store.monthDiff < -0.25) return 'err'
     return ''
 })
+
+const monthGrossLabel = computed(() => {
+    if (!store.grossHourlyRate) return ''
+    return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: 2
+    }).format(store.monthGross)
+})
 </script>
 
 <template>
@@ -48,6 +57,10 @@ const monthActualVariant = computed(() => {
             <KpiCard label="Week actual" :value="formatHours(currentWeekActual)"
                 :sub="`Planned: ${formatHours(store.settings.hoursPerWeek)}`" />
             <KpiCard label="Entries" :value="String(store.entriesForMonth.length)" sub="Work days" />
+
+            <!-- Only if salary is set -->
+            <KpiCard v-if="store.grossHourlyRate > 0" label="Month Gross" :value="monthGrossLabel" sub="Gross earnings"
+                variant="ok" />
         </div>
 
         <!-- Add Bar: Desktop zeigt Button + Legend nebeneinander -->
@@ -84,6 +97,10 @@ const monthActualVariant = computed(() => {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-4);
+}
+
+.kpi-grid--five {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .add-bar {

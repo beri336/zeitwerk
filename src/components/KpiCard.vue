@@ -1,26 +1,12 @@
 <!-- src/components/KpiCard.vue -->
 
 <script setup>
-import { computed } from 'vue'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-import GrossEarningsChart from '@/components/charts/GrossEarningsChart.vue'
-
-const store = useZeitwerkStore()
-
 defineProps({
     label: { type: String, required: true },
     value: { type: String, required: true },
     sub: { type: String, default: '' },
-    variant: { type: String, default: '' } // 'ok' | 'warn' | 'err' | ''
+    variant: { type: String, default: '' }
 })
-
-const monthGrossLabel = computed(() =>
-    new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: 2
-    }).format(store.monthGross)
-)
 </script>
 
 <template>
@@ -28,10 +14,6 @@ const monthGrossLabel = computed(() =>
         <div class="kpi-label">{{ label }}</div>
         <div class="kpi-value" :class="`kpi-${variant}`">{{ value }}</div>
         <div v-if="sub" class="kpi-sub">{{ sub }}</div>
-    </div>
-    <div v-if="store.grossHourlyRate > 0" class="stat-card">
-        <span class="stat-card__label">Month Gross</span>
-        <span class="stat-card__value">{{ monthGrossLabel }}</span>
     </div>
 </template>
 
