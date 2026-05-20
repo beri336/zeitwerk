@@ -105,6 +105,27 @@ const workdays = computed(() =>
 
 <template>
     <main class="main">
+        <!-- Calendar Toolbar for Mobile -->
+        <div class="cal-toolbar">
+            <button class="cal-nav-btn" type="button" @click="store.prevMonth()" aria-label="Previous month">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+            </button>
+
+            <div class="cal-month-label">{{ store.currMonthLabel }}</div>
+
+            <button class="cal-nav-btn" type="button" @click="store.nextMonth()" aria-label="Next month">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
+            </button>
+
+            <button class="cal-today-chip" type="button" @click="goToToday" :disabled="isCurrentMonth">
+                Today
+            </button>
+        </div>
+
         <div class="cal-header">
             <div class="cal-stats">
                 <div class="cal-stat">
@@ -132,15 +153,9 @@ const workdays = computed(() =>
                     </span>
                 </div>
             </div>
-
-            <div class="cal-actions">
-                <div class="cal-hint">Click on a day to add or edit an entry</div>
-                <button class="btn btn-secondary btn-sm cal-today-btn" type="button" @click="goToToday"
-                    :disabled="isCurrentMonth">
-                    Today
-                </button>
-            </div>
         </div>
+
+        <div class="cal-hint">Tap a day to add or edit an entry.</div>
 
         <div class="cal-grid">
             <div v-for="h in DAY_HEADERS" :key="h" class="cal-weekday"
@@ -249,6 +264,72 @@ const workdays = computed(() =>
     color: var(--color-warning);
 }
 
+.cal-toolbar {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 36px auto;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.cal-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.cal-month-label {
+    min-width: 0;
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.cal-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.cal-nav-btn:hover {
+    background: var(--color-surface-offset);
+    color: var(--color-text);
+}
+
+.cal-today-chip {
+    height: 36px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cal-today-chip:hover {
+    background: var(--color-surface-offset);
+}
+
+.cal-today-chip:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
 @media (max-width: 900px) {
     .cal-actions {
         width: 100%;
@@ -270,8 +351,18 @@ const workdays = computed(() =>
         gap: var(--space-4);
     }
 
-    .cal-day__gross {
-        font-size: 11px;
+    .cal-toolbar {
+        grid-template-columns: 36px minmax(0, 1fr) 36px;
+    }
+
+    .cal-today-chip {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-top: var(--space-1);
+    }
+
+    .cal-grid {
+        gap: var(--space-1);
     }
 }
 </style>

@@ -171,8 +171,8 @@ const store = useZeitwerkStore()
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-sm);
     color: var(--color-text-muted);
 }
