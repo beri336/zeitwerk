@@ -22,12 +22,12 @@ function loadStorage() {
         const raw = localStorage.getItem(STORAGE_KEY)
         if (!raw)
             return {}
-        
+
         const parsed = JSON.parse(raw)
-        
+
         if (typeof parsed !== 'object' || parsed === null)
             return {}
-        
+
         return parsed
     } catch {
         return {}
@@ -79,7 +79,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             if (entry.typ !== 'publicholiday')
                 return true // keep other types
             const y = new Date(entry.date).getFullYear()
-            
+
             return y !== year // only remove this year
         })
 
@@ -248,7 +248,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             }, null, 2)],
             { type: 'application/json' }
         )
-        
+
         const url = document.createElement('a')
         const pad = number => String(number).padStart(2, '0')
         url.href = URL.createObjectURL(blob)
@@ -271,48 +271,70 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     // Export as CSV for Excel, with semicolon as separator and UTF-8 BOM
     function exportCSV() {
+        console.log('exportCSV called')
         const pad = num => String(num).padStart(2, '0')
+
         const headers = [
-            'Date', 'Weekday', 'KW', 'Typ',
-            'Time Blocks', 'Actual (h)', 'Planned (h)', 'Difference (h)', 'Notes'
+            'Date',
+            'Weekday',
+            'KW',
+            'Type',
+            'Time Blocks',
+            'Actual (h)',
+            'Planned (h)',
+            'Difference (h)',
+            'Notes'
         ]
 
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-        const rows = entries.value
-            .sort((a, b) => a.datum.localeCompare(b.datum))
-            .map(e => {
-                const ist = calcIstH(e)
-                const soll = e.sollTag || settings.value.tagsstunden
-                const dt = new Date(e.datum + 'T00:00:00')
+        const rows = [...entries.value]
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .map(entry => {
+                const actual = effectiveActualHours(entry)
+                const planned = entry.plannedHours ?? settings.value.hoursPerDay
+                const dt = new Date(entry.date + 'T00:00:00')
 
-                // time-entries blocks as a readable string: “08:00–12:00 (30 min), 16:00–20:00 (0 min)”
-                const bloecke = (e.timeEntries ?? [])
-                    .filter(b => b.start && b.end)
-                    .map(b => `${b.start}–${b.end} (${b.pause ?? 0}min)`)
+                const blocks = (entry.timeEntries ?? [])
+                    .filter(block => block.start && block.end)
+                    .map(block => `${block.start}–${block.end} (${block.pause ?? 0}min)`)
                     .join(', ') || '—'
 
                 return [
                     `${pad(dt.getDate())}.${pad(dt.getMonth() + 1)}.${dt.getFullYear()}`,
                     days[dt.getDay()],
-                    getKW(e.datum),
-                    e.typ || 'work',
-                    bloecke,
+                    getKW(entry.date),
+                    entry.typ || 'work',
+                    blocks,
                     actual.toFixed(2),
                     planned.toFixed(2),
                     (actual - planned).toFixed(2),
-                    e.notes || ''
-                ].map(v => `"${v}"`).join(';')
+                    entry.notes || ''
+                ]
+                    .map(value => `"${String(value).replace(/"/g, '""')}"`)
+                    .join(';')
             })
 
         const csv = [headers.map(h => `"${h}"`).join(';'), ...rows].join('\n')
-        const bom = '\uFEFF' // UTF-8 BOM für Excel
+        const bom = '\uFEFF'
         const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
-        const url = document.createElement('a')
-        
-        url.href = URL.createObjectURL(blob)
-        url.download = `zeitwerk_${currYear.value}_${pad(currMonth.value + 1)}.csv`
-        url.click()
+
+        const objectUrl = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+
+        link.href = objectUrl
+        link.download = `zeitwerk_${currYear.value}_${pad(currMonth.value + 1)}.csv`
+        link.style.display = 'none'
+
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        window.setTimeout(() => {
+            URL.revokeObjectURL(objectUrl)
+        }, 1000)
+
+        return true
     }
 
     // Helpers
@@ -321,7 +343,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const type = getAbsenceType(entry.typ ?? 'work')
         if (!type.counter)
             return entry.plannedHours ?? settings.value.hoursPerDay
-        
+
         return calcActualHours(entry)
     }
 
@@ -331,10 +353,11 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         let added = 0
         let skipped = 0
 
-        holidays.forEach(h => {
+        holidays.forEach((h, i) => {
             const exists = entries.value.find(e => e.date === h.date)
             if (exists) {
-                skipped++; return
+                skipped++
+                return
             }
 
             entries.value.push({

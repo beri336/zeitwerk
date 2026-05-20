@@ -18,8 +18,25 @@ const titles = {
     '/settings': 'Settings'
 }
 
-function handleExport() { store.exportJSON(); showToast('Export successful.', 'ok') }
-function handleCSV() { store.exportCSV(); showToast('CSV export successful.', 'ok') }
+function handleExport() {
+    try {
+        store.exportJSON()
+        showToast('Export successful.', 'ok')
+    } catch {
+        showToast('Export failed.', 'err')
+    }
+}
+
+function handleCSV() {
+    try {
+        const ok = store.exportCSV()
+        showToast(ok ? 'CSV export successful.' : 'CSV export failed.', ok ? 'ok' : 'err')
+    } catch (error) {
+        console.error(error)
+        showToast('CSV export failed.', 'err')
+    }
+}
+
 function handleImport() { document.getElementById('importFileInput').click() }
 
 function onFileChange(event) {
