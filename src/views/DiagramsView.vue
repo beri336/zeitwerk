@@ -8,6 +8,13 @@ import WeekBarChart from '@/components/charts/WeekBarChart.vue'
 import MonthOverviewChart from '@/components/charts/MonthOverviewChart.vue'
 import DayDistributionChart from '@/components/charts/DayDistributionChart.vue'
 
+import ChartCard from '@/components/charts/ChartCard.vue'
+import WeeklyComparisonChart from '@/components/charts/WeeklyComparisonChart.vue'
+import RunningBalanceChart from '@/components/charts/RunningBalanceChart.vue'
+import WeekdayPatternChart from '@/components/charts/WeekdayPatternChart.vue'
+import AbsenceBreakdownChart from '@/components/charts/AbsenceBreakdownChart.vue'
+import DayLengthHistogramChart from '@/components/charts/DayLengthHistogramChart.vue'
+
 const store = useZeitwerkStore()
 
 const hasData = computed(() => store.entriesForMonth.length > 0)
@@ -27,6 +34,10 @@ const longestDay = computed(() => {
         if (!max) return e
         return calcActualHours(e) > calcActualHours(max) ? e : max
     }, null)
+})
+
+const activeDays = computed(() => {
+    return store.entriesForMonth.filter(e => store.effectiveActualHours(e) > 0).length
 })
 </script>
 
@@ -65,9 +76,42 @@ const longestDay = computed(() => {
 
             <!-- Charts Grid -->
             <div class="charts-grid">
-                <WeekBarChart />
-                <MonthOverviewChart />
-                <DayDistributionChart />
+                <ChartCard title="Weekly Planned vs Actual"
+                    subtitle="Compare planned and actual hours for each calendar week" large>
+                    <WeeklyComparisonChart />
+                </ChartCard>
+
+                <ChartCard title="Running Balance"
+                    subtitle="See how your overtime or deficit develops through the month" large>
+                    <RunningBalanceChart />
+                </ChartCard>
+
+                <ChartCard title="Weekday Pattern" subtitle="Average actual hours grouped by weekday">
+                    <WeekdayPatternChart />
+                </ChartCard>
+
+                <ChartCard title="Absence Breakdown"
+                    subtitle="Distribution of work, vacation, sick days and other types">
+                    <AbsenceBreakdownChart />
+                </ChartCard>
+
+                <ChartCard title="Day Length Distribution"
+                    subtitle="How often short, regular or long working days occurred">
+                    <DayLengthHistogramChart />
+                </ChartCard>
+
+                <!-- Alte Charts behalten, aber breit/groß -->
+                <ChartCard title="Week Bar Chart" subtitle="Actual hours per week, color-coded by performance" wide large>
+                    <WeekBarChart />
+                </ChartCard>
+
+                <ChartCard title="Month Overview" subtitle="Overview of actual and planned hours across the month" wide large>
+                    <MonthOverviewChart />
+                </ChartCard>
+
+                <ChartCard title="Day Distribution" subtitle="Distribution of actual working time across the days" wide large>
+                    <DayDistributionChart />
+                </ChartCard>
             </div>
         </template>
     </main>
@@ -75,9 +119,6 @@ const longestDay = computed(() => {
 
 <style scoped>
 .main {
-    grid-column: 2;
-    overflow-y: auto;
-    overscroll-behavior: contain;
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
@@ -86,7 +127,7 @@ const longestDay = computed(() => {
 
 .kpi-row {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: var(--space-4);
 }
 
@@ -113,6 +154,12 @@ const longestDay = computed(() => {
     font-variant-numeric: tabular-nums;
 }
 
+.kpi-mini-sub {
+    margin-top: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
 .kpi-ok .kpi-mini-value {
     color: var(--color-success);
 }
@@ -123,12 +170,8 @@ const longestDay = computed(() => {
 
 .charts-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-5);
-}
-
-.charts-grid> :last-child {
-    grid-column: 1 / -1;
 }
 
 .empty-state {
@@ -158,13 +201,9 @@ const longestDay = computed(() => {
     font-size: var(--text-sm);
 }
 
-@media (max-width: 768px) {
-    .charts-grid {
+@media (max-width: 900px) {
+    .charts-layout {
         grid-template-columns: 1fr;
-    }
-
-    .charts-grid> :last-child {
-        grid-column: auto;
     }
 }
 </style>
