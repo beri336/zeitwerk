@@ -91,6 +91,11 @@
     --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
 }
 
+:root {
+    --content-narrow: 640px;
+    --content-form: 800px;
+}
+
 /* Base */
 *,
 *::before,

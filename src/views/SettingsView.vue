@@ -65,6 +65,27 @@ function confirmDeleteAll() {
     deleteConfirmText.value = ''
     showToast('All entries deleted.', 'ok')
 }
+
+// Calculate gross locally
+const previewGrossHourlyRate = computed(() => {
+    const monthly = Number(form.grossMonthlySalary || 0)
+    const weeklyHours = Number(form.hoursPerWeek || 0)
+
+    if (!monthly || !weeklyHours)
+        return 0
+
+    return (monthly * 12) / (weeklyHours * 52)
+})
+
+const previewGrossDailyRate = computed(() => {
+    const monthly = Number(form.grossMonthlySalary || 0)
+    const workDays = Number(form.workDays || 0)
+
+    if (!monthly || !workDays)
+        return 0
+
+    return (monthly * 12) / (workDays * 52)
+})
 </script>
 
 <template>
@@ -116,12 +137,16 @@ function confirmDeleteAll() {
                         <span class="form-hint">e.g., 3000 for 3000€/Month</span>
                         <span class="form-hint">Used to calculate gross hourly and daily earnings</span>
                     </div>
-                    <div class="form-group full" v-if="store.grossHourlyRate > 0">
+                    <div class="form-group full" v-if="previewGrossHourlyRate > 0">
                         <label class="form-label">Preview</label>
                         <div class="salary-preview">
-                            <span>{{ store.grossHourlyRate.toFixed(2) }} €/h gross</span>
-                            <span>{{ store.grossDailyRate.toFixed(2) }} €/day gross</span>
+                            <span>{{ previewGrossHourlyRate.toFixed(2) }} €/h gross</span>
+                            <span>{{ previewGrossDailyRate.toFixed(2) }} €/day gross</span>
                         </div>
+                        <span class="form-hint">
+                            Hourly pay is based on the yearly average: monthly salary × 12 divided by weekly hours × 52.
+                            That is why 4000€/month at 40h/week is about 23.08€/h instead of 25€/h.
+                        </span>
                     </div>
                 </div>
                 <div class="settings-actions">
@@ -195,11 +220,12 @@ function confirmDeleteAll() {
 }
 
 .settings-card {
+    width: 100%;
+    max-width: var(--content-form);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    max-width: 520px;
     overflow: hidden;
 }
 

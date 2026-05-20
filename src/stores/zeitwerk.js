@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { calcActualHours, getKW, MONTH_NAMES } from '@/composables/useTime'
+import { getKW, MONTH_NAMES } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
 import { getHolidaysForMonth, getHolidays } from '@/composables/useHolidays'
 
@@ -518,12 +518,83 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     // Helpers
     // Returns actual hours worked — if absent = target
+    function timeToMinutes(value) {
+        if (!value || typeof value !== 'string' || !value.includes(':'))
+            return null
+
+        const [hours, minutes] = value.split(':').map(Number)
+
+        if (Number.isNaN(hours) || Number.isNaN(minutes))
+            return null
+
+        return hours * 60 + minutes
+    }
+
+    function getValidTimeBlocks(entry) {
+        return [...(entry.timeEntries ?? [])]
+            .filter(block => block.start && block.end)
+            .map(block => ({
+                ...block,
+                startMinutes: timeToMinutes(block.start),
+                endMinutes: timeToMinutes(block.end)
+            }))
+            .filter(block =>
+                block.startMinutes !== null &&
+                block.endMinutes !== null &&
+                block.endMinutes > block.startMinutes
+            )
+            .sort((a, b) => a.startMinutes - b.startMinutes)
+    }
+
+    function getWorkedMinutes(entry) {
+        const blocks = getValidTimeBlocks(entry)
+
+        if (!blocks.length)
+            return 0
+
+        if (blocks.length === 1) {
+            const only = blocks[0]
+            const blockMinutes = only.endMinutes - only.startMinutes
+            const pauseMinutes = Math.max(0, Number(only.pause ?? 0))
+            return Math.max(0, blockMinutes - pauseMinutes)
+        }
+
+        return blocks.reduce((sum, block) => {
+            return sum + (block.endMinutes - block.startMinutes)
+        }, 0)
+    }
+
+    function getBreakMinutes(entry) {
+        const blocks = getValidTimeBlocks(entry)
+
+        if (!blocks.length)
+            return 0
+
+        if (blocks.length === 1) {
+            return Math.max(0, Number(blocks[0].pause ?? 0))
+        }
+
+        let totalBreak = 0
+
+        for (let index = 1; index < blocks.length; index++) {
+            const previous = blocks[index - 1]
+            const current = blocks[index]
+            const gap = current.startMinutes - previous.endMinutes
+
+            if (gap > 0)
+                totalBreak += gap
+        }
+
+        return totalBreak
+    }
+
     function effectiveActualHours(entry) {
         const type = getAbsenceType(entry.typ ?? 'on-site')
+
         if (!type.counter)
             return entry.plannedHours ?? settings.value.hoursPerDay
 
-        return calcActualHours(entry)
+        return getWorkedMinutes(entry) / 60
     }
 
     // Enter holidays as entries for a month (manually via a modal window)
@@ -566,11 +637,13 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     })
 
     const grossDailyRate = computed(() => {
-        const dayHours = Number(settings.value.hoursPerDay || 0)
-        if (!dayHours)
+        const monthly = Number(settings.value.grossMonthlySalary || 0)
+        const workDays = Number(settings.value.workDays || 0)
+
+        if (!monthly || !workDays)
             return 0
 
-        return grossHourlyRate.value * dayHours
+        return (monthly * 12) / (workDays * 52)
     })
 
     function grossEarnedForEntry(entry) {
