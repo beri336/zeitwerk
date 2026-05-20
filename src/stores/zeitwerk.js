@@ -222,6 +222,12 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         persist()
     }
 
+    function deleteAllEntries() {
+        entries.value = []
+        activeSession.value = { ...DEFAULT_ACTIVE_SESSION }
+        persist()
+    }
+
     function updateEntry(id, data) {
         const index = entries.value.findIndex(entry => entry.id === id)
 
@@ -616,5 +622,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         grossHourlyRate, grossDailyRate, grossEarnedForEntry,
         activeSession, todayEntry, liveStatus, liveWorkedHours, startWork, startBreak, resumeWork, finishWorkDay, resetActiveSession,
         recoverActiveSession,
+        deleteAllEntries,
     }
 })
