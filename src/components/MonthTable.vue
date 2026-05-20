@@ -6,6 +6,7 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { calcActualHours, formatHours, formatDate } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
+import LiveTrackerCard from '@/components/LiveTrackerCard.vue'
 
 const emit = defineEmits(['edit'])
 
@@ -70,6 +71,7 @@ function cancelDelete() {
 </script>
 
 <template>
+    <LiveTrackerCard />
     <!-- Month Table -->
     <div class="table-wrap">
         <div class="table-header">

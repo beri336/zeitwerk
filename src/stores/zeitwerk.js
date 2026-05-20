@@ -38,6 +38,15 @@ function loadStorage() {
 export const useZeitwerkStore = defineStore('zeitwerk', () => {
     const stored = loadStorage()
 
+    const DEFAULT_ACTIVE_SESSION = {
+        date: null,
+        status: 'idle', // idle | working | break
+        currentEntryId: null,
+        currentBlockIndex: null,
+        breakStartedAt: null,
+        startedAt: null
+    }
+
     // State
     const entries = ref(Array.isArray(stored.entries) ? stored.entries : [])
 
@@ -47,12 +56,18 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         ...(stored.settings ?? {})
     })
 
+    const activeSession = ref({
+        ...DEFAULT_ACTIVE_SESSION,
+        ...(stored.activeSession ?? {})
+    })
+
     watch(
-        [entries, settings],
+        [entries, settings, activeSession],
         () => {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
                 entries: entries.value,
-                settings: settings.value
+                settings: settings.value,
+                activeSession: activeSession.value
             }))
         },
         { deep: true } // deep because it is array/object
@@ -65,7 +80,8 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     function persist() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             entries: entries.value,
-            settings: settings.value
+            settings: settings.value,
+            activeSession: activeSession.value
         }))
     }
 
@@ -149,6 +165,20 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     const monthActual = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + effectiveActualHours(entry), 0))
     const monthPlanned = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + (entry.plannedHours || settings.value.hoursPerDay), 0))
     const monthDiff = computed(() => monthActual.value - monthPlanned.value)
+    const todayEntry = computed(() => {
+        const today = nowDateString()
+        return entries.value.find(entry => entry.date === today) ?? null
+    })
+
+    const liveStatus = computed(() => activeSession.value.status || 'idle')
+
+    const liveWorkedHours = computed(() => {
+        const entry = todayEntry.value
+        if (!entry)
+            return 0
+
+        return effectiveActualHours(entry)
+    })
 
     // Watcher
     // Change state -> Resync holidays for the current year
@@ -211,6 +241,122 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         if (index >= 0)
             entries.value[index][field] = value
 
+        persist()
+    }
+
+    function resetActiveSession() {
+        activeSession.value = { ...DEFAULT_ACTIVE_SESSION }
+        persist()
+    }
+
+    function startWork() {
+        if (activeSession.value.status === 'working')
+            return
+
+        const entry = ensureTodayEntry()
+        const start = nowTimeString()
+
+        entry.typ = 'work'
+        entry.timeEntries = entry.timeEntries ?? []
+
+        entry.timeEntries.push({
+            start,
+            end: '',
+            pause: 0
+        })
+
+        activeSession.value = {
+            date: entry.date,
+            status: 'working',
+            currentEntryId: entry.id,
+            currentBlockIndex: entry.timeEntries.length - 1,
+            breakStartedAt: null,
+            startedAt: new Date().toISOString()
+        }
+
+        persist()
+    }
+
+    function startBreak() {
+        if (activeSession.value.status !== 'working')
+            return
+
+        const entry = findEntryById(activeSession.value.currentEntryId)
+        if (!entry)
+            return
+
+        const block = entry.timeEntries?.[activeSession.value.currentBlockIndex]
+        if (!block || block.end)
+            return
+
+        block.end = nowTimeString()
+
+        activeSession.value.status = 'break'
+        activeSession.value.breakStartedAt = new Date().toISOString()
+
+        persist()
+    }
+
+    function resumeWork() {
+        if (activeSession.value.status !== 'break')
+            return
+
+        const entry = findEntryById(activeSession.value.currentEntryId)
+        if (!entry)
+            return
+
+        const breakStartedAt = activeSession.value.breakStartedAt
+        let breakMinutes = 0
+
+        if (breakStartedAt) {
+            const diffMs = Date.now() - new Date(breakStartedAt).getTime()
+            breakMinutes = Math.max(0, Math.round(diffMs / 60000))
+        }
+
+        const previousBlock = entry.timeEntries?.[activeSession.value.currentBlockIndex]
+        if (previousBlock) {
+            previousBlock.pause = breakMinutes
+        }
+
+        entry.timeEntries.push({
+            start: nowTimeString(),
+            end: '',
+            pause: 0
+        })
+
+        activeSession.value.status = 'working'
+        activeSession.value.currentBlockIndex = entry.timeEntries.length - 1
+        activeSession.value.breakStartedAt = null
+
+        persist()
+    }
+
+    function finishWorkDay() {
+        const entry = findEntryById(activeSession.value.currentEntryId)
+
+        if (activeSession.value.status === 'working' && entry) {
+            const block = entry.timeEntries?.[activeSession.value.currentBlockIndex]
+            if (block && !block.end) {
+                block.end = nowTimeString()
+            }
+        }
+
+        if (activeSession.value.status === 'break' && entry) {
+            const breakStartedAt = activeSession.value.breakStartedAt
+            let breakMinutes = 0
+
+            if (breakStartedAt) {
+                const diffMs = Date.now() - new Date(breakStartedAt).getTime()
+                breakMinutes = Math.max(0, Math.round(diffMs / 60000))
+            }
+
+            const previousBlock = entry.timeEntries?.[activeSession.value.currentBlockIndex]
+            if (previousBlock) {
+                previousBlock.pause = breakMinutes
+            }
+        }
+
+        resetActiveSession()
         persist()
     }
 
@@ -402,6 +548,44 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         return grossHourlyRate.value * effectiveActualHours(entry)
     }
 
+    // Live-tracking timer
+    function padTime(num) {
+        return String(num).padStart(2, '0')
+    }
+
+    function nowDateString() {
+        const now = new Date()
+        return `${now.getFullYear()}-${padTime(now.getMonth() + 1)}-${padTime(now.getDate())}`
+    }
+
+    function nowTimeString() {
+        const now = new Date()
+        return `${padTime(now.getHours())}:${padTime(now.getMinutes())}`
+    }
+
+    function findEntryById(id) {
+        return entries.value.find(entry => entry.id === id) ?? null
+    }
+
+    function ensureTodayEntry() {
+        const today = nowDateString()
+        let entry = entries.value.find(entry => entry.date === today)
+
+        if (!entry) {
+            entry = {
+                id: Date.now(),
+                date: today,
+                typ: 'work',
+                timeEntries: [],
+                plannedHours: settings.value.hoursPerDay,
+                notes: ''
+            }
+            entries.value.push(entry)
+        }
+
+        return entry
+    }
+
     return {
         entries, settings, currYear, currMonth,
         currMonthLabel, entriesForMonth, weekGroups,
@@ -413,5 +597,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         exportJSON, importJSON, exportCSV,
         effectiveActualHours, importHolidays, syncHolidays,
         grossHourlyRate, grossDailyRate, grossEarnedForEntry,
+        activeSession, todayEntry, liveStatus, liveWorkedHours, startWork, startBreak, resumeWork, finishWorkDay, resetActiveSession,
     }
 })
