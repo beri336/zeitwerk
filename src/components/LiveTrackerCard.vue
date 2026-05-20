@@ -1,13 +1,31 @@
 <!-- src/components/LiveTrackerCard.vue -->
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { formatHours } from '@/composables/useTime'
 
 const store = useZeitwerkStore()
 const { showToast } = useToast()
+
+const nowTick = ref(Date.now())
+let timerId = null
+
+onMounted(() => {
+    store.recoverActiveSession()
+
+    timerId = window.setInterval(() => {
+        nowTick.value = Date.now()
+    }, 1000)
+})
+
+onUnmounted(() => {
+    if (timerId) {
+        clearInterval(timerId)
+        timerId = null
+    }
+})
 
 const statusMeta = computed(() => {
     switch (store.liveStatus) {
@@ -41,12 +59,57 @@ const grossToday = computed(() => {
     return store.grossEarnedForEntry(store.todayEntry)
 })
 
+const startedAtLabel = computed(() => {
+    const iso = store.activeSession?.startedAt
+    if (!iso)
+        return null
+
+    return new Intl.DateTimeFormat('de-DE', {
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(new Date(iso))
+})
+
+const liveWorkHours = computed(() => {
+    const base = store.todayEntry ? store.effectiveActualHours(store.todayEntry) : 0
+
+    if (store.liveStatus !== 'working')
+        return base
+
+    const resumedAt = store.activeSession?.lastResumedAt
+    if (!resumedAt)
+        return base
+
+    const extraMs = Math.max(0, nowTick.value - new Date(resumedAt).getTime())
+    return base + (extraMs / 3600000)
+})
+
+const liveBreakMinutes = computed(() => {
+    if (store.liveStatus !== 'break')
+        return 0
+
+    const breakStartedAt = store.activeSession?.breakStartedAt
+    if (!breakStartedAt)
+        return 0
+
+    const diffMs = Math.max(0, nowTick.value - new Date(breakStartedAt).getTime())
+    return Math.floor(diffMs / 60000)
+})
+
 function formatCurrency(value) {
     return new Intl.NumberFormat('de-DE', {
         style: 'currency',
         currency: 'EUR',
         maximumFractionDigits: 2
     }).format(value)
+}
+
+function formatLiveDuration(hours) {
+    const totalSeconds = Math.max(0, Math.floor(hours * 3600))
+    const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, '0')
+    const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0')
+    const ss = String(totalSeconds % 60).padStart(2, '0')
+    return `${hh}:${mm}:${ss}`
 }
 
 function onStartWork() {
@@ -74,6 +137,7 @@ function onFinishWorkDay() {
     <section class="live-card" :class="statusMeta.className">
         <div class="live-card__main">
             <div class="live-card__eyebrow">Today</div>
+
             <div class="live-card__header">
                 <h2 class="live-card__title">Live tracking</h2>
                 <span class="live-card__status">{{ statusMeta.label }}</span>
@@ -81,18 +145,22 @@ function onFinishWorkDay() {
 
             <p class="live-card__hint">{{ statusMeta.hint }}</p>
 
-            <div class="live-card__metrics">
-                <div class="live-metric">
-                    <span class="live-metric__label">Worked today</span>
-                    <span class="live-metric__value">
-                        {{ formatHours(store.liveWorkedHours) }}
-                    </span>
+            <div class="live-card__hero">
+                <div class="live-card__clock">
+                    {{ formatLiveDuration(liveWorkHours) }}
                 </div>
 
-                <div class="live-metric" v-if="store.grossHourlyRate > 0">
-                    <span class="live-metric__label">Gross today</span>
-                    <span class="live-metric__value">
-                        {{ formatCurrency(grossToday) }}
+                <div class="live-card__meta">
+                    <span v-if="startedAtLabel" class="live-meta-chip">
+                        Started at {{ startedAtLabel }}
+                    </span>
+
+                    <span v-if="store.liveStatus === 'break'" class="live-meta-chip live-meta-chip--break">
+                        Break for {{ liveBreakMinutes }} min
+                    </span>
+
+                    <span v-if="store.grossHourlyRate > 0" class="live-meta-chip">
+                        {{ formatCurrency(grossToday) }} gross today
                     </span>
                 </div>
             </div>
@@ -147,7 +215,7 @@ function onFinishWorkDay() {
 <style scoped>
 .live-card {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: 1.45fr 1fr;
     gap: var(--space-6);
     padding: var(--space-6);
     background: var(--color-surface);
@@ -222,35 +290,48 @@ function onFinishWorkDay() {
     max-width: 48ch;
 }
 
-.live-card__metrics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-}
-
-.live-metric {
-    min-width: 160px;
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-    background: var(--color-surface-2);
-    border: 1px solid var(--color-divider);
+.live-card__hero {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklch, var(--color-surface-2) 82%, var(--color-bg));
+    border: 1px solid var(--color-divider);
 }
 
-.live-metric__label {
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-text-faint);
-    font-weight: 700;
-}
-
-.live-metric__value {
-    font-size: var(--text-lg);
-    font-weight: 700;
+.live-card__clock {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+}
+
+.live-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.live-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    border: 1px solid var(--color-divider);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 700;
+}
+
+.live-meta-chip--break {
+    color: var(--color-warning);
+    background: var(--color-warning-highlight);
+    border-color: color-mix(in oklch, var(--color-warning) 20%, var(--color-divider));
 }
 
 .live-card__actions {

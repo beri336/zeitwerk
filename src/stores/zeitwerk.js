@@ -44,7 +44,8 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         currentEntryId: null,
         currentBlockIndex: null,
         breakStartedAt: null,
-        startedAt: null
+        startedAt: null,
+        lastResumedAt: null
     }
 
     // State
@@ -254,6 +255,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             return
 
         const entry = ensureTodayEntry()
+        const nowIso = new Date().toISOString()
         const start = nowTimeString()
 
         entry.typ = 'work'
@@ -271,7 +273,8 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             currentEntryId: entry.id,
             currentBlockIndex: entry.timeEntries.length - 1,
             breakStartedAt: null,
-            startedAt: new Date().toISOString()
+            startedAt: nowIso,
+            lastResumedAt: nowIso
         }
 
         persist()
@@ -318,6 +321,8 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             previousBlock.pause = breakMinutes
         }
 
+        const nowIso = new Date().toISOString()
+
         entry.timeEntries.push({
             start: nowTimeString(),
             end: '',
@@ -327,8 +332,20 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         activeSession.value.status = 'working'
         activeSession.value.currentBlockIndex = entry.timeEntries.length - 1
         activeSession.value.breakStartedAt = null
+        activeSession.value.lastResumedAt = nowIso
 
         persist()
+    }
+
+    function recoverActiveSession() {
+        if (!activeSession.value || activeSession.value.status === 'idle')
+            return
+
+        const today = nowDateString()
+
+        if (activeSession.value.date !== today) {
+            finishWorkDay()
+        }
     }
 
     function finishWorkDay() {
@@ -598,5 +615,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         effectiveActualHours, importHolidays, syncHolidays,
         grossHourlyRate, grossDailyRate, grossEarnedForEntry,
         activeSession, todayEntry, liveStatus, liveWorkedHours, startWork, startBreak, resumeWork, finishWorkDay, resetActiveSession,
+        recoverActiveSession,
     }
 })
