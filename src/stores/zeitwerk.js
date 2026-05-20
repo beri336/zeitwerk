@@ -170,6 +170,15 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const today = nowDateString()
         return entries.value.find(entry => entry.date === today) ?? null
     })
+    const monthGross = computed(() =>
+        entriesForMonth.value.reduce((sum, entry) => sum + grossEarnedForEntry(entry), 0)
+    )
+    const weekGrossGroups = computed(() =>
+        weekGroups.value.map(group => ({
+            kw: group.kw,
+            gross: group.entries.reduce((sum, entry) => sum + grossEarnedForEntry(entry), 0)
+        }))
+    )
 
     const liveStatus = computed(() => activeSession.value.status || 'idle')
 
@@ -623,5 +632,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         activeSession, todayEntry, liveStatus, liveWorkedHours, startWork, startBreak, resumeWork, finishWorkDay, resetActiveSession,
         recoverActiveSession,
         deleteAllEntries,
+        monthGross, weekGrossGroups,
     }
 })

@@ -15,6 +15,8 @@ import WeekdayPatternChart from '@/components/charts/WeekdayPatternChart.vue'
 import AbsenceBreakdownChart from '@/components/charts/AbsenceBreakdownChart.vue'
 import DayLengthHistogramChart from '@/components/charts/DayLengthHistogramChart.vue'
 
+import GrossEarningsChart from '@/components/charts/GrossEarningsChart.vue'
+
 const store = useZeitwerkStore()
 
 const hasData = computed(() => store.entriesForMonth.length > 0)
@@ -112,6 +114,8 @@ const activeDays = computed(() => {
                 <ChartCard title="Day Distribution" subtitle="Distribution of actual working time across the days" wide large>
                     <DayDistributionChart />
                 </ChartCard>
+
+                <GrossEarningsChart v-if="store.grossHourlyRate > 0" :items="store.weekGrossGroups" />
             </div>
         </template>
     </main>
