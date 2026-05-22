@@ -64,6 +64,10 @@ const monthGrossLabel = computed(() => {
 
             <!-- Only if salary is set -->
             <KpiCard v-if="store.grossHourlyRate > 0" label="Month Gross" :value="monthGrossLabel" sub="Gross earnings" variant="ok" :private="true" />
+
+            <!-- Vacation -->
+            <KpiCard label="Used Vacation Days" :value="String(store.usedVacationDays)" sub="Days taken" />
+            <KpiCard label="Remaining Vacation Days" :value="String(store.remainingVacationDays)" :sub="`${store.remainingVacationDays === 1 ? 'Day left' : 'Days left'}`" />
         </div>
 
         <!-- Add Bar: Desktop zeigt Button + Legend nebeneinander -->

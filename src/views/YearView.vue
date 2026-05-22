@@ -6,6 +6,7 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours, MONTH_NAMES } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
 import EntryModal from '@/components/EntryModal.vue'
+import KpiCard from '@/components/KpiCard.vue'
 
 const store = useZeitwerkStore()
 
@@ -170,6 +171,21 @@ function isCurrentMonthCard(monthIndex) {
     const now = new Date()
     return store.currYear === now.getFullYear() && monthIndex === now.getMonth()
 }
+
+const yearGross = computed(() =>
+    yearEntries.value.reduce((sum, entry) => sum + store.grossEarnedForEntry(entry), 0)
+)
+
+const yearGrossLabel = computed(() => {
+    if (!store.grossHourlyRate)
+        return ''
+
+    return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: 2
+    }).format(yearGross.value)
+})
 </script>
 
 <template>
@@ -201,38 +217,29 @@ function isCurrentMonthCard(monthIndex) {
         </p>
 
         <section class="year-summary" aria-label="Year summary">
-            <div class="year-summary-card">
-                <span class="year-summary-label">Months with entries</span>
-                <span class="year-summary-value">
-                    {{yearMonths.filter(month => month.stats.count > 0).length}}
-                </span>
-            </div>
+            <KpiCard label="Months with entries"
+                :value="String(yearMonths.filter(month => month.stats.count > 0).length)" />
 
-            <div class="year-summary-card">
-                <span class="year-summary-label">Entries</span>
-                <span class="year-summary-value">{{ yearEntries.length }}</span>
-            </div>
+            <KpiCard label="Entries" :value="String(yearEntries.length)" />
 
-            <div class="year-summary-card">
-                <span class="year-summary-label">Actual</span>
-                <span class="year-summary-value">
-                    {{formatHours(yearEntries.reduce((sum, entry) => sum + store.effectiveActualHours(entry), 0))}}
-                </span>
-            </div>
+            <KpiCard label="Actual"
+                :value="formatHours(yearEntries.reduce((sum, entry) => sum + store.effectiveActualHours(entry), 0))" />
 
-            <div class="year-summary-card">
-                <span class="year-summary-label">Planned</span>
-                <span class="year-summary-value">
-                    {{
-                        formatHours(
-                            yearEntries.reduce(
-                                (sum, entry) => sum + (entry.plannedHours || store.settings.hoursPerDay),
-                                0
-                            )
-                        )
-                    }}
-                </span>
-            </div>
+            <KpiCard label="Planned" :value="formatHours(
+                yearEntries.reduce(
+                    (sum, entry) => sum + (entry.plannedHours || store.settings.hoursPerDay),
+                    0
+                )
+            )" />
+
+            <!-- Only if salary is set -->
+            <KpiCard v-if="store.grossHourlyRate > 0" label="Year Gross" :value="yearGrossLabel" sub="Gross earnings"
+                variant="ok" :private="true" />
+
+            <!-- Vacation -->
+            <KpiCard label="Used Vacation Days" :value="String(store.usedVacationDays)" sub="Days taken" />
+            <KpiCard label="Remaining Vacation Days" :value="String(store.remainingVacationDays)"
+                :sub="`${store.remainingVacationDays === 1 ? 'Day left' : 'Days left'}`" />
         </section>
 
         <section class="year-grid" aria-label="Year calendar overview">
@@ -360,29 +367,6 @@ function isCurrentMonthCard(monthIndex) {
     gap: var(--space-3);
 }
 
-.year-summary-card {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: var(--space-3);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-}
-
-.year-summary-label {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
-
-.year-summary-value {
-    font-size: var(--text-base);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-}
-
 .year-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -408,7 +392,8 @@ function isCurrentMonthCard(monthIndex) {
     border-color: color-mix(in oklch, var(--color-error) 28%, var(--color-border));
 }
 
-.year-month--current { /* Highlight current month */
+.year-month--current {
+    /* Highlight current month */
     border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
     box-shadow:
         inset 0 0 0 1px color-mix(in oklch, var(--color-gold) 38%, transparent),
@@ -416,7 +401,8 @@ function isCurrentMonthCard(monthIndex) {
         var(--shadow-sm);
 }
 
-.year-month--current .year-month-title { /* Highlight current month title */
+.year-month--current .year-month-title {
+    /* Highlight current month title */
     color: var(--color-gold);
 }
 

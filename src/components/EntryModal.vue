@@ -6,6 +6,9 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { calcActualHours, formatHours, today } from '@/composables/useTime'
 import { ABSENCE_TYPES, getAbsenceType } from '@/composables/useAbsence'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
@@ -22,7 +25,8 @@ const defaultForm = () => ({
     typ: 'on-site',
     timeEntries: [{ start: '', end: '', pause: store.settings.defaultBreak }],
     plannedHours: store.settings.hoursPerDay,
-    notes: ''
+    notes: '',
+    remarks: '',
 })
 
 const form = ref(defaultForm())
@@ -87,6 +91,13 @@ function save() {
     }
     close()
 }
+
+// show salary
+const grossPreview = computed(() => {
+    if (!showTimeFields.value)
+        return 0
+    return store.grossEarnedForEntry(form.value)
+})
 </script>
 
 <template>
@@ -126,6 +137,16 @@ function save() {
                             <label class="form-label">Planned Hours (h/Day)</label>
                             <input class="form-input" type="number" step="0.5" min="0" max="24"
                                 v-model.number="form.plannedHours" />
+                        </div>
+
+                        <!-- Gross Preview -->
+                        <div v-if="showTimeFields
+                            && form.timeEntries?.some(b => b.start && b.end)
+                            && store.grossHourlyRate > 0" class="preview-bar">
+                            <span class="form-label">Preview Salary</span>
+                            <strong class="preview-salary">
+                                {{ mask(grossPreview.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })) }}
+                            </strong>
                         </div>
 
                         <!-- TimeEntry - only on Work/ Homeoffice -->
@@ -171,7 +192,7 @@ function save() {
                                         <line x1="12" y1="5" x2="12" y2="19" />
                                         <line x1="5" y1="12" x2="19" y2="12" />
                                     </svg>
-                                    Zeitblock hinzufügen
+                                    Add new time entry
                                 </button>
                             </div>
                         </template>
@@ -190,6 +211,13 @@ function save() {
                             <label class="form-label">Notes</label>
                             <input class="form-input" type="text" maxlength="200" v-model="form.notes"
                                 :placeholder="`e.g., ${currentType.label}${form.typ === 'vacation' ? ', approved' : ''}`" />
+                        </div>
+
+                        <!-- Remarks -->
+                         <div class="form-group full">
+                            <label class="form-label">Remarks</label>
+                            <textarea class="form-input form-textarea" v-model="form.notiz" rows="4" maxlength="2000"
+                                placeholder="Longer daily notes, observations, notable events ..." />
                         </div>
 
                         <!-- Preview Total-Actual -->
@@ -247,12 +275,16 @@ function save() {
 
 .preview-bar {
     margin-top: var(--space-4);
-    padding: var(--space-3);
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-2);
     background: var(--color-surface-offset);
     border-radius: var(--radius-md);
     display: flex;
-    align-items: center;
     gap: var(--space-3);
+}
+
+.preview-salary {
+    color: var(--color-gold);
 }
 
 .preview-hint {
@@ -370,6 +402,12 @@ function save() {
     font-weight: 500;
     color: var(--color-error);
     margin-right: auto;
+}
+
+/* Remarks */
+.form-textarea {
+    min-height: 110px;
+    resize: vertical;
 }
 
 /* Mobile Devices Optimization */

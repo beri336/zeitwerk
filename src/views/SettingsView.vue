@@ -43,7 +43,7 @@ function save() {
 }
 
 function reset() {
-    Object.assign(form, { hoursPerDay: 8, hoursPerWeek: 40, defaultBreak: 30, workDays: 5, state: 'BW', grossHourlyRate: 0, grossMonthlySalary: 0 })
+    Object.assign(form, { hoursPerDay: 8, hoursPerWeek: 40, defaultBreak: 30, workDays: 5, state: 'BW', grossHourlyRate: 0, grossMonthlySalary: 0, vacationDaysPerYear: 30 })
     store.saveSettings({ ...form })
     showToast('Settings reset.', 'ok')
 
@@ -110,24 +110,28 @@ const previewGrossDailyRate = computed(() => {
                             v-model.number="form.hoursPerDay" />
                         <span class="form-hint">e.g., 8 for 8h/Day</span>
                     </div>
+                    <!-- Working hours per week -->
                     <div class="form-group">
                         <label class="form-label">Working Hours / Week (Planned)</label>
                         <input class="form-input" type="number" step="0.5" min="1" max="60"
                             v-model.number="form.hoursPerWeek" />
                         <span class="form-hint">e.g., 40 for 40h/Week</span>
                     </div>
+                    <!-- Default Break -->
                     <div class="form-group">
                         <label class="form-label">Default break (min)</label>
                         <input class="form-input" type="number" step="5" min="0" max="120"
                             v-model.number="form.defaultBreak" />
                         <span class="form-hint">Will be automatically entered</span>
                     </div>
+                    <!-- Working days per week -->
                     <div class="form-group">
                         <label class="form-label">Working Days / Week</label>
                         <input class="form-input" type="number" step="1" min="1" max="7"
                             v-model.number="form.workDays" />
                         <span class="form-hint">e.g., 5 for Mon–Fri</span>
                     </div>
+                    <!-- State selection -->
                     <div class="form-group">
                         <label class="form-label">States</label>
                         <select class="form-input" v-model="form.state">
@@ -137,19 +141,27 @@ const previewGrossDailyRate = computed(() => {
                         </select>
                         <span class="form-hint">For automatic holiday detection</span>
                     </div>
+                    <!-- Vacation days -->
+                    <div class="form-group">
+                        <label class="form-label">Vacation Days / Year</label>
+                        <input class="form-input" type="number" step="1" min="0" max="365"
+                            v-model.number="form.vacationDaysPerYear" />
+                        <span class="form-hint">e.g., 30 for 30 vacation days/year</span>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Gross monthly salary (Brutto)</label>
                         
-                        <!-- Normales Input — nur wenn Privacy OFF -->
+                        <!-- Normal input — only if privacy is OFF -->
                         <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
                             v-model.number="form.grossMonthlySalary" />
 
-                        <!-- Maskiert — wenn Privacy ON -->
+                        <!-- Masked — if Privacy ON -->
                         <input v-else class="form-input" type="text" value="••••" disabled />
 
                         <span class="form-hint">e.g., 3000 for 3000€/Month</span>
                         <span class="form-hint">Used to calculate gross hourly and daily earnings</span>
                     </div>
+                    <!-- Salary Preview -->
                     <div class="form-group full" v-if="previewGrossHourlyRate > 0">
                         <label class="form-label">Preview</label>
                         <div class="salary-preview">
@@ -165,7 +177,7 @@ const previewGrossDailyRate = computed(() => {
                 
                 <div class="privacy-row">
                     <div class="privacy-info">
-                        <!-- Auge durchgestrichen = Privacy ON -->
+                        <!-- Privacy ON -->
                         <span class="privacy-icon">
                             <svg v-if="privacyMode" width="20" height="20" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -175,13 +187,14 @@ const previewGrossDailyRate = computed(() => {
                                 <line x1="1" y1="1" x2="23" y2="23" />
                             </svg>
 
-                            <!-- Auge offen = Privacy OFF -->
+                            <!-- Privacy OFF -->
                             <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                 <circle cx="12" cy="12" r="3" />
                             </svg>
                         </span>
+                        <!-- Privacy Info -->
                         <div>
                             <div class="privacy-label">Privacy Mode</div>
                             <div class="privacy-hint">
@@ -192,7 +205,7 @@ const previewGrossDailyRate = computed(() => {
                         </div>
                     </div>
 
-                    <!-- Toggle Schieberegler -->
+                    <!-- Toggle for privacy mode -->
                     <button class="toggle-switch" :class="{ active: privacyMode }" @click="toggle"
                         :aria-label="privacyMode ? 'Privacy Mode deaktivieren' : 'Privacy Mode aktivieren'"
                         role="switch" :aria-checked="privacyMode">

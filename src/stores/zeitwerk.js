@@ -15,7 +15,8 @@ const DEFAULT_SETTINGS = {
     defaultBreak: 30,
     workDays: 5,
     state: 'BW',
-    grossMonthlySalary: 0
+    grossMonthlySalary: 0,
+    vacationDaysPerYear: 30
 }
 
 function loadStorage() {
@@ -76,6 +77,22 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     const currYear = ref(new Date().getFullYear())
     const currMonth = ref(new Date().getMonth()) // 0-indexed
+
+    // count vacations per year
+    const vacationEntriesForYear = computed(() =>
+        entries.value.filter(e => {
+            const d = new Date(e.date + 'T00:00:00')
+            return d.getFullYear() === currYear.value && e.typ === 'vacation'
+        })
+    )
+
+    const usedVacationDays = computed(() => vacationEntriesForYear.value.length)
+
+    const remainingVacationDays = computed(() => {
+        const raw = Number(settings.value.vacationDaysPerYear)
+        const total = Number.isFinite(raw) ? raw : 30
+        return Math.max(0, total - usedVacationDays.value)
+    })
 
     // Persist
     function persist() {
@@ -743,5 +760,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         recoverActiveSession,
         deleteAllEntries,
         monthGross, weekGrossGroups,
+        usedVacationDays, remainingVacationDays,
     }
 })
