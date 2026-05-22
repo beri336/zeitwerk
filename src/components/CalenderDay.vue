@@ -62,6 +62,12 @@ function formatCurrency(value) {
         maximumFractionDigits: 2
     }).format(value)
 }
+
+// Check if the day is a weekend
+const isWeekend = computed(() => {
+    const day = new Date(props.date + 'T00:00:00').getDay()
+    return day === 0 || day === 6
+})
 </script>
 
 <template>
@@ -70,7 +76,8 @@ function formatCurrency(value) {
         'cal-day--outside': isOutside,
         'cal-day--entry': !!entry,
         'cal-day--absence': entry && entry.typ && entry.typ !== 'on-site',
-        'cal-day--flash': flashToday
+        'cal-day--flash': flashToday,
+        'cal-day--weekend': isWeekend
     }" :style="entry && entry.typ && entry.typ !== 'on-site'
             ? `--day-accent:${type.color};--day-bg:${type.highlight}`
             : ''" :data-cal-date="date" type="button" @click="emit('click', date)">
@@ -294,5 +301,15 @@ function formatCurrency(value) {
     .cal-day__gross {
         font-size: 11px;
     }
+}
+
+/* Weekend styling */
+.cal-day--weekend {
+    background: color-mix(in oklch, var(--color-primary-highlight) 35%, var(--color-surface));
+}
+
+.cal-day--weekend .cal-day__num {
+    color: var(--color-warning);
+    font-weight: 700;
 }
 </style>

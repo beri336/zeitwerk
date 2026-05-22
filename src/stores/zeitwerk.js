@@ -452,7 +452,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     function exportCSV({ fromYear, fromMonth, toYear = fromYear, toMonth = fromMonth } = {}) {
         const pad = num => String(num).padStart(2, '0')
         const quote = value => `"${String(value ?? '').replace(/"/g, '""')}"`
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
         const start = new Date(fromYear, fromMonth, 1)
         const end = new Date(toYear, toMonth + 1, 0)
