@@ -72,7 +72,7 @@ const route = useRoute()
 @media (max-width: 767px) {
     .bottom-nav {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         position: fixed;
         /* fixed, nicht sticky — bleibt immer sichtbar */
         left: 0;

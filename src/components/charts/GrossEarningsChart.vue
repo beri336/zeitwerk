@@ -2,6 +2,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
 
 const props = defineProps({
     items: {
@@ -46,7 +49,7 @@ function barWidth(value) {
             <div v-for="item in items" :key="item.kw" class="gross-row">
                 <div class="gross-row__top">
                     <span class="gross-row__label">KW {{ item.kw }}</span>
-                    <span class="gross-row__value">{{ formatCurrency(item.gross) }}</span>
+                    <span class="gross-row__value">{{ mask(formatCurrency(item.gross)) }}</span>
                 </div>
 
                 <div class="gross-row__track">

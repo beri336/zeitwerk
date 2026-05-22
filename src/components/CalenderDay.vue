@@ -5,6 +5,9 @@ import { computed } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
 
 const props = defineProps({
     date: { type: String, required: true }, // 'YYYY-MM-DD'
@@ -82,7 +85,7 @@ function formatCurrency(value) {
             <div class="cal-day__ist">{{ formatHours(actual) }}</div>
 
             <div v-if="entry && store.grossHourlyRate > 0" class="cal-day__gross">
-                {{ formatCurrency(grossEarned) }}
+                {{ mask(formatCurrency(grossEarned)) }}
             </div>
 
             <div v-if="entry?.timeEntries?.length" class="cal-day__time">

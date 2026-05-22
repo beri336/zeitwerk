@@ -9,6 +9,10 @@ import EntryModal from '@/components/EntryModal.vue'
 import AbsenceLegend from '@/components/AbsenceLegend.vue'
 import HolidayImportModal from '@/components/HolidayImportModal.vue'
 
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
+
 const store = useZeitwerkStore()
 const showModal = ref(false)
 const editEntry = ref(null)
@@ -59,8 +63,7 @@ const monthGrossLabel = computed(() => {
             <KpiCard label="Entries" :value="String(store.entriesForMonth.length)" sub="Work days" />
 
             <!-- Only if salary is set -->
-            <KpiCard v-if="store.grossHourlyRate > 0" label="Month Gross" :value="monthGrossLabel" sub="Gross earnings"
-                variant="ok" />
+            <KpiCard v-if="store.grossHourlyRate > 0" label="Month Gross" :value="monthGrossLabel" sub="Gross earnings" variant="ok" :private="true" />
         </div>
 
         <!-- Add Bar: Desktop zeigt Button + Legend nebeneinander -->

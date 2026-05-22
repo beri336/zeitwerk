@@ -8,6 +8,10 @@ import { calcActualHours, formatHours, formatDate } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
 import LiveTrackerCard from '@/components/LiveTrackerCard.vue'
 
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
+
 const emit = defineEmits(['edit'])
 
 const store = useZeitwerkStore()
@@ -150,11 +154,11 @@ function cancelDelete() {
                                         {{ formatHours(store.effectiveActualHours(entry)) }}
                                     </span>
                                     <span v-if="store.grossHourlyRate > 0" class="day-gross">
-                                        {{ new Intl.NumberFormat('de-DE', {
+                                        {{ mask(new Intl.NumberFormat('de-DE', {
                                             style: 'currency',
                                             currency: 'EUR',
                                             maximumFractionDigits: 2
-                                        }).format(store.grossEarnedForEntry(entry)) }}
+                                        }).format(store.grossEarnedForEntry(entry))) }}
                                     </span>
                                 </div>
                             </td>

@@ -5,6 +5,9 @@ import { reactive, ref, watch, computed } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { STATES } from '@/composables/useHolidays'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { privacyMode, toggle, mask } = usePrivacy()
 
 const store = useZeitwerkStore()
 
@@ -25,7 +28,7 @@ watch(
     (newVal, oldVal) => {
         if (!oldVal || newVal === oldVal)
             return
-        
+
         store.saveSettings({ state: newVal })
         showToast(
             `State changed to  ${STATES[newVal]} - Holidays updated.`,
@@ -40,9 +43,13 @@ function save() {
 }
 
 function reset() {
-    Object.assign(form, { hoursPerDay: 8, hoursPerWeek: 40, defaultBreak: 30, workDays: 5, state: 'BW' })
+    Object.assign(form, { hoursPerDay: 8, hoursPerWeek: 40, defaultBreak: 30, workDays: 5, state: 'BW', grossHourlyRate: 0, grossMonthlySalary: 0 })
     store.saveSettings({ ...form })
     showToast('Settings reset.', 'ok')
+
+    // deactivate privacy mode when resetting settings
+    if (privacyMode)
+        toggle()
 }
 
 // Delete
@@ -132,16 +139,22 @@ const previewGrossDailyRate = computed(() => {
                     </div>
                     <div class="form-group">
                         <label class="form-label">Gross monthly salary (Brutto)</label>
-                        <input class="form-input" type="number" step="1" min="1" max="10000"
+                        
+                        <!-- Normales Input — nur wenn Privacy OFF -->
+                        <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
                             v-model.number="form.grossMonthlySalary" />
+
+                        <!-- Maskiert — wenn Privacy ON -->
+                        <input v-else class="form-input" type="text" value="••••" disabled />
+
                         <span class="form-hint">e.g., 3000 for 3000€/Month</span>
                         <span class="form-hint">Used to calculate gross hourly and daily earnings</span>
                     </div>
                     <div class="form-group full" v-if="previewGrossHourlyRate > 0">
                         <label class="form-label">Preview</label>
                         <div class="salary-preview">
-                            <span>{{ previewGrossHourlyRate.toFixed(2) }} €/h gross</span>
-                            <span>{{ previewGrossDailyRate.toFixed(2) }} €/day gross</span>
+                            <span>{{ mask(previewGrossHourlyRate.toFixed(2)) }} €/h gross</span>
+                            <span>{{ mask(previewGrossDailyRate.toFixed(2)) }} €/day gross</span>
                         </div>
                         <span class="form-hint">
                             Hourly pay is based on the yearly average: monthly salary × 12 divided by weekly hours × 52.
@@ -149,45 +162,82 @@ const previewGrossDailyRate = computed(() => {
                         </span>
                     </div>
                 </div>
-                <div class="settings-actions">
-                    <button class="btn btn-primary" @click="save">Save</button>
-                    <button class="btn btn-secondary" @click="reset">Reset</button>
+                
+                <div class="privacy-row">
+                    <div class="privacy-info">
+                        <!-- Auge durchgestrichen = Privacy ON -->
+                        <span class="privacy-icon">
+                            <svg v-if="privacyMode" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+
+                            <!-- Auge offen = Privacy OFF -->
+                            <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </span>
+                        <div>
+                            <div class="privacy-label">Privacy Mode</div>
+                            <div class="privacy-hint">
+                                {{ privacyMode
+                                    ? 'The salary is now masked and are hidden.'
+                                    : 'All numbers are visible.' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toggle Schieberegler -->
+                    <button class="toggle-switch" :class="{ active: privacyMode }" @click="toggle"
+                        :aria-label="privacyMode ? 'Privacy Mode deaktivieren' : 'Privacy Mode aktivieren'"
+                        role="switch" :aria-checked="privacyMode">
+                        <span class="toggle-thumb" />
+                    </button>
+                </div>
+            </div>
+            <div class="settings-actions">
+                <button class="btn btn-primary" @click="save">Save</button>
+                <button class="btn btn-secondary" @click="reset">Reset</button>
+            </div>
+
+            <div class="danger-zone">
+                <div class="danger-zone__header">
+                    <div class="danger-zone__title">Danger Zone</div>
+                    <div class="danger-zone__sub">
+                        Delete all stored entries permanently. This action cannot be undone.
+                    </div>
                 </div>
 
-                <div class="danger-zone">
-                    <div class="danger-zone__header">
-                        <div class="danger-zone__title">Danger Zone</div>
-                        <div class="danger-zone__sub">
-                            Delete all stored entries permanently. This action cannot be undone.
-                        </div>
+                <div v-if="!showDeleteConfirm" class="danger-zone__actions">
+                    <button class="btn btn-danger" @click="askDeleteAll">
+                        Delete all entries
+                    </button>
+                </div>
+
+                <div v-else class="danger-confirm">
+                    <div class="danger-confirm__warning">
+                        You are about to permanently remove all tracked entries, including work days, absences, and
+                        imported holidays.
                     </div>
 
-                    <div v-if="!showDeleteConfirm" class="danger-zone__actions">
-                        <button class="btn btn-danger" @click="askDeleteAll">
-                            Delete all entries
+                    <label class="form-label" for="delete-confirm-input">
+                        Type <strong>DELETE</strong> to confirm
+                    </label>
+                    <input id="delete-confirm-input" v-model="deleteConfirmText" class="form-input danger-input"
+                        type="text" placeholder="DELETE" autocomplete="off" />
+
+                    <div class="danger-confirm__actions">
+                        <button class="btn btn-secondary" @click="cancelDeleteAll">
+                            Cancel
                         </button>
-                    </div>
-
-                    <div v-else class="danger-confirm">
-                        <div class="danger-confirm__warning">
-                            You are about to permanently remove all tracked entries, including work days, absences, and
-                            imported holidays.
-                        </div>
-
-                        <label class="form-label" for="delete-confirm-input">
-                            Type <strong>DELETE</strong> to confirm
-                        </label>
-                        <input id="delete-confirm-input" v-model="deleteConfirmText" class="form-input danger-input"
-                            type="text" placeholder="DELETE" autocomplete="off" />
-
-                        <div class="danger-confirm__actions">
-                            <button class="btn btn-secondary" @click="cancelDeleteAll">
-                                Cancel
-                            </button>
-                            <button class="btn btn-danger" :disabled="!canDeleteAll" @click="confirmDeleteAll">
-                                Yes, delete everything
-                            </button>
-                        </div>
+                        <button class="btn btn-danger" :disabled="!canDeleteAll" @click="confirmDeleteAll">
+                            Yes, delete everything
+                        </button>
                     </div>
                 </div>
             </div>
@@ -203,6 +253,14 @@ const previewGrossDailyRate = computed(() => {
     flex-direction: column;
     gap: var(--space-5);
     /* kein grid-column, kein overflow-y — App.vue steuert das */
+}
+
+.btn-primary {
+    margin-left: var(--space-6);
+}
+
+.btn-secondary {
+    margin-left: var(--space-1);
 }
 
 .salary-preview {
@@ -250,15 +308,21 @@ const previewGrossDailyRate = computed(() => {
 }
 
 .settings-actions {
-    margin-top: var(--space-6);
+    margin-top: var(--space-4);
+    margin-left: var(--space-6);
+    margin-bottom: var(--space-2);
     display: flex;
     gap: var(--space-3);
 }
 
 /* Delete Confirmation */
+/* Padding unten zur settings-card hinzufügen */
 .danger-zone {
     margin-top: var(--space-6);
+    margin-left: var(--space-6);
+    margin-right: var(--space-6);
     padding-top: var(--space-6);
+    padding-bottom: var(--space-6);
     border-top: 1px solid var(--color-divider);
     display: flex;
     flex-direction: column;
@@ -329,5 +393,81 @@ const previewGrossDailyRate = computed(() => {
         padding: var(--space-3);
         gap: var(--space-3);
     }
+}
+
+.form-input:disabled {
+    min-width: 0;
+    width: 100%;
+    /* gleiche Breite wie normales Input */
+    letter-spacing: 2px;
+    /* •••• etwas lockerer, weniger breit */
+    color: var(--color-text-muted);
+}
+
+/* Settings */
+.privacy-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-divider);
+}
+
+.privacy-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.privacy-icon {
+    font-size: 1.5rem;
+}
+
+.privacy-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 1px;
+}
+
+.privacy-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: 1px;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 26px;
+    border-radius: var(--radius-full);
+    background: var(--color-border);
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition);
+    flex-shrink: 0;
+}
+
+.toggle-switch.active {
+    background: var(--color-primary);
+}
+
+.toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition);
+}
+
+.toggle-switch.active .toggle-thumb {
+    transform: translateX(18px);
 }
 </style>

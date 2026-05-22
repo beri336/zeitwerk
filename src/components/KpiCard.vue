@@ -1,18 +1,25 @@
 <!-- src/components/KpiCard.vue -->
 
 <script setup>
-defineProps({
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
+
+const props = defineProps({
     label: { type: String, required: true },
     value: { type: String, required: true },
     sub: { type: String, default: '' },
-    variant: { type: String, default: '' }
+    variant: { type: String, default: '' },
+    private: { type: Boolean, default: false }
 })
 </script>
 
 <template>
     <div class="kpi-card">
         <div class="kpi-label">{{ label }}</div>
-        <div class="kpi-value" :class="`kpi-${variant}`">{{ value }}</div>
+        <div class="kpi-value" :class="`kpi-${variant}`">
+            {{ props.private ? mask(value) : value }}
+        </div>
         <div v-if="sub" class="kpi-sub">{{ sub }}</div>
     </div>
 </template>

@@ -5,6 +5,9 @@ import { useRoute } from 'vue-router'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import ExportCsvModal from '@/components/ExportCsvModal.vue'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { privacyMode, toggle } = usePrivacy()
 
 const props = defineProps({ isDark: Boolean })
 const emit = defineEmits(['toggle-theme'])
@@ -131,11 +134,29 @@ function onFileChange(event) {
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
             </button>
+
+            <!-- Privacy Toggle -->
+            <button class="btn btn-ghost icon-btn" :title="privacyMode ? 'Zahlen anzeigen' : 'Zahlen ausblenden'"
+                @click="toggle">
+                <!-- Auge offen -->
+                <svg v-if="!privacyMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+                <!-- Auge durchgestrichen -->
+                <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+            </button>
         </div>
 
         <input type="file" id="importFileInput" accept=".json" style="display:none" @change="onFileChange" />
     </header>
-    
+
     <ExportCsvModal v-model="showCsvModal" @confirm="handleCsvConfirm" />
 </template>
 
