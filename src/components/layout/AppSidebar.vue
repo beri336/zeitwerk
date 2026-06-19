@@ -40,19 +40,6 @@
                 <span>Live Tracking</span>
             </RouterLink>
 
-            <!-- Calendar -->
-            <RouterLink to="/calender" class="sidebar-item" :class="{ active: route.path === '/calender' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke-linecap="round"
-                        stroke-width="2.5" />
-                </svg>
-                <span>Calendar</span>
-            </RouterLink>
-
             <!-- Month Overview -->
             <RouterLink to="/month-overview" class="sidebar-item" :class="{ active: route.path === '/month-overview' }">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -80,6 +67,19 @@
                     <line x1="7" y1="19" x2="13" y2="19" />
                 </svg>
                 <span>Year Overview</span>
+            </RouterLink>
+
+            <!-- Calendar -->
+            <RouterLink to="/calender" class="sidebar-item" :class="{ active: route.path === '/calender' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke-linecap="round"
+                        stroke-width="2.5" />
+                </svg>
+                <span>Calendar</span>
             </RouterLink>
 
             <!-- Diagrams -->
