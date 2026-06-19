@@ -8,6 +8,7 @@ import MonthOverviewView from '@/views/MonthOverviewView.vue'
 import YearView from '@/views/YearView.vue'
 import CalenderView from '@/views/CalenderView.vue'
 import DiagramsView from '@/views/DiagramsView.vue'
+import ProfileView from '@/views/ProfileView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
 const routes = [
@@ -18,6 +19,7 @@ const routes = [
     { path: '/year-overview', name: 'year-overview', component: YearView },
     { path: '/calender', name: 'calender', component: CalenderView },
     { path: '/diagrams', name: 'diagrams', component: DiagramsView },
+    { path: '/profile', name: 'profile', component: ProfileView },
     { path: '/settings', name: 'settings', component: SettingsView },
 ]
 

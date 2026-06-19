@@ -161,6 +161,7 @@ const titles = {
     '/calender': 'Calender',
     '/year-overview': 'Year Overview',
     '/diagrams': 'Diagrams & Stats',
+    '/profile': 'Profile',
     '/settings': 'Settings',
 }
 
