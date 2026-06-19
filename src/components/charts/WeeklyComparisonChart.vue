@@ -1,4 +1,10 @@
 <!-- src/components/charts/WeeklyComparisonChart.vue -->
+
+<template>
+    <Bar :data="chartData" :options="chartOptions" aria-label="Weekly comparison of planned and actual hours"
+        role="img" />
+</template>
+
 <script setup>
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
@@ -21,14 +27,14 @@ const chartData = computed(() => ({
     datasets: [
         {
             label: 'Planned',
-            data: store.weekGroups.map(g => Number(g.planned.toFixed(2))),
+            data: store.weekGroups.map(group => Number(group.planned.toFixed(2))),
             backgroundColor: 'rgba(0, 100, 148, 0.72)',
             borderRadius: 8,
             maxBarThickness: 28
         },
         {
             label: 'Actual',
-            data: store.weekGroups.map(g => Number(g.actual.toFixed(2))),
+            data: store.weekGroups.map(group => Number(group.actual.toFixed(2))),
             backgroundColor: 'rgba(1, 105, 111, 0.82)',
             borderRadius: 8,
             maxBarThickness: 28
@@ -39,11 +45,18 @@ const chartData = computed(() => ({
 const chartOptions = computed(() => ({
     responsive: true,
     maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
+    interaction: {
+        mode: 'index',
+        intersect: false
+    },
     plugins: {
         legend: {
             position: 'top',
-            labels: { usePointStyle: true, boxWidth: 10, color: getComputedStyle(document.documentElement).getPropertyValue('--color-text') }
+            labels: {
+                usePointStyle: true,
+                boxWidth: 10,
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-text')
+            }
         },
         tooltip: {
             callbacks: {
@@ -53,8 +66,12 @@ const chartOptions = computed(() => ({
     },
     scales: {
         x: {
-            grid: { display: false },
-            ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--color-text-muted') }
+            grid: {
+                display: false
+            },
+            ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-text-muted')
+            }
         },
         y: {
             beginAtZero: true,
@@ -69,8 +86,3 @@ const chartOptions = computed(() => ({
     }
 }))
 </script>
-
-<template>
-    <Bar :data="chartData" :options="chartOptions" aria-label="Weekly comparison of planned and actual hours"
-        role="img" />
-</template>

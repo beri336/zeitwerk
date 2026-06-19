@@ -1,66 +1,98 @@
 <!-- src/components/charts/MonthOverviewChart.vue -->
 
+<template>
+    <ChartCard title="12-Month Overview" subtitle="Actual · Planned · Difference" wide tall>
+        <Bar :data="chartData" :options="options" />
+    </ChartCard>
+</template>
+
 <script setup>
 import { computed } from 'vue'
-import { Line } from 'vue-chartjs'
+import { Bar } from 'vue-chartjs'
 import {
     Chart as ChartJS, CategoryScale, LinearScale,
-    PointElement, LineElement, Title, Tooltip, Legend, Filler
+    BarElement, LineElement, PointElement, Tooltip, Legend, Filler
 } from 'chart.js'
+
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useChartTheme } from '@/composables/useChartTheme'
-import { calcActualHours, MONTH_NAMES } from '@/composables/useTime'
+import { MONTH_NAMES } from '@/composables/useTime'
+import ChartCard from './ChartCard.vue'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend, Filler)
 
 const store = useZeitwerkStore()
 const { colors, baseOptions } = useChartTheme()
 
-// Calculate Overtime/Missed Hours for the last 12 months
 const monthlyData = computed(() => {
-    const results = []
-
-    for (let i = 11; i >= 0; i--) {
-        let month = store.currMonth - i
+    return Array.from({ length: 12 }, (_, i) => {
+        let month = store.currMonth - 11 + i
         let year = store.currYear
+
         if (month < 0) {
-            month += 12;
+            month += 12
             year--
         }
 
-        const monthEntries = store.entries.filter(entry => {
-            const date = new Date(entry.date)
+        const entries = store.entries.filter(e => {
+            const date = new Date(e.date)
+
             return date.getFullYear() === year && date.getMonth() === month
         })
 
-        const actual = monthEntries.reduce((a, entry) => a + calcActualHours(entry), 0)
-        const planned = monthEntries.reduce((a, entry) => a + (entry.plannedHours || store.settings.hoursPerDay), 0)
+        const actual = parseFloat(entries.reduce((s, e) => s + store.effectiveActualHours(e), 0).toFixed(2))
+        const planned = parseFloat(entries.reduce((s, e) => s + (e.plannedHours || store.settings.hoursPerDay), 0).toFixed(2))
+        const diff = parseFloat((actual - planned).toFixed(2))
 
-        results.push({ label: MONTH_NAMES[month].slice(0, 3), diff: parseFloat((actual - planned).toFixed(2)), ist: parseFloat(actual.toFixed(2)), soll: parseFloat(planned.toFixed(2)) })
-    }
-    return results
+        return {
+            label: MONTH_NAMES[month].slice(0, 3),
+            actual,
+            planned,
+            diff
+        }
+    })
 })
 
 const chartData = computed(() => ({
-    labels: monthlyData.value.map(d => d.label),
-
+    labels: monthlyData.value.map(data => data.label),
     datasets: [
         {
-            label: 'Overtime (h)',
-            data: monthlyData.value.map(d => d.diff),
+            type: 'bar',
+            label: 'Actual (h)',
+            data: monthlyData.value.map(data => data.actual),
+            backgroundColor: colors.value.primaryHL,
             borderColor: colors.value.primary,
-            backgroundColor: ctx => {
-                const canvas = ctx.chart.canvas
-                const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, canvas.height)
-                gradient.addColorStop(0, colors.value.primaryHL + 'cc')
-                gradient.addColorStop(1, colors.value.primaryHL + '00')
-                return gradient
-            },
+            borderWidth: 2,
+            borderRadius: 5,
+            borderSkipped: false,
+            order: 2,
+        },
+        {
+            type: 'bar',
+            label: 'Planned (h)',
+            data: monthlyData.value.map(data => data.planned),
+            backgroundColor: colors.value.border,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            borderRadius: 5,
+            borderSkipped: false,
+            order: 3,
+        },
+        {
+            type: 'line',
+            label: 'Difference (h)',
+            data: monthlyData.value.map(data => data.diff),
+            borderColor: colors.value.warning,
+            backgroundColor: 'transparent',
             borderWidth: 2,
             pointRadius: 4,
-            pointBackgroundColor: colors.value.primary,
+            pointBackgroundColor: monthlyData.value.map(data =>
+                data.diff >= 0 ? colors.value.success : colors.value.error
+            ),
             tension: 0.4,
-            fill: true
+            fill: false,
+            order: 1,
+            yAxisID: 'diff',
         }
     ]
 }))
@@ -69,23 +101,15 @@ const options = computed(() => ({
     ...baseOptions.value,
     plugins: {
         ...baseOptions.value.plugins,
-        title: {
-            display: true,
-            text: 'Overtime-History (12 Months)',
-            color: colors.value.text,
-            font: { family: 'Inter', size: 14, weight: '600' },
-            padding: { bottom: 16 }
-        },
         tooltip: {
             ...baseOptions.value.plugins.tooltip,
             callbacks: {
                 label: ctx => {
-                    const d = monthlyData.value[ctx.dataIndex]
-                    return [
-                        ` Difference: ${ctx.parsed.y}h`,
-                        ` Actual: ${d.ist}h`,
-                        ` Planned: ${d.soll}h`
-                    ]
+                    const data = monthlyData.value[ctx.dataIndex]
+                    if (ctx.dataset.label === 'Difference (h)')
+                        return ` Diff: ${data.diff >= 0 ? '+' : ''}${data.diff}h`
+
+                    return ` ${ctx.dataset.label}: ${ctx.parsed.y}h`
                 }
             }
         }
@@ -94,33 +118,19 @@ const options = computed(() => ({
         ...baseOptions.value.scales,
         y: {
             ...baseOptions.value.scales.y,
+            beginAtZero: true,
+            ticks: { ...baseOptions.value.scales.y.ticks, callback: v => `${v}h` }
+        },
+        diff: {
+            position: 'right',
+            grid: { display: false },
+            border: { display: false },
             ticks: {
-                ...baseOptions.value.scales.y.ticks,
-                callback: v => `${v > 0 ? '+' : ''}${v}h`
+                color: colors.value.textMuted,
+                font: { family: 'Inter', size: 11 },
+                callback: v => `${v >= 0 ? '+' : ''}${v}h`
             }
         }
     }
 }))
 </script>
-
-<template>
-    <div class="chart-card">
-        <div class="chart-wrap">
-            <Line :data="chartData" :options="options" />
-        </div>
-    </div>
-</template>
-
-<style scoped>
-.chart-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-sm);
-}
-
-.chart-wrap {
-    height: 280px;
-}
-</style>

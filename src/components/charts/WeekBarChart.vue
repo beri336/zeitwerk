@@ -1,16 +1,24 @@
 <!-- src/components/charts/WeekBarChart.vue -->
 
+<template>
+    <ChartCard title="Actual vs. Planned" :subtitle="`${store.weekGroups.length} weeks · ${store.currMonthLabel}`">
+        <Bar :data="chartData" :options="options" />
+    </ChartCard>
+</template>
+
 <script setup>
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
     Chart as ChartJS, CategoryScale, LinearScale,
-    BarElement, Title, Tooltip, Legend
+    BarElement, LineElement, PointElement, Tooltip, Legend
 } from 'chart.js'
+
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useChartTheme } from '@/composables/useChartTheme'
+import ChartCard from './ChartCard.vue'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend)
 
 const store = useZeitwerkStore()
 const { colors, baseOptions } = useChartTheme()
@@ -18,26 +26,29 @@ const { colors, baseOptions } = useChartTheme()
 const chartData = computed(() => ({
     labels: store.weekGroups.map(g => `KW ${g.kw}`),
     datasets: [
-            {
-                label: 'Actual (h)',
-                data: store.weekGroups.map(g => parseFloat(g.actual.toFixed(2))),
+        {
+            type: 'bar',
+            label: 'Actual (h)',
+            data: store.weekGroups.map(g => parseFloat(g.actual.toFixed(2))),
             backgroundColor: colors.value.primaryHL,
             borderColor: colors.value.primary,
             borderWidth: 2,
             borderRadius: 6,
-            borderSkipped: false
+            borderSkipped: false,
+            order: 2,
         },
         {
+            type: 'line',
             label: 'Planned (h)',
             data: store.weekGroups.map(g => parseFloat(g.planned.toFixed(2))),
-            backgroundColor: 'transparent',
-            borderColor: colors.value.border,
+            borderColor: colors.value.textMuted,
             borderWidth: 2,
-            borderDash: [4, 4],
-            borderRadius: 6,
-            borderSkipped: false,
-            type: 'line',
-            pointRadius: 0
+            borderDash: [5, 4],
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            fill: false,
+            tension: 0,
+            order: 1,
         }
     ]
 }))
@@ -46,13 +57,6 @@ const options = computed(() => ({
     ...baseOptions.value,
     plugins: {
         ...baseOptions.value.plugins,
-        title: {
-            display: true,
-            text: 'Actual vs. Planned pro Woche',
-            color: colors.value.text,
-            font: { family: 'Inter', size: 14, weight: '600' },
-            padding: { bottom: 16 }
-        },
         tooltip: {
             ...baseOptions.value.plugins.tooltip,
             callbacks: {
@@ -73,25 +77,3 @@ const options = computed(() => ({
     }
 }))
 </script>
-
-<template>
-    <div class="chart-card">
-        <div class="chart-wrap">
-            <Bar :data="chartData" :options="options" />
-        </div>
-    </div>
-</template>
-
-<style scoped>
-.chart-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-sm);
-}
-
-.chart-wrap {
-    height: 280px;
-}
-</style>

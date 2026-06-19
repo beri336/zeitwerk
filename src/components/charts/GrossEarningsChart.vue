@@ -1,156 +1,81 @@
 <!-- src/components/charts/GrossEarningsChart.vue -->
 
-<script setup>
-import { computed } from 'vue'
-import { usePrivacy } from '@/composables/usePrivacy'
-
-const { mask } = usePrivacy()
-
-const props = defineProps({
-    items: {
-        type: Array,
-        default: () => []
-    },
-    title: {
-        type: String,
-        default: 'Gross earnings by week'
-    }
-})
-
-const maxValue = computed(() => {
-    const values = props.items.map(item => item.gross || 0)
-    return Math.max(...values, 0)
-})
-
-function formatCurrency(value) {
-    return new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: 0
-    }).format(value)
-}
-
-function barWidth(value) {
-    if (!maxValue.value)
-        return '0%'
-
-    return `${(value / maxValue.value) * 100}%`
-}
-</script>
-
 <template>
-    <section class="chart-card">
-        <div class="chart-card__header">
-            <h3 class="chart-card__title">{{ title }}</h3>
-            <span class="chart-card__sub">{{ items.length }} weeks</span>
-        </div>
-
-        <div v-if="items.length" class="gross-chart">
-            <div v-for="item in items" :key="item.kw" class="gross-row">
-                <div class="gross-row__top">
-                    <span class="gross-row__label">KW {{ item.kw }}</span>
-                    <span class="gross-row__value">{{ mask(formatCurrency(item.gross)) }}</span>
-                </div>
-
-                <div class="gross-row__track">
-                    <div class="gross-row__bar" :style="{ width: barWidth(item.gross) }" />
-                </div>
-            </div>
-        </div>
-
-        <div v-else class="chart-empty">
-            No gross earnings data available for this month.
-        </div>
-    </section>
+    <ChartCard v-if="store.grossHourlyRate > 0" title="Gross Earnings by Week"
+        :subtitle="`${store.currMonthLabel} · Privacy-masked`">
+        <Bar :data="chartData" :options="options" />
+    </ChartCard>
 </template>
 
-<style scoped>
-.chart-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: var(--space-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
+<script setup>
+import { computed } from 'vue'
+import { Bar } from 'vue-chartjs'
+import {
+    Chart as ChartJS, CategoryScale, LinearScale,
+    BarElement, Tooltip, Legend
+} from 'chart.js'
 
-.chart-card__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-}
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+import { useChartTheme } from '@/composables/useChartTheme'
+import { usePrivacy } from '@/composables/usePrivacy'
+import ChartCard from './ChartCard.vue'
 
-.chart-card__title {
-    font-size: var(--text-base);
-    font-weight: 700;
-    color: var(--color-text);
-}
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
-.chart-card__sub {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 700;
-}
+const store = useZeitwerkStore()
+const { colors, baseOptions } = useChartTheme()
+const { mask } = usePrivacy()
 
-.gross-chart {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
+const weekData = computed(() =>
+    store.weekGroups.map(g => {
+        const gross = (g.entries ?? []).reduce(
+            (s, e) => s + store.grossEarnedForEntry(e), 0
+        )
+        return {
+            kw: g.kw,
+            gross: parseFloat(gross.toFixed(2)),
+            actual: g.actual,
+        }
+    })
+)
 
-.gross-row {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-}
+const chartData = computed(() => ({
+    labels: weekData.value.map(w => `KW ${w.kw}`),
+    datasets: [{
+        label: 'Gross (€)',
+        data: weekData.value.map(w => parseFloat((w.gross ?? 0).toFixed(2))),
+        backgroundColor: colors.value.successHL,
+        borderColor: colors.value.success,
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+    }]
+}))
 
-.gross-row__top {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--space-3);
-    align-items: baseline;
-}
-
-.gross-row__label {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    font-weight: 600;
-}
-
-.gross-row__value {
-    font-size: var(--text-sm);
-    color: var(--color-text);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-}
-
-.gross-row__track {
-    width: 100%;
-    height: 12px;
-    border-radius: var(--radius-full);
-    background: var(--color-surface-offset);
-    overflow: hidden;
-    border: 1px solid var(--color-divider);
-}
-
-.gross-row__bar {
-    height: 100%;
-    border-radius: inherit;
-    background: linear-gradient(90deg,
-            color-mix(in oklch, var(--color-success) 88%, white),
-            color-mix(in oklch, var(--color-primary) 65%, var(--color-success)));
-    transition: width var(--transition-interactive);
-}
-
-.chart-empty {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    padding: var(--space-4) 0;
-}
-</style>
+const options = computed(() => ({
+    ...baseOptions.value,
+    plugins: {
+        ...baseOptions.value.plugins,
+        legend: { display: false },
+        tooltip: {
+            ...baseOptions.value.plugins.tooltip,
+            callbacks: {
+                label: ctx => ` ${mask(new Intl.NumberFormat('de-DE', {
+                    style: 'currency', currency: 'EUR', maximumFractionDigits: 2
+                }).format(ctx.parsed.y))}`
+            }
+        }
+    },
+    scales: {
+        ...baseOptions.value.scales,
+        y: {
+            ...baseOptions.value.scales.y,
+            beginAtZero: true,
+            ticks: {
+                ...baseOptions.value.scales.y.ticks,
+                callback: v => mask(`${v}€`)
+            }
+        }
+    }
+}))
+</script>

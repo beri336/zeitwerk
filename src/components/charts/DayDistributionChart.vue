@@ -1,57 +1,66 @@
 <!-- src/components/charts/DayDistributionChart.vue -->
 
+<template>
+    <ChartCard title="Avg. Hours by Weekday" :subtitle="`${store.currMonthLabel} · Weekdays vs. Weekend`">
+        <Bar :data="chartData" :options="options" />
+    </ChartCard>
+</template>
+
 <script setup>
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
     Chart as ChartJS, CategoryScale, LinearScale,
-    BarElement, Title, Tooltip, Legend
+    BarElement, Tooltip, Legend
 } from 'chart.js'
+
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useChartTheme } from '@/composables/useChartTheme'
-import { calcActualHours } from '@/composables/useTime'
+import ChartCard from './ChartCard.vue'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
 const store = useZeitwerkStore()
 const { colors, baseOptions } = useChartTheme()
 
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-const dayStats = computed(() => {
-    // Index 0 = Mon, 6 = Sun
-    const totals = Array(7).fill(0)
-    const counts = Array(7).fill(0)
+const dayStats = computed(() =>
+    DAY_NAMES.map((name, i) => {
+        const entries = store.entriesForMonth.filter(e => {
+            const dow = new Date(e.date + 'T00:00').getDay()
 
-    store.entriesForMonth.forEach(e => {
-        const dow = new Date(e.date + 'T00:00:00').getDay() // 0=Sun
-        
-        const index = dow === 0 ? 6 : dow - 1                  // Mon=0
-        totals[index] += calcActualHours(e)
-        counts[index]++
+            return ((dow + 6) % 7) === i
+        })
+        const avg = entries.length
+            ? parseFloat((entries.reduce((s, e) => s + store.effectiveActualHours(e), 0) / entries.length).toFixed(2))
+            : 0
+        return {
+            name,
+            avg,
+            count: entries.length
+        }
     })
-
-    return DAY_NAMES.map((name, index) => ({
-        name,
-        avg: counts[index] > 0 ? parseFloat((totals[index] / counts[index]).toFixed(2)) : 0,
-        count: counts[index]
-    }))
-})
+)
 
 const chartData = computed(() => ({
-    labels: dayStats.value.map(d => d.name),
+    labels: DAY_NAMES,
     datasets: [{
         label: 'Ø Hours',
         data: dayStats.value.map(d => d.avg),
-        backgroundColor: dayStats.value.map((_, index) =>
-            index < 5 ? colors.value.primaryHL : colors.value.successHL
+        backgroundColor: dayStats.value.map((_, i) =>
+            i < 5
+                ? colors.value.primaryHL
+                : colors.value.warningHL
         ),
-        borderColor: dayStats.value.map((_, index) =>
-            index < 5 ? colors.value.primary : colors.value.success
+        borderColor: dayStats.value.map((_, i) =>
+            i < 5
+                ? colors.value.primary
+                : colors.value.warning
         ),
         borderWidth: 2,
         borderRadius: 6,
-        borderSkipped: false
+        borderSkipped: false,
     }]
 }))
 
@@ -59,13 +68,7 @@ const options = computed(() => ({
     ...baseOptions.value,
     plugins: {
         ...baseOptions.value.plugins,
-        title: {
-            display: true,
-            text: 'Ø Hours per Weekday',
-            color: colors.value.text,
-            font: { family: 'Inter', size: 14, weight: '600' },
-            padding: { bottom: 16 }
-        },
+        legend: { display: false },
         tooltip: {
             ...baseOptions.value.plugins.tooltip,
             callbacks: {
@@ -73,7 +76,7 @@ const options = computed(() => ({
                     const d = dayStats.value[ctx.dataIndex]
                     return [
                         ` Ø ${ctx.parsed.y}h`,
-                        ` ${d.count} Entries`
+                        ` ${d.count} ${d.count === 1 ? 'entry' : 'entries'}`
                     ]
                 }
             }
@@ -93,25 +96,3 @@ const options = computed(() => ({
     }
 }))
 </script>
-
-<template>
-    <div class="chart-card">
-        <div class="chart-wrap">
-            <Bar :data="chartData" :options="options" />
-        </div>
-    </div>
-</template>
-
-<style scoped>
-.chart-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-sm);
-}
-
-.chart-wrap {
-    height: 280px;
-}
-</style>

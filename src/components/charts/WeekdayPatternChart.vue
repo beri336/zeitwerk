@@ -1,4 +1,9 @@
 <!-- src/components/charts/WeekdayPatternChart.vue -->
+
+<template>
+    <Bar :data="chartData" :options="chartOptions" aria-label="Average actual working hours by weekday" role="img" />
+</template>
+
 <script setup>
 import { computed } from 'vue'
 import { Bar } from 'vue-chartjs'
@@ -19,13 +24,16 @@ const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 const weekdayMap = computed(() => {
     const buckets = Array.from({ length: 7 }, () => [])
+
     for (const entry of store.entriesForMonth) {
         const jsDay = new Date(entry.date).getDay()
         const idx = (jsDay + 6) % 7
         buckets[idx].push(store.effectiveActualHours(entry))
     }
     return buckets.map(items => {
-        if (!items.length) return 0
+        if (!items.length)
+            return 0
+
         return Number((items.reduce((a, b) => a + b, 0) / items.length).toFixed(2))
     })
 })
@@ -55,7 +63,3 @@ const chartOptions = {
     }
 }
 </script>
-
-<template>
-    <Bar :data="chartData" :options="chartOptions" aria-label="Average actual working hours by weekday" role="img" />
-</template>
