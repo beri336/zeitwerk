@@ -1,7 +1,7 @@
 /* src/style.css */
 
 /*
- * Globale App-Basis
+ * Global app base styles, including design tokens and resets.
  */
 
 /* Reset */
@@ -21,7 +21,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  /* The app manages its own scroll areas - the body should not scroll along with them. */
+  /* The app manages its own scroll areas—the body should not scroll along with them. */
 }
 
 #app {
