@@ -159,6 +159,7 @@ const titles = {
     '/livetracking': 'Live Tracking',
     '/month-overview': 'Month Overview',
     '/calender': 'Calender',
+    '/todo': 'To-Do List',
     '/year-overview': 'Year Overview',
     '/diagrams': 'Diagrams & Stats',
     '/profile': 'Profile',

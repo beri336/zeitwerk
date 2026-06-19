@@ -82,6 +82,15 @@
                 <span>Calendar</span>
             </RouterLink>
 
+            <!-- ToDo -->
+            <RouterLink to="/todo" class="sidebar-item" :class="{ active: route.path === '/todo' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3 8-8" />
+                    <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9" />
+                </svg>
+                <span>ToDo</span>
+            </RouterLink>
+
             <!-- Diagrams -->
             <RouterLink to="/diagrams" class="sidebar-item" :class="{ active: route.path === '/diagrams' }">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
