@@ -1,15 +1,101 @@
 <!-- src/views/YearView.vue -->
 
+<template>
+    <main class="main">
+        <section class="year-toolbar" aria-label="Year navigation">
+            <button class="year-nav-btn" type="button" @click="prevYear" aria-label="Previous year">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6" />
+                </svg>
+            </button>
+
+            <div class="year-label" aria-live="polite">
+                {{ store.currYear }}
+            </div>
+
+            <button class="year-nav-btn" type="button" @click="nextYear" aria-label="Next year">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
+            </button>
+
+            <button class="year-current-btn" type="button" @click="goToCurrentYear" :disabled="isCurrentYear">
+                This year
+            </button>
+        </section>
+
+        <p class="year-hint">
+            Tap a day to open or create an entry. Colored days indicate tracked work, absences, or public holidays.
+        </p>
+
+        <section class="year-summary" aria-label="Year summary">
+            <KpiCard label="Months with entries"
+                :value="String(yearMonths.filter(month => month.stats.count > 0).length)" />
+
+            <KpiCard label="Entries" :value="String(yearEntries.length)" />
+
+            <KpiCard label="Actual"
+                :value="formatHours(yearEntries.reduce((sum, entry) => sum + store.effectiveActualHours(entry), 0))" />
+
+            <KpiCard label="Planned" :value="formatHours(
+                yearEntries.reduce(
+                    (sum, entry) => sum + (entry.plannedHours || store.settings.hoursPerDay),
+                    0
+                )
+            )" />
+
+            <!-- Only if salary is set -->
+            <KpiCard v-if="store.grossHourlyRate > 0" label="Year Gross" :value="yearGrossLabel" sub="Gross earnings"
+                variant="ok" :private="true" />
+
+            <!-- Vacation -->
+            <KpiCard label="Used Vacation Days" :value="String(store.usedVacationDays)" sub="Days taken" />
+
+            <KpiCard label="Remaining Vacation Days" :value="String(store.remainingVacationDays)"
+                :sub="`${store.remainingVacationDays === 1 ? 'Day left' : 'Days left'}`" />
+        </section>
+
+        <section class="year-grid" aria-label="Year calendar overview">
+            <article v-for="month in yearMonths" :key="month.index" class="year-month"
+                :class="[monthCardClass(month), { 'year-month--current': isCurrentMonthCard(month.index) }]">
+                <header class="year-month-header">
+                    <div class="year-month-title">{{ month.name }}</div>
+                    <div class="year-month-meta">
+                        <span>{{ month.stats.count }} entries</span>
+                        <span :class="month.stats.diff >= 0 ? 'stat-ok' : 'stat-err'">
+                            {{ month.stats.diff >= 0 ? '+' : '' }}{{ formatHours(month.stats.diff) }}
+                        </span>
+                    </div>
+                </header>
+
+                <div class="year-weekdays">
+                    <span v-for="day in DAY_HEADERS" :key="day" class="year-weekday">
+                        {{ day.slice(0, 2) }}
+                    </span>
+                </div>
+
+                <div class="year-days">
+                    <button v-for="day in month.days" :key="day.date" type="button" class="year-day"
+                        :class="dayClass(day)" :aria-label="day.date" @click="openDay(day.date)">
+                        <span class="year-day-number">{{ day.dayNumber }}</span>
+                    </button>
+                </div>
+            </article>
+        </section>
+
+        <EntryModal v-model="showModal" :edit-entry="editEntry" :prefill-date="clickedDate" />
+    </main>
+</template>
+
 <script setup>
 import { computed, ref } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours, MONTH_NAMES } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
 import EntryModal from '@/components/EntryModal.vue'
-import KpiCard from '@/components/KpiCard.vue'
+import KpiCard from '@/components/ui/KpiCard.vue'
 
 const store = useZeitwerkStore()
-
 const showModal = ref(false)
 const editEntry = ref(null)
 const clickedDate = ref(null)
@@ -19,6 +105,7 @@ const DAY_HEADERS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const todayStr = computed(() => {
     const date = new Date()
     const p = num => String(num).padStart(2, '0')
+
     return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`
 })
 
@@ -41,8 +128,9 @@ function getMonthDays(year, month) {
 
     const days = []
 
-    for (let i = startDow - 1; i >= 0; i--) {
-        const date = new Date(year, month, -i)
+    for (let index = startDow - 1; index >= 0; index--) {
+        const date = new Date(year, month, -index)
+
         days.push({
             date: formatDateString(date),
             dayNumber: date.getDate(),
@@ -50,17 +138,19 @@ function getMonthDays(year, month) {
         })
     }
 
-    for (let d = 1; d <= lastDay.getDate(); d++) {
-        const date = new Date(year, month, d)
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day)
+        
         days.push({
             date: formatDateString(date),
-            dayNumber: d,
+            dayNumber: day,
             outside: false
         })
     }
 
     while (days.length < 42) {
         const date = new Date(year, month + 1, days.length - startDow - lastDay.getDate() + 1)
+
         days.push({
             date: formatDateString(date),
             dayNumber: date.getDate(),
@@ -74,6 +164,7 @@ function getMonthDays(year, month) {
 const yearEntries = computed(() =>
     store.entries.filter(entry => {
         const date = new Date(entry.date)
+
         return date.getFullYear() === store.currYear
     })
 )
@@ -136,13 +227,8 @@ function openDay(date) {
     showModal.value = true
 }
 
-function prevYear() {
-    store.currYear--
-}
-
-function nextYear() {
-    store.currYear++
-}
+function prevYear() { store.currYear-- }
+function nextYear() { store.currYear++ }
 
 function goToCurrentYear() {
     store.currYear = new Date().getFullYear()
@@ -151,8 +237,10 @@ function goToCurrentYear() {
 function monthCardClass(month) {
     if (month.stats.diff > 0.1)
         return 'year-month--positive'
+
     if (month.stats.diff < -0.1)
         return 'year-month--negative'
+
     return ''
 }
 
@@ -169,11 +257,14 @@ function dayClass(day) {
 /* Highlight current month */
 function isCurrentMonthCard(monthIndex) {
     const now = new Date()
-    return store.currYear === now.getFullYear() && monthIndex === now.getMonth()
+    return store.currYear === now.getFullYear()
+        && monthIndex === now.getMonth()
 }
 
 const yearGross = computed(() =>
-    yearEntries.value.reduce((sum, entry) => sum + store.grossEarnedForEntry(entry), 0)
+    yearEntries
+        .value
+        .reduce((sum, entry) => sum + store.grossEarnedForEntry(entry), 0)
 )
 
 const yearGrossLabel = computed(() => {
@@ -188,93 +279,8 @@ const yearGrossLabel = computed(() => {
 })
 </script>
 
-<template>
-    <main class="main">
-        <section class="year-toolbar" aria-label="Year navigation">
-            <button class="year-nav-btn" type="button" @click="prevYear" aria-label="Previous year">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 18l-6-6 6-6" />
-                </svg>
-            </button>
-
-            <div class="year-label" aria-live="polite">
-                {{ store.currYear }}
-            </div>
-
-            <button class="year-nav-btn" type="button" @click="nextYear" aria-label="Next year">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6" />
-                </svg>
-            </button>
-
-            <button class="year-current-btn" type="button" @click="goToCurrentYear" :disabled="isCurrentYear">
-                This year
-            </button>
-        </section>
-
-        <p class="year-hint">
-            Tap a day to open or create an entry. Colored days indicate tracked work, absences, or public holidays.
-        </p>
-
-        <section class="year-summary" aria-label="Year summary">
-            <KpiCard label="Months with entries"
-                :value="String(yearMonths.filter(month => month.stats.count > 0).length)" />
-
-            <KpiCard label="Entries" :value="String(yearEntries.length)" />
-
-            <KpiCard label="Actual"
-                :value="formatHours(yearEntries.reduce((sum, entry) => sum + store.effectiveActualHours(entry), 0))" />
-
-            <KpiCard label="Planned" :value="formatHours(
-                yearEntries.reduce(
-                    (sum, entry) => sum + (entry.plannedHours || store.settings.hoursPerDay),
-                    0
-                )
-            )" />
-
-            <!-- Only if salary is set -->
-            <KpiCard v-if="store.grossHourlyRate > 0" label="Year Gross" :value="yearGrossLabel" sub="Gross earnings"
-                variant="ok" :private="true" />
-
-            <!-- Vacation -->
-            <KpiCard label="Used Vacation Days" :value="String(store.usedVacationDays)" sub="Days taken" />
-            <KpiCard label="Remaining Vacation Days" :value="String(store.remainingVacationDays)"
-                :sub="`${store.remainingVacationDays === 1 ? 'Day left' : 'Days left'}`" />
-        </section>
-
-        <section class="year-grid" aria-label="Year calendar overview">
-            <article v-for="month in yearMonths" :key="month.index" class="year-month"
-                :class="[monthCardClass(month), { 'year-month--current': isCurrentMonthCard(month.index) }]">
-                <header class="year-month-header">
-                    <div class="year-month-title">{{ month.name }}</div>
-                    <div class="year-month-meta">
-                        <span>{{ month.stats.count }} entries</span>
-                        <span :class="month.stats.diff >= 0 ? 'stat-ok' : 'stat-err'">
-                            {{ month.stats.diff >= 0 ? '+' : '' }}{{ formatHours(month.stats.diff) }}
-                        </span>
-                    </div>
-                </header>
-
-                <div class="year-weekdays">
-                    <span v-for="day in DAY_HEADERS" :key="day" class="year-weekday">
-                        {{ day.slice(0, 2) }}
-                    </span>
-                </div>
-
-                <div class="year-days">
-                    <button v-for="day in month.days" :key="day.date" type="button" class="year-day"
-                        :class="dayClass(day)" :aria-label="day.date" @click="openDay(day.date)">
-                        <span class="year-day-number">{{ day.dayNumber }}</span>
-                    </button>
-                </div>
-            </article>
-        </section>
-
-        <EntryModal v-model="showModal" :edit-entry="editEntry" :prefill-date="clickedDate" />
-    </main>
-</template>
-
 <style scoped>
+/* Main Layout */
 .main {
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -284,6 +290,7 @@ const yearGrossLabel = computed(() => {
     gap: var(--space-4);
 }
 
+/* Toolbar */
 .year-toolbar {
     display: grid;
     grid-template-columns: 36px minmax(0, 1fr) 36px auto;
@@ -294,6 +301,13 @@ const yearGrossLabel = computed(() => {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
+}
+
+.year-label {
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 .year-nav-btn {
@@ -313,13 +327,6 @@ const yearGrossLabel = computed(() => {
     color: var(--color-text);
 }
 
-.year-label {
-    text-align: center;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-}
-
 .year-current-btn {
     height: 36px;
     padding: 0 var(--space-2);
@@ -332,28 +339,8 @@ const yearGrossLabel = computed(() => {
     white-space: nowrap;
 }
 
-.year-current-btn:hover {
-    background: var(--color-surface-offset);
-}
-
-.year-current-btn:disabled {
-    opacity: 0.55;
-    cursor: default;
-}
-
-.year-day.year-day--today.year-day--entry,
-.year-day.year-day--today.year-day--absence,
-.year-day.year-day--today.year-day--holiday {
-    background: color-mix(in oklch, var(--color-gold) 28%, var(--color-surface-2));
-    border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
-}
-
-.year-day.year-day--today {
-    background: color-mix(in oklch, var(--color-gold) 28%, var(--color-surface-2));
-    border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
-    outline: none;
-    font-weight: 700;
-}
+.year-current-btn:hover    { background: var(--color-surface-offset); }
+.year-current-btn:disabled { opacity: 0.55; cursor: default; }
 
 .year-hint {
     font-size: var(--text-xs);
@@ -361,18 +348,24 @@ const yearGrossLabel = computed(() => {
     margin-top: calc(var(--space-2) * -1);
 }
 
+/* Summary */
 .year-summary {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-3);
 }
 
+.stat-ok  { color: var(--color-success); }
+.stat-err { color: var(--color-error); }
+
+/* Year Grid */
 .year-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4);
 }
 
+/* Month Card */
 .year-month {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -426,6 +419,7 @@ const yearGrossLabel = computed(() => {
     font-variant-numeric: tabular-nums;
 }
 
+/* Weekday Labels & Day Grid */
 .year-weekdays,
 .year-days {
     display: grid;
@@ -442,6 +436,7 @@ const yearGrossLabel = computed(() => {
     letter-spacing: 0.04em;
 }
 
+/* Day Cell */
 .year-day {
     aspect-ratio: 1 / 1;
     min-height: 28px;
@@ -466,9 +461,7 @@ const yearGrossLabel = computed(() => {
     border-color: var(--color-border);
 }
 
-.year-day--outside {
-    opacity: 0.35;
-}
+.year-day--outside { opacity: 0.35; }
 
 .year-day--entry {
     background: color-mix(in oklch, var(--color-primary) 10%, var(--color-surface-2));
@@ -485,24 +478,24 @@ const yearGrossLabel = computed(() => {
     border-color: color-mix(in oklch, var(--color-error) 20%, var(--color-border));
 }
 
-.stat-ok {
-    color: var(--color-success);
+/* Today Highlight */
+.year-day.year-day--today,
+.year-day.year-day--today.year-day--entry,
+.year-day.year-day--today.year-day--absence,
+.year-day.year-day--today.year-day--holiday {
+    background: color-mix(in oklch, var(--color-gold) 28%, var(--color-surface-2));
+    border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
+    outline: none;
+    font-weight: 700;
 }
 
-.stat-err {
-    color: var(--color-error);
-}
-
+/* Large screens */
 @media (max-width: 1100px) {
-    .year-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .year-summary {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .year-grid    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .year-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Mobile */
 @media (max-width: 768px) {
     .main {
         padding: var(--space-3);
@@ -516,18 +509,9 @@ const yearGrossLabel = computed(() => {
             "current current current";
     }
 
-    .year-toolbar>.year-nav-btn:first-child {
-        grid-area: prev;
-    }
-
-    .year-label {
-        grid-area: label;
-    }
-
-    .year-toolbar>.year-nav-btn:nth-of-type(2) {
-        grid-area: next;
-        justify-self: end;
-    }
+    .year-toolbar > .year-nav-btn:first-child   { grid-area: prev; }
+    .year-toolbar > .year-nav-btn:nth-of-type(2) { grid-area: next; justify-self: end; }
+    .year-label { grid-area: label; }
 
     .year-current-btn {
         grid-area: current;
@@ -535,16 +519,8 @@ const yearGrossLabel = computed(() => {
         margin-top: var(--space-1);
     }
 
-    .year-summary {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .year-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .year-day {
-        min-height: 30px;
-    }
+    .year-summary { grid-template-columns: 1fr 1fr; }
+    .year-grid    { grid-template-columns: 1fr; }
+    .year-day     { min-height: 30px; }
 }
 </style>

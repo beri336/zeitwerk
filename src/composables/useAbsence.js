@@ -5,7 +5,7 @@ export const ABSENCE_TYPES = {
         label: 'On Site',
         color: 'var(--color-primary)',
         highlight: 'var(--color-primary-highlight)',
-        counter: true,   // counts as actual time
+        counter: true, // counts as actual time
         icon: '💼'
     },
     homeoffice: {
@@ -19,7 +19,7 @@ export const ABSENCE_TYPES = {
         label: 'Vacation',
         color: 'var(--color-gold, #d19900)',
         highlight: 'var(--color-gold-highlight, #e9e0c6)',
-        counter: false,  // actual = planned (auto-filled)
+        counter: false, // actual = planned (auto-filled)
         icon: '🏖️'
     },
     sick: {

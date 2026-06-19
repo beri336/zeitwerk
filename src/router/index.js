@@ -8,12 +8,12 @@ import SettingsView from '@/views/SettingsView.vue'
 import YearView from '@/views/YearView.vue'
 
 const routes = [
-    { path: '/', redirect: '/tracking' },
-    { path: '/tracking', name: 'tracking', component: TrackingView },
+    { path: '/', redirect: '/month-overview' },
+    { path: '/month-overview', name: 'month-overview', component: TrackingView },
     { path: '/calender', name: 'calender', component: CalenderView },
     { path: '/diagrams', name: 'diagrams', component: DiagramsView },
     { path: '/settings', name: 'settings', component: SettingsView },
-    { path: '/year', component: YearView },
+    { path: '/year-overview', name: 'year-overview', component: YearView },
 ]
 
 export default createRouter({

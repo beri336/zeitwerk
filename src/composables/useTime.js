@@ -3,7 +3,7 @@
 export function timeToMin(time) {
     if (!time)
         return null
-    
+
     const [hour, minute] = time.split(':').map(Number)
     return hour * 60 + minute
 }
@@ -20,14 +20,14 @@ export function calcActualMin(entry) {
 
     if (start === null || end === null)
         return 0
-    
+
     let diff = end - start
     if (diff < 0)
         diff += 24 * 60 // overnight
-    
+
     diff -= entry.defaultBreak || 0
     diff -= entry.additionalBreaks || 0
-    
+
     return Math.max(0, diff)
 }
 
@@ -50,12 +50,12 @@ export function calcActualHours(entry) {
 export function formatHours(h) {
     if (h === null || h === undefined || isNaN(h))
         return '—'
-    
+
     const sign = h < 0 ? '-' : ''
     const abs = Math.abs(h)
     const hh = Math.floor(abs)
     const mm = Math.round((abs - hh) * 60)
-    
+
     return `${sign}${hh}:${String(mm).padStart(2, '0')}h`
 }
 
@@ -65,8 +65,8 @@ export function formatDate(day) {
 
     const date = new Date(day + 'T00:00:00')
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    const pad = n => String(n).padStart(2, '0')
-    
+    const pad = input => String(input).padStart(2, '0')
+
     return `${days[date.getDay()]}, ${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`
 }
 
@@ -74,14 +74,15 @@ export function getKW(dateStr) {
     const date = new Date(dateStr)
     date.setHours(0, 0, 0, 0)
     date.setDate(date.getDate() + 4 - (date.getDay() || 7))
-    const y = new Date(date.getFullYear(), 0, 1)
-    
-    return Math.ceil((((date - y) / 86400000) + 1) / 7)
+
+    const year = new Date(date.getFullYear(), 0, 1)
+
+    return Math.ceil((((date - year) / 86400000) + 1) / 7)
 }
 
 export function today() {
     const date = new Date()
-    const pad = n => String(n).padStart(2, '0')
+    const pad = input => String(input).padStart(2, '0')
 
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }

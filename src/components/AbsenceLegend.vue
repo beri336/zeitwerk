@@ -1,5 +1,16 @@
 <!-- src/components/AbsenceLegend.vue -->
 
+<template>
+    <div v-if="stats.length" class="legend">
+        <div v-for="stat in stats" :key="stat.key" class="legend-item"
+            :style="`background:${stat.highlight};color:${stat.color};border-color:${stat.color}40`">
+            <span>{{ stat.icon }}</span>
+            <span class="legend-label">{{ stat.label }}</span>
+            <span class="legend-count">{{ stat.count }}x</span>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import { computed } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
@@ -21,18 +32,8 @@ const stats = computed(() => {
 })
 </script>
 
-<template>
-    <div v-if="stats.length" class="legend">
-        <div v-for="s in stats" :key="s.key" class="legend-item"
-            :style="`background:${s.highlight};color:${s.color};border-color:${s.color}40`">
-            <span>{{ s.icon }}</span>
-            <span class="legend-label">{{ s.label }}</span>
-            <span class="legend-count">{{ s.count }}x</span>
-        </div>
-    </div>
-</template>
-
 <style scoped>
+/* Legend */
 .legend {
     display: flex;
     flex-wrap: wrap;

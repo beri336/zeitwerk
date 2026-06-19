@@ -1,81 +1,6 @@
 <!-- src/components/MonthTable.vue -->
 
-<script setup>
-import { ref } from 'vue'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-import { useToast } from '@/composables/useToast'
-import { calcActualHours, formatHours, formatDate } from '@/composables/useTime'
-import { getAbsenceType } from '@/composables/useAbsence'
-import LiveTrackerCard from '@/components/LiveTrackerCard.vue'
-
-import { usePrivacy } from '@/composables/usePrivacy'
-
-const { mask } = usePrivacy()
-
-const emit = defineEmits(['edit'])
-
-const store = useZeitwerkStore()
-const { showToast } = useToast()
-
-const editCell = ref(null)
-
-function startEdit(entry, field) {
-    editCell.value = { id: entry.id, field, value: entry[field] }
-}
-
-function saveEdit(entry) {
-    if (!editCell.value)
-        return
-    
-    store.patchEntryField(entry.id, editCell.value.field, editCell.value.value)
-    editCell.value = null
-}
-
-function cancelEdit() { editCell.value = null }
-
-function rowStyle(entry) {
-    const type = getAbsenceType(entry.typ ?? 'on-site')
-    if (entry.typ && entry.typ !== 'on-site') {
-        return `border-left: 3px solid ${type.color}`
-    }
-    
-    return ''
-}
-
-function actualVariant(entry) {
-    const Actual = store.effectiveActualHours(entry)
-    const planned = entry.plannedHours || store.settings.hoursPerDay
-
-    if (Actual >= planned - 0.1)
-        return 'cell-ok'
-    if (Actual > 0)
-        return 'cell-warn'
-    
-    return ''
-}
-
-// Delete handler with confirmation
-const pendingDelete = ref(null)
-
-function askDelete(id) {
-    pendingDelete.value = id
-}
-
-function confirmDelete() {
-    store.deleteEntry(pendingDelete.value)
-    showToast('Entry deleted.', 'ok')
-    pendingDelete.value = null
-}
-
-function cancelDelete() {
-    pendingDelete.value = null
-}
-
-// v-focus directive via defineOptions
-</script>
-
 <template>
-    <LiveTrackerCard />
     <!-- Month Table -->
     <div class="table-wrap">
         <div class="table-header">
@@ -114,11 +39,10 @@ function cancelDelete() {
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="(group, gi) in store.weekGroups" :key="group.kw">
+                    <template v-for="(group, groupIndex) in store.weekGroups" :key="group.kw">
                         <!-- Entry rows -->
-                        <tr v-for="(entry, ei) in group.entries"
-                            :key="entry.id"
-                            :class="{ 'week-separator': ei === 0 && gi > 0 }">
+                        <tr v-for="(entry, entryIndex) in group.entries" :key="entry.id"
+                            :class="{ 'week-separator': entryIndex === 0 && groupIndex > 0 }">
                             <td>
                                 <div style="display:flex;align-items:center;gap:var(--space-2);">
                                     <span v-if="entry.typ && entry.typ !== 'on-site'" class="typ-chip"
@@ -132,8 +56,9 @@ function cancelDelete() {
                             <!-- Inline editable cells -->
                             <td>
                                 <div class="time-stack">
-                                    <span v-for="(b, i) in (entry.timeEntries ?? [])" :key="i" class="time-line">
-                                        {{ b.start || '—' }}–{{ b.end || '—' }}
+                                    <span v-for="(timeEntry, index) in (entry.timeEntries ?? [])" :key="index"
+                                        class="time-line">
+                                        {{ timeEntry.start || '—' }}–{{ timeEntry.end || '—' }}
                                     </span>
                                     <span v-if="!entry.timeEntries?.length">—</span>
                                 </div>
@@ -142,8 +67,8 @@ function cancelDelete() {
                             <!-- Pauses: sum of all entries -->
                             <td>
                                 {{entry.timeEntries?.length
-                                    ? entry.timeEntries.reduce((s, b) => s + (b.pause ?? 0), 0) + 'min'
-                                : '—'
+                                    ? entry.timeEntries.reduce((sum, timeEntry) => sum + (timeEntry.pause ?? 0), 0) + 'min'
+                                    : '—'
                                 }}
                             </td>
 
@@ -176,8 +101,7 @@ function cancelDelete() {
                             <!-- Row actions -->
                             <td class="actions-cell">
                                 <div class="row-actions">
-                                    <button class="btn btn-ghost btn-sm" @click="emit('edit', entry)"
-                                        title="Edit">
+                                    <button class="btn btn-ghost btn-sm" @click="emit('edit', entry)" title="Edit">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -241,7 +165,78 @@ function cancelDelete() {
     </div>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+import { useToast } from '@/composables/useToast'
+import { calcActualHours, formatHours, formatDate } from '@/composables/useTime'
+import { getAbsenceType } from '@/composables/useAbsence'
+import LiveTrackerCard from '@/components/features/LiveTrackerCard.vue'
+
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const { mask } = usePrivacy()
+const emit = defineEmits(['edit'])
+const store = useZeitwerkStore()
+const { showToast } = useToast()
+const editCell = ref(null)
+
+function startEdit(entry, field) {
+    editCell.value = {
+        id: entry.id,
+        field,
+        value: entry[field]
+    }
+}
+
+function saveEdit(entry) {
+    if (!editCell.value)
+        return
+
+    store.patchEntryField(entry.id, editCell.value.field, editCell.value.value)
+    editCell.value = null
+}
+
+function cancelEdit() { editCell.value = null }
+
+function rowStyle(entry) {
+    const type = getAbsenceType(entry.typ ?? 'on-site')
+
+    if (entry.typ && entry.typ !== 'on-site') {
+        return `border-left: 3px solid ${type.color}`
+    }
+
+    return ''
+}
+
+function actualVariant(entry) {
+    const Actual = store.effectiveActualHours(entry)
+    const planned = entry.plannedHours || store.settings.hoursPerDay
+
+    if (Actual >= planned - 0.1)
+        return 'cell-ok'
+    if (Actual > 0)
+        return 'cell-warn'
+
+    return ''
+}
+
+// delete handler with confirmation
+const pendingDelete = ref(null)
+
+function askDelete(id) { pendingDelete.value = id }
+
+function confirmDelete() {
+    store.deleteEntry(pendingDelete.value)
+    showToast('Entry deleted.', 'ok')
+    pendingDelete.value = null
+}
+
+function cancelDelete() { pendingDelete.value = null }
+</script>
+
 <style scoped>
+/* Table Wrapper */
 .table-wrap {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -274,6 +269,7 @@ function cancelDelete() {
     scrollbar-width: thin;
 }
 
+/* Table Base */
 .data-table {
     width: 100%;
     font-size: var(--text-xs);
@@ -302,16 +298,6 @@ function cancelDelete() {
     background: var(--color-surface-offset);
 }
 
-.data-table th.actions-header {
-    text-align: center;
-    min-width: 72px;
-    position: sticky;
-    right: 0;
-    background: var(--color-surface-offset);
-    border-left: 1px solid var(--color-border);
-    z-index: 4;
-}
-
 .data-table td {
     padding: var(--space-3) var(--space-3);
     border-bottom: 1px solid var(--color-divider);
@@ -324,14 +310,6 @@ function cancelDelete() {
         color var(--transition-interactive);
 }
 
-.data-table td.actions-cell {
-    position: sticky;
-    right: 0;
-    background: var(--color-surface);
-    border-left: 1px solid var(--color-border);
-    z-index: 3;
-}
-
 .data-table tr:last-child td {
     border-bottom: none;
 }
@@ -340,8 +318,33 @@ function cancelDelete() {
     background: var(--color-surface-offset);
 }
 
+/* Sticky Actions Column */
+.data-table th.actions-header {
+    text-align: center;
+    min-width: 72px;
+    position: sticky;
+    right: 0;
+    background: var(--color-surface-offset);
+    border-left: 1px solid var(--color-border);
+    z-index: 4;
+}
+
+.data-table td.actions-cell {
+    position: sticky;
+    right: 0;
+    background: var(--color-surface);
+    border-left: 1px solid var(--color-border);
+    z-index: 3;
+}
+
 .data-table tr:hover td.actions-cell {
     background: var(--color-surface-offset);
+}
+
+/* Row Actions */
+.actions-cell {
+    min-width: 72px;
+    text-align: center;
 }
 
 .row-actions {
@@ -352,25 +355,6 @@ function cancelDelete() {
     min-width: 72px;
     opacity: 1;
     transition: opacity 150ms ease, transform 150ms ease;
-}
-
-.actions-cell {
-    min-width: 72px;
-    text-align: center;
-}
-
-.day-metric {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-}
-
-.day-gross {
-    font-size: 11px;
-    color: var(--color-success);
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
 }
 
 .row-actions button {
@@ -414,6 +398,18 @@ function cancelDelete() {
     color: var(--color-error);
 }
 
+/* Delete Confirm Button */
+.btn-danger {
+    background: var(--color-error-highlight);
+    color: var(--color-error);
+}
+
+.btn-danger:hover {
+    background: var(--color-error);
+    color: var(--color-text-inverse);
+}
+
+/* Inline Edit */
 .editable {
     cursor: pointer;
 }
@@ -422,6 +418,24 @@ td.editable:hover {
     background: var(--color-primary-highlight);
 }
 
+.inline-input {
+    width: 100%;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    font-size: var(--text-xs);
+    outline: none;
+    min-width: 70px;
+}
+
+.inline-input:focus {
+    box-shadow: 0 0 0 2px var(--color-primary-highlight);
+    border-color: var(--color-primary);
+}
+
+/* Cell Utilities */
 .num {
     text-align: right;
 }
@@ -448,23 +462,30 @@ td.editable:hover {
     max-width: 180px;
 }
 
-.inline-input {
-    width: 100%;
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-sm);
-    padding: var(--space-1) var(--space-2);
-    background: var(--color-surface-2);
-    color: var(--color-text);
-    font-size: var(--text-xs);
-    outline: none;
-    min-width: 70px;
+/* Absence Row */
+tr[data-absence="true"] td {
+    background: color-mix(in oklch, var(--color-primary-highlight) 30%, var(--color-surface));
 }
 
-.inline-input:focus {
-    box-shadow: 0 0 0 2px var(--color-primary-highlight);
-    border-color: var(--color-primary);
+tr[data-absence="true"]:hover td {
+    background: var(--color-surface-offset);
 }
 
+/* Absence Type Chip */
+.typ-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: 1px solid color-mix(in oklch, currentColor 18%, transparent);
+}
+
+/* Week / Month Row Separators */
 .week-separator td {
     border-top: 2px solid var(--color-primary-highlight);
 }
@@ -491,14 +512,40 @@ td.editable:hover {
     padding: var(--space-3);
 }
 
-tr[data-absence="true"] td {
-    background: color-mix(in oklch, var(--color-primary-highlight) 30%, var(--color-surface));
+/* Day Metric */
+.day-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
 }
 
-tr[data-absence="true"]:hover td {
-    background: var(--color-surface-offset);
+.day-gross {
+    font-size: 11px;
+    color: var(--color-success);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
+/* Time Stack */
+.time-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.time-line {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-xs);
+    white-space: nowrap;
+}
+
+.time-stack span+span {
+    color: var(--color-text-muted);
+}
+
+/* Empty State */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -526,67 +573,7 @@ tr[data-absence="true"]:hover td {
     font-size: var(--text-sm);
 }
 
-/* Absence type chip */
-.typ-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 1px var(--space-2);
-    border-radius: var(--radius-full);
-    font-size: 10px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-    border: 1px solid color-mix(in oklch, currentColor 18%, transparent);
-}
-
-/* Button delete confirmation */
-.btn-danger {
-    background: var(--color-error-highlight);
-    color: var(--color-error);
-}
-
-.btn-danger:hover {
-    background: var(--color-error);
-    color: var(--color-text-inverse);
-}
-
-/* Time entries stack */
-.time-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.time-line {
-    display: block;
-    font-variant-numeric: tabular-nums;
-    font-size: var(--text-xs);
-    white-space: nowrap;
-}
-
-.time-stack span+span {
-    color: var(--color-text-muted);
-}
-
-/* Mobile Devices Optimizations */
-@media (max-width: 900px) {
-    .table-header {
-        padding: var(--space-3) var(--space-4);
-    }
-
-    .table-badges {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: var(--space-2) var(--space-3);
-    }
-}
-
-/* Nur Desktop/Hover-Geräte bekommen Hover-Optik */
+/* Hover-capable devices only */
 @media (hover: hover) {
     .data-table tr:hover td {
         background: var(--color-surface-offset);
@@ -604,7 +591,7 @@ tr[data-absence="true"]:hover td {
     }
 }
 
-/* Touch-Geräte: keine Hover-Abhängigkeit */
+/* Touch devices */
 @media (hover: none) {
     .row-actions button {
         opacity: 1;
@@ -616,7 +603,7 @@ tr[data-absence="true"]:hover td {
     }
 }
 
-/* Tablet / kleinere Laptops */
+/* Tablet */
 @media (max-width: 900px) {
     .table-header {
         flex-direction: column;
@@ -645,7 +632,7 @@ tr[data-absence="true"]:hover td {
     }
 }
 
-/* Richtig kleine Screens */
+/* Mobile */
 @media (max-width: 640px) {
     .table-wrap {
         border-radius: var(--radius-md);

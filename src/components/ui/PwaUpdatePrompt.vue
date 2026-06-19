@@ -1,22 +1,4 @@
-<!-- src/components/PwaUpdatePrompt.vue -->
-
-<script setup>
-import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { useToast } from '@/composables/useToast'
-
-const { needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegistered(r) {
-        console.log('[Zeitwerk] SW registered:', r)
-    },
-    onRegisterError(error) {
-        console.error('[Zeitwerk] SW error:', error)
-    }
-})
-
-function update() {
-    updateServiceWorker(true)
-}
-</script>
+<!-- src/components/ui/PwaUpdatePrompt.vue -->
 
 <template>
     <Teleport to="body">
@@ -40,7 +22,24 @@ function update() {
     </Teleport>
 </template>
 
+<script setup>
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { useToast } from '@/composables/useToast'
+
+const { needRefresh, updateServiceWorker } = useRegisterSW({
+    onRegistered(registration) {
+        console.log('[Zeitwerk] SW registered:', registration)
+    },
+    onRegisterError(error) {
+        console.error('[Zeitwerk] SW error:', error)
+    }
+})
+
+function update() { updateServiceWorker(true) }
+</script>
+
 <style scoped>
+/* PWA Install Banner */
 .pwa-banner {
     position: fixed;
     bottom: var(--space-6);
@@ -73,6 +72,7 @@ function update() {
     gap: var(--space-2);
 }
 
+/* Animation */
 @keyframes slideUp {
     from {
         opacity: 0;

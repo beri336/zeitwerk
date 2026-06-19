@@ -1,4 +1,14 @@
-<!-- src/components/KpiCard.vue -->
+<!-- src/components/ui/KpiCard.vue -->
+
+<template>
+    <div class="kpi-card">
+        <div class="kpi-label">{{ label }}</div>
+        <div class="kpi-value" :class="`kpi-${variant}`">
+            {{ props.private ? mask(value) : value }}
+        </div>
+        <div v-if="sub" class="kpi-sub">{{ sub }}</div>
+    </div>
+</template>
 
 <script setup>
 import { usePrivacy } from '@/composables/usePrivacy'
@@ -14,17 +24,8 @@ const props = defineProps({
 })
 </script>
 
-<template>
-    <div class="kpi-card">
-        <div class="kpi-label">{{ label }}</div>
-        <div class="kpi-value" :class="`kpi-${variant}`">
-            {{ props.private ? mask(value) : value }}
-        </div>
-        <div v-if="sub" class="kpi-sub">{{ sub }}</div>
-    </div>
-</template>
-
 <style scoped>
+/* KPI Card */
 .kpi-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -54,15 +55,8 @@ const props = defineProps({
     margin-top: var(--space-1);
 }
 
-.kpi-ok {
-    color: var(--color-success);
-}
-
-.kpi-warn {
-    color: var(--color-warning);
-}
-
-.kpi-err {
-    color: var(--color-error);
-}
+/* Status Colors */
+.kpi-ok  { color: var(--color-success); }
+.kpi-warn { color: var(--color-warning); }
+.kpi-err  { color: var(--color-error); }
 </style>

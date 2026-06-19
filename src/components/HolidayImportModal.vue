@@ -1,52 +1,5 @@
 <!-- src/components/HolidayImportModal.vue -->
 
-<script setup>
-import { computed, ref } from 'vue'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-import { useToast } from '@/composables/useToast'
-import { STATES, getHolidaysForMonth } from '@/composables/useHolidays'
-
-const props = defineProps({ modelValue: { type: Boolean, default: false } })
-const emit = defineEmits(['update:modelValue'])
-
-const store = useZeitwerkStore()
-const { showToast } = useToast()
-
-const selectedState = ref(store.settings.state ?? 'BW')
-
-const preview = computed(() =>
-    getHolidaysForMonth(store.currYear, store.currMonth, selectedState.value)
-)
-
-const existingDates = computed(() =>
-    new Set(store.entries.map(entry => entry.date))
-)
-
-function isAlreadyImported(date) {
-    return existingDates.value.has(date)
-}
-
-function close() { emit('update:modelValue', false) }
-
-function doImport() {
-    // Save state in Settings
-    store.saveSettings({ state: selectedState.value })
-
-    const result = store.importHolidays(store.currYear, store.currMonth)
-
-    if (result.added === 0 && result.skipped > 0) {
-        showToast(`All ${result.skipped} holidays already exist.`, 'ok')
-    } else {
-        showToast(
-            `${result.added} holiday${result.added !== 1 ? 's' : ''} added` +
-            (result.skipped ? `, ${result.skipped} skipped` : '') + '.',
-            'ok'
-        )
-    }
-    close()
-}
-</script>
-
 <template>
     <Teleport to="body">
         <div v-if="modelValue" class="modal-backdrop" @click.self="close">
@@ -86,15 +39,15 @@ function doImport() {
                     </div>
 
                     <div v-else class="holiday-list">
-                        <div v-for="h in preview" :key="h.date" class="holiday-item"
-                            :class="{ 'holiday-item--exists': isAlreadyImported(h.date) }">
+                        <div v-for="holiday in preview" :key="holiday.date" class="holiday-item"
+                            :class="{ 'holiday-item--exists': isAlreadyImported(holiday.date) }">
                             <div class="holiday-date">
-                                {{ new Date(h.date + 'T00:00:00').toLocaleDateString('de-DE', {
+                                {{ new Date(holiday.date + 'T00:00:00').toLocaleDateString('de-DE', {
                                     weekday: 'short', day: '2-digit', month: '2-digit' }) }}
                             </div>
-                            <div class="holiday-name">{{ h.name }}</div>
+                            <div class="holiday-name">{{ holiday.name }}</div>
                             <div class="holiday-status">
-                                <span v-if="isAlreadyImported(h.date)" class="badge badge-ok">✓ available</span>
+                                <span v-if="isAlreadyImported(holiday.date)" class="badge badge-ok">✓ available</span>
                                 <span v-else class="badge badge-new">new</span>
                             </div>
                         </div>
@@ -122,7 +75,54 @@ function doImport() {
     </Teleport>
 </template>
 
+<script setup>
+import { computed, ref } from 'vue'
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+import { useToast } from '@/composables/useToast'
+import { STATES, getHolidaysForMonth } from '@/composables/useHolidays'
+
+const props = defineProps( { modelValue: { type: Boolean, default: false } } )
+const emit = defineEmits( ['update:modelValue'] )
+
+const store = useZeitwerkStore()
+const { showToast } = useToast()
+
+const selectedState = ref(store.settings.state ?? 'BW')
+
+const preview = computed(() =>
+    getHolidaysForMonth(store.currYear, store.currMonth, selectedState.value)
+)
+
+const existingDates = computed(() =>
+    new Set(store.entries.map(entry => entry.date))
+)
+
+function isAlreadyImported(date) {
+    return existingDates.value.has(date)
+}
+
+function close() { emit('update:modelValue', false) }
+
+function doImport() {
+    store.saveSettings({ state: selectedState.value })
+
+    const result = store.importHolidays(store.currYear, store.currMonth)
+
+    if (result.added === 0 && result.skipped > 0) {
+        showToast(`All ${result.skipped} holidays already exist.`, 'ok')
+    } else {
+        showToast(
+            `${result.added} holiday${result.added !== 1 ? 's' : ''} added` +
+            (result.skipped ? `, ${result.skipped} skipped` : '') + '.',
+            'ok'
+        )
+    }
+    close()
+}
+</script>
+
 <style scoped>
+/* Preview Label */
 .preview-label {
     font-size: var(--text-xs);
     font-weight: 600;
@@ -143,15 +143,21 @@ function doImport() {
     font-weight: 600;
 }
 
-.no-holidays {
-    padding: var(--space-6);
-    text-align: center;
-    color: var(--color-text-faint);
-    font-size: var(--text-sm);
-    background: var(--color-surface-offset);
+/* Auto Hint */
+.auto-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-blue-highlight);
+    color: var(--color-blue);
     border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-4);
+    line-height: 1.5;
 }
 
+/* Holiday List */
 .holiday-list {
     display: flex;
     flex-direction: column;
@@ -194,17 +200,13 @@ function doImport() {
     justify-content: flex-end;
 }
 
-/* Auto-hint */
-.auto-hint {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-blue-highlight);
-    color: var(--color-blue);
+/* Empty State */
+.no-holidays {
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--color-text-faint);
+    font-size: var(--text-sm);
+    background: var(--color-surface-offset);
     border-radius: var(--radius-md);
-    font-size: var(--text-xs);
-    margin-bottom: var(--space-4);
-    line-height: 1.5;
 }
 </style>

@@ -8,7 +8,9 @@ import { getHolidaysForMonth, getHolidays } from '@/composables/useHolidays'
 
 const STORAGE_KEY = 'zeitwerk_data'
 
-// Default-Settings zentral definiert
+export const chartExportTrigger = ref(null) // null | 'png' | 'jpg'
+
+// Default settings defined centrally
 const DEFAULT_SETTINGS = {
     hoursPerDay: 8,
     hoursPerWeek: 40,
@@ -50,7 +52,10 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // State
-    const entries = ref(Array.isArray(stored.entries) ? stored.entries : [])
+    const entries = ref(Array.isArray(stored.entries)
+        ? stored.entries
+        : []
+    )
 
     // Settings: Merge saved values with defaults (no data loss for new keys)
     const settings = ref({
@@ -72,7 +77,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
                 activeSession: activeSession.value
             }))
         },
-        { deep: true } // deep because it is array/object
+        { deep: true } // deep because it is an array/ object
     )
 
     const currYear = ref(new Date().getFullYear())
@@ -80,9 +85,9 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     // count vacations per year
     const vacationEntriesForYear = computed(() =>
-        entries.value.filter(e => {
-            const d = new Date(e.date + 'T00:00:00')
-            return d.getFullYear() === currYear.value && e.typ === 'vacation'
+        entries.value.filter(entry => {
+            const date = new Date(entry.date + 'T00:00:00')
+            return date.getFullYear() === currYear.value && entry.typ === 'vacation'
         })
     )
 
@@ -91,6 +96,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     const remainingVacationDays = computed(() => {
         const raw = Number(settings.value.vacationDaysPerYear)
         const total = Number.isFinite(raw) ? raw : 30
+
         return Math.max(0, total - usedVacationDays.value)
     })
 
@@ -113,9 +119,11 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         entries.value = entries.value.filter(entry => {
             if (entry.typ !== 'publicholiday')
                 return true // keep other types
-            const y = new Date(entry.date).getFullYear()
 
-            return y !== year // only remove this year
+            const date = new Date(entry.date)
+            const year = date.getFullYear()
+
+            return year !== year // only remove this year
         })
 
         // Add new holidays for the entire year
@@ -135,11 +143,11 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // When you first launch the program, enter the holidays for the current year,
-    //  but only if there are NO holidays scheduled for this year yet.
+    //  but only if there are no holidays scheduled for this year yet.
     const initYear = new Date().getFullYear()
-    const hasHolidaysThisYear = entries.value.some(e =>
-        e.typ === 'publicholiday' &&
-        new Date(e.date).getFullYear() === initYear
+    const hasHolidaysThisYear = entries.value.some(entry =>
+        entry.typ === 'publicholiday' &&
+        new Date(entry.date).getFullYear() === initYear
     )
     if (!hasHolidaysThisYear && settings.value.state) {
         syncHolidays(initYear, settings.value.state)
@@ -155,6 +163,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         entries.value
             .filter(entry => {
                 const date = new Date(entry.date)
+
                 return date.getFullYear() === currYear.value
                     && date.getMonth() === currMonth.value
             })
@@ -169,31 +178,57 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             let group = groups.find(item => item.kw === kw)
 
             if (!group) {
-                group = { kw, entries: [], actual: 0, planned: 0 }; groups.push(group)
+                group = {
+                    kw,
+                    entries: [],
+                    actual: 0,
+                    planned: 0
+                }; groups.push(group)
             }
 
             group.entries.push(entry)
             group.actual += effectiveActualHours(entry)
             group.planned += entry.plannedHours || settings.value.hoursPerDay
         })
-        groups.forEach(g => g.ActualDiff = g.actual - g.planned)
+        groups.forEach(group => group.ActualDiff = group.actual - group.planned)
+
         return groups
     })
 
-    const monthActual = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + effectiveActualHours(entry), 0))
-    const monthPlanned = computed(() => entriesForMonth.value.reduce((accumulator, entry) => accumulator + (entry.plannedHours || settings.value.hoursPerDay), 0))
+    const monthActual = computed(() =>
+        entriesForMonth
+            .value
+            .reduce((accumulator, entry) => accumulator + effectiveActualHours(entry), 0))
+
+    const monthPlanned = computed(() =>
+        entriesForMonth
+            .value
+            .reduce((accumulator, entry) =>
+                accumulator + (entry.plannedHours || settings.value.hoursPerDay), 0)
+    )
+
     const monthDiff = computed(() => monthActual.value - monthPlanned.value)
+
     const todayEntry = computed(() => {
         const today = nowDateString()
-        return entries.value.find(entry => entry.date === today) ?? null
+
+        return entries
+            .value
+            .find(entry => entry.date === today) ?? null
     })
+
     const monthGross = computed(() =>
-        entriesForMonth.value.reduce((sum, entry) => sum + grossEarnedForEntry(entry), 0)
+        entriesForMonth
+            .value
+            .reduce((sum, entry) => sum + grossEarnedForEntry(entry), 0)
     )
+
     const weekGrossGroups = computed(() =>
         weekGroups.value.map(group => ({
             kw: group.kw,
-            gross: group.entries.reduce((sum, entry) => sum + grossEarnedForEntry(entry), 0)
+            gross: group
+                .entries
+                .reduce((sum, entry) => sum + grossEarnedForEntry(entry), 0)
         }))
     )
 
@@ -208,18 +243,19 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     })
 
     // Watcher
-    // Change state -> Resync holidays for the current year
+    // Change state -> resync holidays for the current year
     watch(
         () => settings.value.state,
         (newState, oldState) => {
             if (!newState || !oldState || newState === oldState)
                 return
+
             syncHolidays(currYear.value, newState)
         },
         { immediate: false }
     )
 
-    // Year change → Add holidays for the new year if none are present
+    // Year change -> add holidays for the new year if none are present
     watch(
         () => currYear.value,
         (newYear) => {
@@ -243,7 +279,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             timeEntries: [{ start: '', end: '', pause: 0 }],
             plannedHours: settings.value.hoursPerDay,
             notes: '',
-            ...data  // overrides what is found from modal
+            ...data // overrides what is found from modal
         })
         persist()
     }
@@ -447,6 +483,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
         const url = document.createElement('a')
         const pad = number => String(number).padStart(2, '0')
+
         url.href = URL.createObjectURL(blob)
         url.download = `zeitwerk_${currYear.value}_${pad(currMonth.value + 1)}.json`
         url.click()
@@ -454,7 +491,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     function importJSON(data) {
         if (!data.entries)
-            throw new Error('Ungültiges Format')
+            throw new Error('Invalid format')
 
         entries.value = data.entries
 
@@ -462,6 +499,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             settings.value = data.settings
 
         persist()
+
         return data.entries.length
     }
 
@@ -505,7 +543,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             const isoDate = `${yyyy}-${mm}-${dd}`
 
             const entry = entries.value.find(item => item.date === isoDate) ?? null
-            const dt = new Date(`${isoDate}T00:00:00`)
+            const date = new Date(`${isoDate}T00:00:00`)
 
             const actualValue = entry ? effectiveActualHours(entry) : null
             const plannedValue = entry ? (entry.plannedHours ?? settings.value.hoursPerDay) : null
@@ -526,7 +564,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
             rows.push([
                 `${dd}.${mm}.${yyyy}`,
-                days[dt.getDay()],
+                days[date.getDay()],
                 getKW(isoDate),
                 entry?.typ || '',
                 timeBlocks,
@@ -571,7 +609,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // Helpers
-    // Returns actual hours worked — if absent = target
+    // Returns actual hours worked -> if absent = target
     function timeToMinutes(value) {
         if (!value || typeof value !== 'string' || !value.includes(':'))
             return null
@@ -610,6 +648,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             const only = blocks[0]
             const blockMinutes = only.endMinutes - only.startMinutes
             const pauseMinutes = Math.max(0, Number(only.pause ?? 0))
+
             return Math.max(0, blockMinutes - pauseMinutes)
         }
 
@@ -676,6 +715,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         })
 
         persist()
+
         return { added, skipped, total: holidays.length }
     }
 

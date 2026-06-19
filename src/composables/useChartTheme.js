@@ -2,57 +2,78 @@
 
 import { computed } from 'vue'
 
-export function useChartTheme() {
-    function getCSSVar(name) {
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
-    }
+function getCSSVar(name) {
+    return getComputedStyle(document.documentElement)
+        .getPropertyValue(name)
+        .trim()
+}
 
+export function useChartTheme() {
     const colors = computed(() => ({
-        primary: getCSSVar('--color-primary'),
-        success: getCSSVar('--color-success'),
-        warning: getCSSVar('--color-warning'),
-        error: getCSSVar('--color-error'),
-        text: getCSSVar('--color-text'),
-        textMuted: getCSSVar('--color-text-muted'),
-        border: getCSSVar('--color-border'),
-        surface: getCSSVar('--color-surface'),
-        primaryHL: getCSSVar('--color-primary-highlight'),
-        successHL: getCSSVar('--color-success-highlight'),
-        errorHL: getCSSVar('--color-error-highlight'),
+        primary: getCSSVar('--color-primary') || '#6366f1',
+        primaryHL: getCSSVar('--color-primary-highlight') || 'rgba(99,102,241,0.15)',
+        success: getCSSVar('--color-success') || '#22c55e',
+        successHL: 'rgba(34,197,94,0.15)',
+        warning: getCSSVar('--color-warning') || '#f59e0b',
+        warningHL: 'rgba(245,158,11,0.15)',
+        error: getCSSVar('--color-error') || '#ef4444',
+        errorHL: 'rgba(239,68,68,0.15)',
+        text: getCSSVar('--color-text') || '#e2e8f0',
+        textMuted: getCSSVar('--color-text-muted') || '#94a3b8',
+        border: getCSSVar('--color-border') || '#2d3148',
+        divider: getCSSVar('--color-divider') || '#1e2130',
+        surface: getCSSVar('--color-surface') || '#1e2130',
     }))
 
     const baseOptions = computed(() => ({
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
         plugins: {
             legend: {
+                position: 'top',
                 labels: {
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    boxWidth: 8,
+                    padding: 16,
                     color: colors.value.textMuted,
-                    font: { family: 'Inter', size: 12 },
-                    boxWidth: 12,
-                    padding: 16
+                    font: { family: 'Inter', size: 12 }
                 }
             },
             tooltip: {
                 backgroundColor: colors.value.surface,
-                titleColor: colors.value.text,
-                bodyColor: colors.value.textMuted,
                 borderColor: colors.value.border,
                 borderWidth: 1,
+                titleColor: colors.value.text,
+                bodyColor: colors.value.textMuted,
                 padding: 10,
                 cornerRadius: 8,
-                titleFont: { family: 'Inter', weight: '600' },
-                bodyFont: { family: 'Inter' }
+                displayColors: true,
+                boxWidth: 8,
+                boxHeight: 8,
             }
         },
         scales: {
             x: {
-                ticks: { color: colors.value.textMuted, font: { family: 'Inter', size: 11 } },
-                grid: { color: colors.value.border, lineWidth: 0.5 }
+                grid: { display: false },
+                border: { display: false },
+                ticks: {
+                    color: colors.value.textMuted,
+                    font: { family: 'Inter', size: 11 }
+                }
             },
             y: {
-                ticks: { color: colors.value.textMuted, font: { family: 'Inter', size: 11 } },
-                grid: { color: colors.value.border, lineWidth: 0.5 }
+                grid: {
+                    color: colors.value.border,
+                    drawBorder: false,
+                },
+                border: { display: false, dash: [4, 4] },
+                ticks: {
+                    color: colors.value.textMuted,
+                    font: { family: 'Inter', size: 11 },
+                    padding: 8
+                }
             }
         }
     }))

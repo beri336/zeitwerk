@@ -1,14 +1,10 @@
 /* src/style.css */
-/* =========================================================
-   GLOBALE APP-BASIS
-   ---------------------------------------------------------
-   Diese Datei ersetzt die alte Vite-Demo-CSS komplett.
-   Die alte Datei hatte ein globales #app Flex-Layout,
-   fixe Breiten und Demo-Blöcke (#center, #next-steps, etc.),
-   die mit deiner echten App-Shell kollidiert haben.
-   ========================================================= */
 
-/* Basis-Reset */
+/*
+ * Globale App-Basis
+ */
+
+/* Reset */
 *,
 *::before,
 *::after {
@@ -25,9 +21,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  /* WICHTIG:
-     Die App selbst verwaltet ihre Scrollbereiche.
-     Der Body soll nicht zusätzlich scrollen. */
+  /* The app manages its own scroll areas - the body should not scroll along with them. */
 }
 
 #app {
@@ -36,13 +30,9 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  /* WICHTIG:
-     Kein display:flex mehr, kein max-width, kein border-inline,
-     kein text-align:center — das kam aus dem Vite-Starter und
-     hat dein echtes Layout kaputt gemacht. */
 }
 
-/* Medien standardisieren */
+/* Media defaults */
 img,
 svg,
 video,
@@ -51,7 +41,7 @@ canvas {
   max-width: 100%;
 }
 
-/* Form controls erben Schrift */
+/* Form controls inherit font */
 button,
 input,
 textarea,
@@ -59,12 +49,12 @@ select {
   font: inherit;
 }
 
-/* Links neutraler Standard */
+/* Neutral link color */
 a {
   color: inherit;
 }
 
-/* Optional: iPhone Safe Areas sauber unterstützen */
+/* Safe Area Variables */
 :root {
   --safe-top: env(safe-area-inset-top);
   --safe-right: env(safe-area-inset-right);

@@ -1,11 +1,4 @@
-<!-- src/components/AppSidebar.vue -->
-<script setup>
-import { useRoute } from 'vue-router'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-
-const route = useRoute()
-const store = useZeitwerkStore()
-</script>
+<!-- src/components/layout/AppSidebar.vue -->
 
 <template>
     <aside class="sidebar">
@@ -22,25 +15,21 @@ const store = useZeitwerkStore()
 
         <nav class="sidebar-section">
             <div class="sidebar-section-label">Navigation</div>
-            <RouterLink to="/tracking" class="sidebar-item" :class="{ active: route.path === '/tracking' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <span>Month Overview</span>
-            </RouterLink>
-            <RouterLink to="/year" class="sidebar-item" :class="{ active: route.path === '/year' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <span>Year Overview</span>
-            </RouterLink>
+            <!-- Calendar -->
             <RouterLink to="/calender" class="sidebar-item" :class="{ active: route.path === '/calender' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke-linecap="round"
+                        stroke-width="2.5" />
+                </svg>
+                <span>Calendar</span>
+            </RouterLink>
+
+            <!-- Month Overview -->
+            <RouterLink to="/month-overview" class="sidebar-item" :class="{ active: route.path === '/month-overview' }">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
@@ -49,9 +38,37 @@ const store = useZeitwerkStore()
                     <circle cx="8" cy="15" r="1" fill="currentColor" stroke="none" />
                     <circle cx="12" cy="15" r="1" fill="currentColor" stroke="none" />
                     <circle cx="16" cy="15" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="8" cy="19" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
                 </svg>
-                <span>Calender</span>
+                <span>Month Overview</span>
             </RouterLink>
+
+            <!-- Year Overview -->
+            <RouterLink to="/year-overview" class="sidebar-item" :class="{ active: route.path === '/year-overview' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                    <line x1="7" y1="15" x2="17" y2="15" />
+                    <line x1="7" y1="19" x2="13" y2="19" />
+                </svg>
+                <span>Year Overview</span>
+            </RouterLink>
+
+            <!-- Diagrams -->
+            <RouterLink to="/diagrams" class="sidebar-item" :class="{ active: route.path === '/diagrams' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                    <line x1="3" y1="20" x2="21" y2="20" />
+                </svg>
+                <span>Diagrams</span>
+            </RouterLink>
+
+            <!-- Settings -->
             <RouterLink to="/settings" class="sidebar-item" :class="{ active: route.path === '/settings' }">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3" />
@@ -59,14 +76,6 @@ const store = useZeitwerkStore()
                     <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
                 </svg>
                 <span>Settings</span>
-            </RouterLink>
-            <RouterLink to="/diagrams" class="sidebar-item" :class="{ active: route.path === '/diagrams' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="20" x2="18" y2="10" />
-                    <line x1="12" y1="20" x2="12" y2="4" />
-                    <line x1="6" y1="20" x2="6" y2="14" />
-                </svg>
-                <span>Diagrams</span>
             </RouterLink>
         </nav>
 
@@ -89,7 +98,16 @@ const store = useZeitwerkStore()
     </aside>
 </template>
 
+<script setup>
+import { useRoute } from 'vue-router'
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+
+const route = useRoute()
+const store = useZeitwerkStore()
+</script>
+
 <style scoped>
+/* Sidebar */
 .sidebar {
     /* grid-row: 1 / -1 entfernt — App.vue übernimmt Grid-Zuweisung */
     background: var(--color-surface);
@@ -100,6 +118,7 @@ const store = useZeitwerkStore()
     overscroll-behavior: contain;
 }
 
+/* Logo */
 .sidebar-logo {
     padding: var(--space-4) var(--space-5);
     display: flex;
@@ -118,6 +137,7 @@ const store = useZeitwerkStore()
     font-weight: 600;
 }
 
+/* Navigation */
 .sidebar-section {
     padding: var(--space-4) var(--space-3);
 }
@@ -156,6 +176,7 @@ const store = useZeitwerkStore()
     font-weight: 500;
 }
 
+/* Month Navigator */
 .sidebar-month {
     padding: var(--space-4) var(--space-5);
     margin-top: auto;

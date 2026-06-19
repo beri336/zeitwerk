@@ -1,68 +1,5 @@
 <!-- src/components/ExportCsvModal.vue -->
 
-<script setup>
-import { computed, ref, watch } from 'vue'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-
-const props = defineProps({
-    modelValue: { type: Boolean, default: false }
-})
-
-const emit = defineEmits(['update:modelValue', 'confirm'])
-
-const store = useZeitwerkStore()
-
-const singleMonth = ref(true)
-const fromMonth = ref('')
-const toMonth = ref('')
-
-const isOpen = computed({
-    get: () => props.modelValue,
-    set: value => emit('update:modelValue', value)
-})
-
-function pad(num) {
-    return String(num).padStart(2, '0')
-}
-
-function close() {
-    isOpen.value = false
-}
-
-function resetToCurrentMonth() {
-    const current = `${store.currYear}-${pad(store.currMonth + 1)}`
-    fromMonth.value = current
-    toMonth.value = current
-    singleMonth.value = true
-}
-
-watch(
-    () => props.modelValue,
-    open => {
-        if (open) resetToCurrentMonth()
-    },
-    { immediate: true }
-)
-
-const canSubmit = computed(() => {
-    if (!fromMonth.value) return false
-    if (singleMonth.value) return true
-    if (!toMonth.value) return false
-    return toMonth.value >= fromMonth.value
-})
-
-function submit() {
-    if (!canSubmit.value) return
-
-    emit('confirm', {
-        from: fromMonth.value,
-        to: singleMonth.value ? fromMonth.value : toMonth.value
-    })
-
-    close()
-}
-</script>
-
 <template>
     <Teleport to="body">
         <div v-if="isOpen" class="modal-backdrop" @click="close">
@@ -108,7 +45,66 @@ function submit() {
     </Teleport>
 </template>
 
+<script setup>
+import { computed, ref, watch } from 'vue'
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+
+const props = defineProps({
+    modelValue: { type: Boolean, default: false }
+})
+
+const emit = defineEmits( ['update:modelValue', 'confirm'] )
+const store = useZeitwerkStore()
+
+const singleMonth = ref(true)
+const fromMonth = ref('')
+const toMonth = ref('')
+
+const isOpen = computed({
+    get: () => props.modelValue,
+    set: value => emit('update:modelValue', value)
+})
+
+function pad(num) { return String(num).padStart(2, '0') }
+
+function close() { isOpen.value = false }
+
+function resetToCurrentMonth() {
+    const current = `${store.currYear}-${pad(store.currMonth + 1)}`
+    fromMonth.value = current
+    toMonth.value = current
+    singleMonth.value = true
+}
+
+watch(
+    () => props.modelValue,
+    open => {
+        if (open) resetToCurrentMonth()
+    },
+    { immediate: true }
+)
+
+const canSubmit = computed(() => {
+    if (!fromMonth.value) return false
+    if (singleMonth.value) return true
+    if (!toMonth.value) return false
+    return toMonth.value >= fromMonth.value
+})
+
+function submit() {
+    if (!canSubmit.value) return
+
+    emit('confirm', {
+        from: fromMonth.value,
+        to: singleMonth.value ? fromMonth.value : toMonth.value
+    })
+
+    close()
+}
+</script>
+
 <style scoped>
+/* Backdrop */
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -120,6 +116,7 @@ function submit() {
     padding: var(--space-4);
 }
 
+/* Card */
 .modal-card {
     width: min(100%, 460px);
     background: var(--color-surface);
@@ -131,6 +128,7 @@ function submit() {
     overflow: hidden;
 }
 
+/* Header */
 .modal-header {
     display: flex;
     align-items: flex-start;
@@ -151,6 +149,7 @@ function submit() {
     color: var(--color-text-muted);
 }
 
+/* Body */
 .modal-body {
     padding: var(--space-4);
     display: flex;
@@ -158,6 +157,7 @@ function submit() {
     gap: var(--space-4);
 }
 
+/* Form Fields */
 .field {
     display: flex;
     flex-direction: column;
@@ -189,6 +189,7 @@ function submit() {
     color: var(--color-text);
 }
 
+/* Footer */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -197,6 +198,7 @@ function submit() {
     border-top: 1px solid var(--color-border);
 }
 
+/* Icon Button */
 .icon-btn {
     width: 36px;
     height: 36px;

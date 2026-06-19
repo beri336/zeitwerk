@@ -1,105 +1,5 @@
 <!-- src/components/EntryModal.vue -->
 
-<script setup>
-import { ref, watch, computed } from 'vue'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-import { useToast } from '@/composables/useToast'
-import { calcActualHours, formatHours, today } from '@/composables/useTime'
-import { ABSENCE_TYPES, getAbsenceType } from '@/composables/useAbsence'
-import { usePrivacy } from '@/composables/usePrivacy'
-
-const { mask } = usePrivacy()
-
-const props = defineProps({
-    modelValue: { type: Boolean, default: false },
-    editEntry: { type: Object, default: null },
-    prefillDate: { type: String, default: null }
-})
-const emit = defineEmits(['update:modelValue'])
-
-const store = useZeitwerkStore()
-const { showToast } = useToast()
-
-const defaultForm = () => ({
-    date: today(),
-    typ: 'on-site',
-    timeEntries: [{ start: '', end: '', pause: store.settings.defaultBreak }],
-    plannedHours: store.settings.hoursPerDay,
-    notes: '',
-    remarks: '',
-})
-
-const form = ref(defaultForm())
-
-watch(() => props.modelValue, open => {
-    if (!open)
-        return
-
-    form.value = props.editEntry
-        ? { ...props.editEntry }
-        : { ...defaultForm(), date: props.prefillDate ?? today() }
-})
-
-const currentType = computed(() => getAbsenceType(form.value.typ ?? 'on-site'))
-const showTimeFields = computed(() => currentType.value.counter)
-const previewActual = computed(() => calcActualHours(form.value))
-
-// timeEntries helper
-function addBlock() {
-    form.value.timeEntries.push({ start: '', end: '', pause: 0 })
-}
-
-function removeBlock(index) {
-    if (form.value.timeEntries.length <= 1)
-        return
-    form.value.timeEntries.splice(index, 1)
-}
-
-// Delete with confirmation + Toast
-const pendingDelete = ref(false)
-
-function askDelete() { pendingDelete.value = true }
-function cancelDelete() { pendingDelete.value = false }
-
-function deleteAndClose() {
-    if (!props.editEntry)
-        return
-    store.deleteEntry(props.editEntry.id)
-    showToast('Deleted entry.', 'ok')
-    close()
-}
-
-// Reset on closing
-function close() {
-    pendingDelete.value = false
-    emit('update:modelValue', false)
-}
-
-// Save new or updated entry
-function save() {
-    if (!form.value.date) {
-        showToast('Please select a date.', 'error')
-        return
-    }
-
-    if (props.editEntry) {
-        store.updateEntry(props.editEntry.id, form.value)
-        showToast('Entry updated.', 'ok')
-    } else {
-        store.addEntry(form.value)
-        showToast('Entry added.', 'ok')
-    }
-    close()
-}
-
-// show salary
-const grossPreview = computed(() => {
-    if (!showTimeFields.value)
-        return 0
-    return store.grossEarnedForEntry(form.value)
-})
-</script>
-
 <template>
     <Teleport to="body">
         <div v-if="modelValue" class="modal-backdrop" @click.self="close">
@@ -118,12 +18,12 @@ const grossPreview = computed(() => {
                 <div class="modal-body">
                     <!-- Type selector -->
                     <div class="typ-selector">
-                        <button v-for="(t, key) in ABSENCE_TYPES" :key="key" class="typ-btn"
+                        <button v-for="(type, key) in ABSENCE_TYPES" :key="key" class="typ-btn"
                             :class="{ active: form.typ === key }" :style="form.typ === key
-                                ? `background:${t.highlight};color:${t.color};border-color:${t.color}`
+                                ? `background:${type.highlight};color:${type.color};border-color:${type.color}`
                                 : ''" @click="form.typ = key">
-                            <span>{{ t.icon }}</span>
-                            <span>{{ t.label }}</span>
+                            <span>{{ type.icon }}</span>
+                            <span>{{ type.label }}</span>
                         </button>
                     </div>
 
@@ -141,7 +41,7 @@ const grossPreview = computed(() => {
 
                         <!-- Gross Preview -->
                         <div v-if="showTimeFields
-                            && form.timeEntries?.some(b => b.start && b.end)
+                            && form.timeEntries?.some(entry => entry.start && entry.end)
                             && store.grossHourlyRate > 0" class="preview-bar">
                             <span class="form-label">Preview Salary</span>
                             <strong class="preview-salary">
@@ -155,8 +55,8 @@ const grossPreview = computed(() => {
                                 <label class="form-label">Time Entries</label>
 
                                 <div class="time-blocks">
-                                    <div v-for="(block, idx) in form.timeEntries" :key="idx" class="time-block">
-                                        <span class="block-label">Block {{ idx + 1 }}</span>
+                                    <div v-for="(block, index) in form.timeEntries" :key="index" class="time-block">
+                                        <span class="block-label">Block {{ index + 1 }}</span>
 
                                         <div class="block-fields">
                                             <div class="form-group">
@@ -175,7 +75,7 @@ const grossPreview = computed(() => {
                                         </div>
 
                                         <button v-if="form.timeEntries.length > 1"
-                                            class="btn btn-ghost btn-sm block-remove" @click="removeBlock(idx)"
+                                            class="btn btn-ghost btn-sm block-remove" @click="removeBlock(index)"
                                             title="Remove Entry">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
                                                 stroke="currentColor" stroke-width="2">
@@ -214,9 +114,9 @@ const grossPreview = computed(() => {
                         </div>
 
                         <!-- Remarks -->
-                         <div class="form-group full">
+                        <div class="form-group full">
                             <label class="form-label">Remarks</label>
-                            <textarea class="form-input form-textarea" v-model="form.notiz" rows="4" maxlength="2000"
+                            <textarea class="form-input form-textarea" v-model="form.remarks" rows="4" maxlength="2000"
                                 placeholder="Longer daily notes, observations, notable events ..." />
                         </div>
 
@@ -225,7 +125,7 @@ const grossPreview = computed(() => {
                             <span class="form-label">Preview Actual total:</span>
                             <strong>{{ formatHours(previewActual) }}</strong>
                             <span class="preview-hint">
-                                over {{form.timeEntries.filter(b => b.start && b.end).length}} entries
+                                over {{form.timeEntries.filter(entry => entry.start && entry.end).length}} entries
                             </span>
                         </div>
                     </div>
@@ -265,7 +165,106 @@ const grossPreview = computed(() => {
     </Teleport>
 </template>
 
+<script setup>
+import { ref, watch, computed } from 'vue'
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+import { useToast } from '@/composables/useToast'
+import { calcActualHours, formatHours, today } from '@/composables/useTime'
+import { ABSENCE_TYPES, getAbsenceType } from '@/composables/useAbsence'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const props = defineProps({
+    modelValue: { type: Boolean, default: false },
+    editEntry: { type: Object, default: null },
+    prefillDate: { type: String, default: null }
+})
+
+const emit = defineEmits(['update:modelValue'])
+const store = useZeitwerkStore()
+const { showToast } = useToast()
+const { mask } = usePrivacy()
+
+const defaultForm = () => ({
+    date: today(),
+    typ: 'on-site',
+    timeEntries: [{ start: '', end: '', pause: store.settings.defaultBreak }],
+    plannedHours: store.settings.hoursPerDay,
+    notes: '',
+    remarks: '',
+})
+const form = ref(defaultForm())
+
+watch(() => props.modelValue, open => {
+    if (!open)
+        return
+
+    form.value = props.editEntry
+        ? { ...props.editEntry }
+        : { ...defaultForm(), date: props.prefillDate ?? today() }
+})
+
+const currentType = computed( () => getAbsenceType(form.value.typ ?? 'on-site') )
+const showTimeFields = computed( () => currentType.value.counter )
+const previewActual = computed( () => calcActualHours(form.value) )
+
+// show salary
+const grossPreview = computed(() => {
+    if (!showTimeFields.value)
+        return 0
+    return store.grossEarnedForEntry(form.value)
+})
+
+// timeEntries helper
+function addBlock() {
+    form.value.timeEntries.push({ start: '', end: '', pause: 0 })
+}
+
+function removeBlock(index) {
+    if (form.value.timeEntries.length <= 1)
+        return
+    form.value.timeEntries.splice(index, 1)
+}
+
+// delete with confirmation + Toast
+const pendingDelete = ref(false)
+
+function askDelete() { pendingDelete.value = true }
+function cancelDelete() { pendingDelete.value = false }
+
+function deleteAndClose() {
+    if (!props.editEntry)
+        return
+    store.deleteEntry(props.editEntry.id)
+    showToast('Deleted entry.', 'ok')
+    close()
+}
+
+// reset on closing
+function close() {
+    pendingDelete.value = false
+    emit('update:modelValue', false)
+}
+
+// save new or updated entry
+function save() {
+    if (!form.value.date) {
+        showToast('Please select a date.', 'error')
+        return
+    }
+
+    if (props.editEntry) {
+        store.updateEntry(props.editEntry.id, form.value)
+        showToast('Entry updated.', 'ok')
+    } else {
+        store.addEntry(form.value)
+        showToast('Entry added.', 'ok')
+    }
+    close()
+}
+</script>
+
 <style scoped>
+/* Modal */
 .modal-content {
     max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);
     overflow-y: auto;
@@ -273,6 +272,7 @@ const grossPreview = computed(() => {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Preview Bar */
 .preview-bar {
     margin-top: var(--space-4);
     padding-top: var(--space-1);
@@ -292,7 +292,7 @@ const grossPreview = computed(() => {
     color: var(--color-text-faint);
 }
 
-/* Type-Selector */
+/* Type Selector */
 .typ-selector {
     display: flex;
     flex-wrap: wrap;
@@ -378,7 +378,7 @@ const grossPreview = computed(() => {
     color: var(--color-error);
 }
 
-/* Add Button */
+/* Add Block Button */
 .add-block-btn {
     width: 100%;
     display: flex;
@@ -410,8 +410,7 @@ const grossPreview = computed(() => {
     resize: vertical;
 }
 
-/* Mobile Devices Optimization */
-/* Auf Mobile volle Breite */
+/* Mobile */
 @media (max-width: 767px) {
     .modal-content {
         width: 100%;

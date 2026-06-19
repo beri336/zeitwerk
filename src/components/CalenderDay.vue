@@ -1,75 +1,5 @@
 <!-- src/components/CalenderDay.vue -->
 
-<script setup>
-import { computed } from 'vue'
-import { useZeitwerkStore } from '@/stores/zeitwerk'
-import { formatHours } from '@/composables/useTime'
-import { getAbsenceType } from '@/composables/useAbsence'
-import { usePrivacy } from '@/composables/usePrivacy'
-
-const { mask } = usePrivacy()
-
-const props = defineProps({
-    date: { type: String, required: true }, // 'YYYY-MM-DD'
-    isToday: { type: Boolean, default: false },
-    isOutside: { type: Boolean, default: false }, // other month
-    flashToday: { type: Boolean, default: false },
-})
-
-const emit = defineEmits(['click'])
-
-const store = useZeitwerkStore()
-
-const entry = computed(() =>
-    store.entries.find(e => e.date === props.date) ?? null
-)
-
-const type = computed(() =>
-    entry.value ? getAbsenceType(entry.value.typ ?? 'on-site') : null
-)
-
-const actual = computed(() =>
-    entry.value ? store.effectiveActualHours(entry.value) : 0
-)
-
-const planned = computed(() =>
-    entry.value ? (entry.value.plannedHours ?? store.settings.hoursPerDay) : store.settings.hoursPerDay
-)
-
-const progress = computed(() =>
-    planned.value > 0 ? Math.min(100, (actual.value / planned.value) * 100) : 0
-)
-
-const progressColor = computed(() => {
-    if (!entry.value) return 'var(--color-border)'
-    if (!type.value?.counter) return type.value?.color ?? 'var(--color-border)'
-    if (progress.value >= 100) return 'var(--color-success)'
-    if (progress.value >= 60) return 'var(--color-warning)'
-    return 'var(--color-error)'
-})
-
-const dayNum = computed(() => new Date(props.date + 'T00:00:00').getDate())
-
-// Calculate salary
-const grossEarned = computed(() =>
-    entry.value ? store.grossEarnedForEntry(entry.value) : 0
-)
-
-function formatCurrency(value) {
-    return new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: 2
-    }).format(value)
-}
-
-// Check if the day is a weekend
-const isWeekend = computed(() => {
-    const day = new Date(props.date + 'T00:00:00').getDay()
-    return day === 0 || day === 6
-})
-</script>
-
 <template>
     <button class="cal-day" :class="{
         'cal-day--today': isToday,
@@ -79,8 +9,8 @@ const isWeekend = computed(() => {
         'cal-day--flash': flashToday,
         'cal-day--weekend': isWeekend
     }" :style="entry && entry.typ && entry.typ !== 'on-site'
-            ? `--day-accent:${type.color};--day-bg:${type.highlight}`
-            : ''" :data-cal-date="date" type="button" @click="emit('click', date)">
+        ? `--day-accent:${type.color};--day-bg:${type.highlight}`
+        : ''" :data-cal-date="date" type="button" @click="emit('click', date)">
         <div class="cal-day__header">
             <span class="cal-day__num">{{ dayNum }}</span>
             <span v-if="entry?.typ && entry.typ !== 'on-site'" class="cal-day__icon">
@@ -110,15 +40,96 @@ const isWeekend = computed(() => {
     </button>
 </template>
 
+<script setup>
+import { computed } from 'vue'
+import { useZeitwerkStore } from '@/stores/zeitwerk'
+import { formatHours } from '@/composables/useTime'
+import { getAbsenceType } from '@/composables/useAbsence'
+import { usePrivacy } from '@/composables/usePrivacy'
+
+const props = defineProps({
+    date: { type: String, required: true }, // 'YYYY-MM-DD'
+    isToday: { type: Boolean, default: false },
+    isOutside: { type: Boolean, default: false }, // other month
+    flashToday: { type: Boolean, default: false },
+})
+
+const emit = defineEmits(['click'])
+const store = useZeitwerkStore()
+const { mask } = usePrivacy()
+
+const dateObj = computed(() => new Date(props.date + 'T00:00:00'))
+const dayNum = computed(() => dateObj.value.getDate())
+function formatCurrency(value) { return currencyFormatter.format(value) }
+
+const entry = computed(() =>
+    store.entries.find(e => e.date === props.date)
+    ?? null
+)
+const type = computed(() =>
+    entry.value ?
+        getAbsenceType(entry.value.typ ?? 'on-site')
+        : null
+)
+const actual = computed(() =>
+    entry.value ?
+        store.effectiveActualHours(entry.value)
+        : 0
+)
+const planned = computed(() =>
+    entry.value
+        ? (entry.value.plannedHours ?? store.settings.hoursPerDay)
+        : store.settings.hoursPerDay
+)
+const progress = computed(() =>
+    planned.value > 0
+        ? Math.min(100, (actual.value / planned.value) * 100)
+        : 0
+)
+const progressColor = computed(() => {
+    if (!entry.value)
+        return 'var(--color-border)'
+
+    if (!type.value?.counter)
+        return type.value?.color ?? 'var(--color-border)'
+
+    if (progress.value >= 100)
+        return 'var(--color-success)'
+
+    if (progress.value >= 60)
+        return 'var(--color-warning)'
+
+    return 'var(--color-error)'
+})
+const grossEarned = computed(() =>
+    entry.value ?
+        store.grossEarnedForEntry(entry.value)
+        : 0
+)
+const currencyFormatter = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 2
+})
+const isWeekend = computed(() => {
+    const day = dateObj.value.getDay()
+    return day === 0 || day === 6
+})
+</script>
+
 <style scoped>
+/* Base: Day Cell */
 .cal-day {
     position: relative;
     min-height: 96px;
+    min-width: 44px;
     padding: var(--space-2);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     cursor: pointer;
+    text-align: left;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
@@ -127,9 +138,6 @@ const isWeekend = computed(() => {
         border-color var(--transition),
         box-shadow var(--transition),
         transform var(--transition);
-    overflow: hidden;
-    min-width: 44px;
-    text-align: left;
 }
 
 .cal-day:hover {
@@ -144,8 +152,15 @@ const isWeekend = computed(() => {
     box-shadow: 0 0 0 3px var(--color-primary-highlight);
 }
 
+/* Variants: State */
 .cal-day--today {
     box-shadow: inset 0 0 0 2px var(--color-gold);
+}
+
+.cal-day--today .cal-day__num {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-radius: var(--radius-full);
 }
 
 .cal-day--flash {
@@ -153,43 +168,6 @@ const isWeekend = computed(() => {
         inset 0 0 0 2px var(--color-gold),
         0 0 0 4px color-mix(in oklch, var(--color-gold) 22%, transparent);
     animation: todayPulse 1.4s ease;
-}
-
-.cal-day__gross {
-    font-size: 12px;
-    color: var(--color-success);
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.2;
-}
-
-@keyframes todayPulse {
-    0% {
-        transform: scale(1);
-        box-shadow:
-            inset 0 0 0 2px var(--color-gold),
-            0 0 0 0 color-mix(in oklch, var(--color-gold) 30%, transparent);
-    }
-
-    35% {
-        transform: scale(1.015);
-        box-shadow:
-            inset 0 0 0 2px var(--color-gold),
-            0 0 0 6px color-mix(in oklch, var(--color-gold) 22%, transparent);
-    }
-
-    100% {
-        transform: scale(1);
-        box-shadow:
-            inset 0 0 0 2px var(--color-gold),
-            0 0 0 0 color-mix(in oklch, var(--color-gold) 0%, transparent);
-    }
-}
-
-.cal-day--today .cal-day__num {
-    background: var(--color-primary);
-    color: var(--color-text-inverse);
-    border-radius: var(--radius-full);
 }
 
 .cal-day--outside {
@@ -207,6 +185,17 @@ const isWeekend = computed(() => {
     border-color: var(--day-accent, var(--color-border));
 }
 
+.cal-day--weekend {
+    background: color-mix(in oklch, var(--color-primary-highlight) 35%, var(--color-surface));
+}
+
+.cal-day--weekend .cal-day__num {
+    color: var(--color-warning);
+    font-weight: 700;
+}
+
+
+/* Header */
 .cal-day__header {
     display: flex;
     align-items: center;
@@ -233,6 +222,7 @@ const isWeekend = computed(() => {
     line-height: 1;
 }
 
+/*  Body: Time & Labels */
 .cal-day__body {
     flex: 1;
     display: flex;
@@ -255,6 +245,14 @@ const isWeekend = computed(() => {
     line-height: 1.2;
 }
 
+.cal-day__gross {
+    font-size: 12px;
+    color: var(--color-success);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+
 .cal-day__note {
     font-size: 12px;
     color: var(--color-text-faint);
@@ -263,6 +261,7 @@ const isWeekend = computed(() => {
     text-overflow: ellipsis;
 }
 
+/*  Progress Bar */
 .cal-day__bar-track {
     position: absolute;
     bottom: 0;
@@ -278,19 +277,35 @@ const isWeekend = computed(() => {
     transition: width 0.4s ease;
 }
 
+/* Animation: Today Pulse */
+@keyframes todayPulse {
+    0% {
+        transform: scale(1);
+        box-shadow:
+            inset 0 0 0 2px var(--color-gold),
+            0 0 0 0 color-mix(in oklch, var(--color-gold) 30%, transparent);
+    }
+
+    35% {
+        transform: scale(1.015);
+        box-shadow:
+            inset 0 0 0 2px var(--color-gold),
+            0 0 0 6px color-mix(in oklch, var(--color-gold) 22%, transparent);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow:
+            inset 0 0 0 2px var(--color-gold),
+            0 0 0 0 color-mix(in oklch, var(--color-gold) 0%, transparent);
+    }
+}
+
+/* Responsive: Mobile */
 @media (max-width: 768px) {
     .cal-day {
         min-height: 72px;
         padding: var(--space-2);
-    }
-
-    .cal-day__time,
-    .cal-day__note {
-        display: none;
-    }
-
-    .cal-day__ist {
-        font-size: 12px;
     }
 
     .cal-day__num {
@@ -298,18 +313,17 @@ const isWeekend = computed(() => {
         height: 24px;
     }
 
+    .cal-day__ist {
+        font-size: 12px;
+    }
+
     .cal-day__gross {
         font-size: 11px;
     }
-}
 
-/* Weekend styling */
-.cal-day--weekend {
-    background: color-mix(in oklch, var(--color-primary-highlight) 35%, var(--color-surface));
-}
-
-.cal-day--weekend .cal-day__num {
-    color: var(--color-warning);
-    font-weight: 700;
+    .cal-day__time,
+    .cal-day__note {
+        display: none;
+    }
 }
 </style>

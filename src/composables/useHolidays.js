@@ -1,6 +1,6 @@
 // src/composables/useHolidays.js
 
-// All public holidays in Germany — all 16 federal states
+// All public holidays in Germany - all 16 federal states
 // Calculation based on Easter Sunday (Gauss's formula)
 
 export const STATES = {
@@ -43,16 +43,16 @@ function easterSunday(year) {
 }
 
 function addDays(date, days) {
-    const d = new Date(date)
-    d.setDate(d.getDate() + days)
+    const _date = new Date(date)
+    _date.setDate(_date.getDate() + days)
 
-    return d
+    return _date
 }
 
 function format(date) {
-    const p = num => String(num).padStart(2, '0')
+    const pad = num => String(num).padStart(2, '0')
 
-    return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
 // Returns all holidays for a given year and state
@@ -148,7 +148,7 @@ export function getHolidays(year, state) {
 function getBussUndBettag(year) {
     const nov23 = new Date(year, 10, 23)
     const dow = nov23.getDay() // 0=So
-    // Tage zurück bis Mittwoch (3)
+    // Days until Wednesday (3)
     const diff = (dow >= 3) ? dow - 3 : dow + 4
     return format(new Date(year, 10, 23 - diff))
 }
@@ -156,8 +156,8 @@ function getBussUndBettag(year) {
 // Filters holidays for a specific month
 export function getHolidaysForMonth(year, month, state) {
     return getHolidays(year, state).filter(h => {
-        const d = new Date(h.date)
+        const date = new Date(h.date)
         
-        return d.getFullYear() === year && d.getMonth() === month
+        return date.getFullYear() === year && date.getMonth() === month
     })
 }
