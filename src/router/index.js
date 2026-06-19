@@ -5,7 +5,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import DashboardView from '@/views/DashboardView.vue'
 import LiveTrackingView from '@/views/LiveTrackingView.vue'
 import MonthOverviewView from '@/views/MonthOverviewView.vue'
-import YearView from '@/views/YearView.vue'
+import YearOverviewView from '@/views/YearOverviewView.vue'
 import CalenderView from '@/views/CalenderView.vue'
 import ToDoView from '@/views/ToDoView.vue'
 import DiagramsView from '@/views/DiagramsView.vue'
@@ -19,7 +19,7 @@ const routes = [
     { path: '/dashboard', name: 'dashboard', component: DashboardView },
     { path: '/livetracking', name: 'livetracking', component: LiveTrackingView },
     { path: '/month-overview', name: 'month-overview', component: MonthOverviewView },
-    { path: '/year-overview', name: 'year-overview', component: YearView },
+    { path: '/year-overview', name: 'year-overview', component: YearOverviewView },
     { path: '/calender', name: 'calender', component: CalenderView },
     { path: '/todo', name: 'todo', component: ToDoView },
     { path: '/diagrams', name: 'diagrams', component: DiagramsView },

@@ -1,4 +1,4 @@
-<!-- src/views/YearView.vue -->
+<!-- src/components/features/YearOverviewCard.vue -->
 
 <template>
     <main class="main">
@@ -27,33 +27,6 @@
         <p class="year-hint">
             Tap a day to open or create an entry. Colored days indicate tracked work, absences, or public holidays.
         </p>
-
-        <section class="year-summary" aria-label="Year summary">
-            <KpiCard label="Months with entries"
-                :value="String(yearMonths.filter(month => month.stats.count > 0).length)" />
-
-            <KpiCard label="Entries" :value="String(yearEntries.length)" />
-
-            <KpiCard label="Actual"
-                :value="formatHours(yearEntries.reduce((sum, entry) => sum + store.effectiveActualHours(entry), 0))" />
-
-            <KpiCard label="Planned" :value="formatHours(
-                yearEntries.reduce(
-                    (sum, entry) => sum + (entry.plannedHours || store.settings.hoursPerDay),
-                    0
-                )
-            )" />
-
-            <!-- Only if salary is set -->
-            <KpiCard v-if="store.grossHourlyRate > 0" label="Year Gross" :value="yearGrossLabel" sub="Gross earnings"
-                variant="ok" :private="true" />
-
-            <!-- Vacation -->
-            <KpiCard label="Used Vacation Days" :value="String(store.usedVacationDays)" sub="Days taken" />
-
-            <KpiCard label="Remaining Vacation Days" :value="String(store.remainingVacationDays)"
-                :sub="`${store.remainingVacationDays === 1 ? 'Day left' : 'Days left'}`" />
-        </section>
 
         <section class="year-grid" aria-label="Year calendar overview">
             <article v-for="month in yearMonths" :key="month.index" class="year-month"
@@ -92,10 +65,12 @@ import { computed, ref } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours, MONTH_NAMES } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
+
 import EntryModal from '@/components/EntryModal.vue'
 import KpiCard from '@/components/ui/KpiCard.vue'
 
 const store = useZeitwerkStore()
+
 const showModal = ref(false)
 const editEntry = ref(null)
 const clickedDate = ref(null)
@@ -104,9 +79,9 @@ const DAY_HEADERS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 const todayStr = computed(() => {
     const date = new Date()
-    const p = num => String(num).padStart(2, '0')
+    const pad = num => String(num).padStart(2, '0')
 
-    return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 })
 
 const isCurrentYear = computed(() => {
@@ -138,12 +113,12 @@ function getMonthDays(year, month) {
         })
     }
 
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-        const date = new Date(year, month, day)
-        
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+        const date = new Date(year, month, d)
+
         days.push({
             date: formatDateString(date),
-            dayNumber: day,
+            dayNumber: d,
             outside: false
         })
     }
@@ -254,17 +229,16 @@ function dayClass(day) {
     }
 }
 
-/* Highlight current month */
+// Highlight current month
 function isCurrentMonthCard(monthIndex) {
     const now = new Date()
+
     return store.currYear === now.getFullYear()
         && monthIndex === now.getMonth()
 }
 
 const yearGross = computed(() =>
-    yearEntries
-        .value
-        .reduce((sum, entry) => sum + store.grossEarnedForEntry(entry), 0)
+    yearEntries.value.reduce((sum, entry) => sum + store.grossEarnedForEntry(entry), 0)
 )
 
 const yearGrossLabel = computed(() => {
@@ -283,14 +257,13 @@ const yearGrossLabel = computed(() => {
 /* Main Layout */
 .main {
     overflow-y: auto;
-    overscroll-behavior: contain;
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
 }
 
-/* Toolbar */
+/* Year Toolbar */
 .year-toolbar {
     display: grid;
     grid-template-columns: 36px minmax(0, 1fr) 36px auto;
@@ -301,13 +274,6 @@ const yearGrossLabel = computed(() => {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-}
-
-.year-label {
-    text-align: center;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
 }
 
 .year-nav-btn {
@@ -327,6 +293,13 @@ const yearGrossLabel = computed(() => {
     color: var(--color-text);
 }
 
+.year-label {
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
 .year-current-btn {
     height: 36px;
     padding: 0 var(--space-2);
@@ -339,8 +312,14 @@ const yearGrossLabel = computed(() => {
     white-space: nowrap;
 }
 
-.year-current-btn:hover    { background: var(--color-surface-offset); }
-.year-current-btn:disabled { opacity: 0.55; cursor: default; }
+.year-current-btn:hover {
+    background: var(--color-surface-offset);
+}
+
+.year-current-btn:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
 
 .year-hint {
     font-size: var(--text-xs);
@@ -348,15 +327,12 @@ const yearGrossLabel = computed(() => {
     margin-top: calc(var(--space-2) * -1);
 }
 
-/* Summary */
+/* Year Summary */
 .year-summary {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-3);
 }
-
-.stat-ok  { color: var(--color-success); }
-.stat-err { color: var(--color-error); }
 
 /* Year Grid */
 .year-grid {
@@ -365,7 +341,7 @@ const yearGrossLabel = computed(() => {
     gap: var(--space-4);
 }
 
-/* Month Card */
+/* Year Month */
 .year-month {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -386,7 +362,6 @@ const yearGrossLabel = computed(() => {
 }
 
 .year-month--current {
-    /* Highlight current month */
     border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
     box-shadow:
         inset 0 0 0 1px color-mix(in oklch, var(--color-gold) 38%, transparent),
@@ -395,7 +370,6 @@ const yearGrossLabel = computed(() => {
 }
 
 .year-month--current .year-month-title {
-    /* Highlight current month title */
     color: var(--color-gold);
 }
 
@@ -419,7 +393,7 @@ const yearGrossLabel = computed(() => {
     font-variant-numeric: tabular-nums;
 }
 
-/* Weekday Labels & Day Grid */
+/* Year Days */
 .year-weekdays,
 .year-days {
     display: grid;
@@ -436,7 +410,6 @@ const yearGrossLabel = computed(() => {
     letter-spacing: 0.04em;
 }
 
-/* Day Cell */
 .year-day {
     aspect-ratio: 1 / 1;
     min-height: 28px;
@@ -461,7 +434,9 @@ const yearGrossLabel = computed(() => {
     border-color: var(--color-border);
 }
 
-.year-day--outside { opacity: 0.35; }
+.year-day--outside {
+    opacity: 0.35;
+}
 
 .year-day--entry {
     background: color-mix(in oklch, var(--color-primary) 10%, var(--color-surface-2));
@@ -478,21 +453,34 @@ const yearGrossLabel = computed(() => {
     border-color: color-mix(in oklch, var(--color-error) 20%, var(--color-border));
 }
 
-/* Today Highlight */
-.year-day.year-day--today,
-.year-day.year-day--today.year-day--entry,
-.year-day.year-day--today.year-day--absence,
-.year-day.year-day--today.year-day--holiday {
+/* Today — overrides all state variants */
+.year-day--today,
+.year-day--today.year-day--entry,
+.year-day--today.year-day--absence,
+.year-day--today.year-day--holiday {
     background: color-mix(in oklch, var(--color-gold) 28%, var(--color-surface-2));
     border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
     outline: none;
     font-weight: 700;
 }
 
-/* Large screens */
+.stat-ok {
+    color: var(--color-success);
+}
+
+.stat-err {
+    color: var(--color-error);
+}
+
+/* Tablet */
 @media (max-width: 1100px) {
-    .year-grid    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .year-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .year-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .year-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 /* Mobile */
@@ -509,9 +497,18 @@ const yearGrossLabel = computed(() => {
             "current current current";
     }
 
-    .year-toolbar > .year-nav-btn:first-child   { grid-area: prev; }
-    .year-toolbar > .year-nav-btn:nth-of-type(2) { grid-area: next; justify-self: end; }
-    .year-label { grid-area: label; }
+    .year-toolbar>.year-nav-btn:first-child {
+        grid-area: prev;
+    }
+
+    .year-toolbar>.year-nav-btn:nth-of-type(2) {
+        grid-area: next;
+        justify-self: end;
+    }
+
+    .year-label {
+        grid-area: label;
+    }
 
     .year-current-btn {
         grid-area: current;
@@ -519,8 +516,16 @@ const yearGrossLabel = computed(() => {
         margin-top: var(--space-1);
     }
 
-    .year-summary { grid-template-columns: 1fr 1fr; }
-    .year-grid    { grid-template-columns: 1fr; }
-    .year-day     { min-height: 30px; }
+    .year-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .year-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .year-day {
+        min-height: 30px;
+    }
 }
 </style>
