@@ -6,7 +6,7 @@
         <!-- Header -->
         <header class="habit-header">
             <h1 class="habit-title">Habit Tracker Overview</h1>
-            <span class="habit-badge">{{ todayDoneCount }}/{{ habits.length }} today</span>
+            <span class="habit-badge">{{ todayDoneCount }}/{{ todayHabitCount }} today</span>
             <button class="btn btn-primary btn-sm ml-auto" @click="openModal()">+ Add Habit</button>
         </header>
 
@@ -29,7 +29,7 @@
 
         <!-- Habit List -->
         <TransitionGroup name="habit-list" tag="div" class="habit-list">
-            <div v-for="habit in habits" :key="habit.id" class="habit-item"
+            <div v-for="habit in visibleHabits" :key="habit.id" class="habit-item"
                 :class="{ 'habit-item--done': isDone(habit.id, selectedDate) }">
 
                 <!-- Check Button -->
@@ -54,7 +54,8 @@
                     <!-- Streak + Last 7 Days -->
                     <div class="habit-meta">
                         <span class="streak-badge" :class="{ 'streak-badge--active': currentStreak(habit.id) > 0 }">
-                            🔥 {{ currentStreak(habit.id) }} day streak
+                            🔥 {{ currentStreak(habit.id) }}
+                            {{ currentStreak(habit.id) === 1 ? 'day' : 'days' }} streak
                         </span>
                         <div class="mini-calendar">
                             <div v-for="d in last7(habit.id)" :key="d.dateStr" class="mini-dot"
@@ -87,7 +88,7 @@
         </TransitionGroup>
 
         <!-- Empty State -->
-        <div v-if="habits.length === 0" class="habit-empty">
+        <div v-if="visibleHabits.length === 0" class="habit-empty">
             <p>No habits yet. Start building a routine! 💪</p>
         </div>
 
@@ -142,7 +143,7 @@
             <!-- Weekday Labels -->
             <div class="month-grid-header">
                 <span v-for="day in ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']" :key="day" class="month-wd">{{ day
-                }}</span>
+                    }}</span>
             </div>
 
             <!-- Day Grid -->
@@ -155,9 +156,10 @@
                     <span class="month-day-num">{{ cell.day }}</span>
                     <!-- Per-Habit dots -->
                     <div class="month-cell-dots">
-                        <div v-for="habit in habits" :key="habit.id" class="month-habit-dot" :style="isDone(habit.id, cell.dateStr)
-                            ? { background: habit.color }
-                            : { background: 'var(--color-border, #2d3148)' }" :title="habit.name">
+                        <div v-for="habit in habits.filter(h => isValidDayForHabit(h.id, cell.dateStr))" :key="habit.id"
+                            class="month-habit-dot" :style="isDone(habit.id, cell.dateStr)
+                                ? { background: habit.color }
+                                : { background: 'var(--color-border, #2d3148)' }" :title="habit.name">
                         </div>
                     </div>
 
@@ -389,11 +391,45 @@ const selectedDateLabel = computed(() => {
 })
 
 // Completion Logic
+function isValidDayForHabit(habitId, dateStr) {
+    const habit = habits.value.find(h => h.id === habitId)
+
+    if (!habit)
+        return false
+
+    const date = new Date(dateStr + 'T00:00')
+    const dow = date.getDay()
+
+    switch (habit.frequency) {
+        case 'daily':
+            return true
+
+        case 'weekdays':
+            return dow >= 1 && dow <= 5
+
+        case 'weekend':
+            return dow === 0 || dow === 6
+
+        default:
+            return false
+    }
+}
+
+function habitsForDate(dateStr) {
+    return habits.value.filter(h =>
+        isValidDayForHabit(h.id, dateStr)
+    )
+}
+
 function isDone(habitId, dateStr) {
-    return completions.value[habitId]?.has(dateStr) ?? false
+    const isCompleted = completions.value[habitId]?.has(dateStr) ?? false
+    return isCompleted && isValidDayForHabit(habitId, dateStr)
 }
 
 function toggleHabit(habitId, dateStr) {
+    if (!isValidDayForHabit(habitId, dateStr))
+        return
+
     if (!completions.value[habitId]) {
         completions.value[habitId] = new Set()
     }
@@ -409,34 +445,70 @@ function toggleHabit(habitId, dateStr) {
 
 // Streak
 function currentStreak(habitId) {
+    let date = new Date(today)
+
+    // Find most recent scheduled occurrence
+    while (!isValidDayForHabit(habitId, toDateStr(date))) {
+        date.setDate(date.getDate() - 1)
+    }
+
     let streak = 0
-    const date = new Date(today)
+
     while (true) {
         const dateStr = toDateStr(date)
 
-        if (!completions.value[habitId]?.has(dateStr))
+        if (!isDone(habitId, dateStr))
             break
 
         streak++
-        date.setDate(date.getDate() - 1)
+
+        const prev = previousScheduledDate(habitId, date)
+
+        if (!prev)
+            break
+
+        date = prev
     }
 
     return streak
 }
 
-function bestStreak(habitId) {
-    const dates = [...(completions.value[habitId] ?? [])].sort()
+function previousScheduledDate(habitId, date) {
+    const d = new Date(date)
 
-    if (!dates.length)
+    for (let i = 0; i < 370; i++) {
+        d.setDate(d.getDate() - 1)
+
+        if (isValidDayForHabit(habitId, toDateStr(d)))
+            return new Date(d)
+    }
+
+    return null
+}
+
+function bestStreak(habitId) {
+    const completedDates = [...(completions.value[habitId] ?? [])]
+        .filter(date => isDone(habitId, date))
+        .sort()
+
+    if (!completedDates.length)
         return 0
 
-    let best = 1, current = 1
-    for (let index = 1; index < dates.length; index++) {
-        const prev = new Date(dates[index - 1] + 'T00:00')
-        const curr = new Date(dates[index] + 'T00:00')
-        const diff = (curr - prev) / 86400000
+    let best = 1
+    let current = 1
 
-        if (diff === 1) {
+    for (let i = 1; i < completedDates.length; i++) {
+        const prevCompleted = completedDates[i - 1]
+        const currentCompleted = completedDates[i]
+
+        const expectedPrevious = toDateStr(
+            previousScheduledDate(
+                habitId,
+                new Date(currentCompleted + 'T00:00')
+            )
+        )
+
+        if (prevCompleted === expectedPrevious) {
             current++
             best = Math.max(best, current)
         } else {
@@ -456,31 +528,36 @@ function last7(habitId) {
 
         return {
             dateStr,
-            done: completions.value[habitId]?.has(dateStr) ?? false
+            done: isDone(habitId, dateStr)
         }
     })
 }
 
 // Day Completion Dot Color
 function dayCompletionClass(dateStr) {
-    if (!habits.value.length)
+    const validHabits = habitsForDate(dateStr)
+
+    if (!validHabits.length)
         return ''
 
-    const done = habits.value.filter(h => isDone(h.id, dateStr)).length
-    const total = habits.value.length
+    const done = validHabits.filter(h =>
+        isDone(h.id, dateStr)
+    ).length
 
     if (done === 0)
         return 'dot--none'
 
-    if (done === total)
+    if (done === validHabits.length)
         return 'dot--full'
 
     return 'dot--partial'
 }
 
 // Stats
-const todayDoneCount = computed(() =>
-    habits.value.filter(h => isDone(h.id, todayStr)).length
+const todayHabitCount = computed(() =>
+    habits.value.filter(h =>
+        isValidDayForHabit(h.id, todayStr)
+    ).length
 )
 
 const totalCompletionsThisWeek = computed(() => {
@@ -495,9 +572,15 @@ const completionRateThisWeek = computed(() => {
     if (!habits.value.length)
         return 0
 
-    const possible = habits.value.length * 7
+    let possible = 0
+    habits.value.forEach(h => {
+        weekStrip.value.forEach(d => {
+            if (isValidDayForHabit(h.id, d.dateStr))
+                possible++
+        })
+    })
 
-    return Math.round((totalCompletionsThisWeek.value / possible) * 100)
+    return possible === 0 ? 0 : Math.round((totalCompletionsThisWeek.value / possible) * 100)
 })
 
 const bestStreakOverall = computed(() =>
@@ -561,6 +644,12 @@ function removeHabit(id) {
     delete completions.value[id]
     persistCompletions()
 }
+
+const visibleHabits = computed(() =>
+    habits.value.filter(h =>
+        isValidDayForHabit(h.id, selectedDate.value)
+    )
+)
 
 // Month and Year view state and logic
 // History Views
@@ -631,12 +720,18 @@ const monthCells = computed(() => {
 })
 
 function cellCompletionRate(dateStr) {
-    if (!habits.value.length)
+    const validHabits = habits.value.filter(h =>
+        isValidDayForHabit(h.id, dateStr)
+    )
+
+    if (!validHabits.length)
         return 0
 
-    const done = habits.value.filter(h => isDone(h.id, dateStr)).length
+    const done = validHabits.filter(h =>
+        isDone(h.id, dateStr)
+    ).length
 
-    return Math.round((done / habits.value.length) * 100)
+    return Math.round((done / validHabits.length) * 100)
 }
 
 function cellCompletionColor(dateStr) {
@@ -699,21 +794,31 @@ const yearCompletions = computed(() => {
     const year = viewYear.value
 
     return [...(completions.value[yearHabitId.value] ?? [])].filter(d =>
-        d.startsWith(String(year))
+        d.startsWith(String(year)) && isDone(yearHabitId.value, d)
     ).length
 })
 
 const yearRate = computed(() => {
-    const daysPassed = viewYear.value < today.getFullYear()
-        ? 365
-        : today.getMonth() === 0 && today.getDate() === 1
-            ? 1
-            : Math.floor((today - new Date(viewYear.value, 0, 1)) / 86400000) + 1
-
-    if (!daysPassed)
+    if (!yearHabitId.value)
         return 0
 
-    return Math.round((yearCompletions.value / daysPassed) * 100)
+    const year = viewYear.value
+    const lastDay = viewYear.value < today.getFullYear()
+        ? new Date(year, 11, 31)
+        : today
+
+    let validDays = 0
+    const checkDate = new Date(year, 0, 1)
+    while (checkDate <= lastDay) {
+        if (isValidDayForHabit(yearHabitId.value, toDateStr(checkDate)))
+            validDays++
+        checkDate.setDate(checkDate.getDate() + 1)
+    }
+
+    if (!validDays)
+        return 0
+
+    return Math.round((yearCompletions.value / validDays) * 100)
 })
 
 const yearBestStreak = computed(() => {
@@ -1115,7 +1220,7 @@ const yearBestStreak = computed(() => {
 }
 
 .form-input {
-    background: var(--color-surface-hover, #252840);
+    background: var(--color-surface-hover);
     border: 1px solid var(--color-border, #2d3148);
     border-radius: var(--radius, 0.5rem);
     color: var(--color-text, #e2e8f0);
@@ -1163,7 +1268,7 @@ const yearBestStreak = computed(() => {
 .freq-selector {
     display: flex;
     gap: 4px;
-    background: var(--color-surface-hover, #252840);
+    background: var(--color-surface-hover);
     border: 1px solid var(--color-border, #2d3148);
     border-radius: var(--radius, 0.5rem);
     padding: 4px;

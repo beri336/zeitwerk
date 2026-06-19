@@ -40,6 +40,11 @@ export const useHabitStore = defineStore('habits', () => {
     }
 
     function getNextId() {
+        // Always ensure nextId is >= max existing ID + 1
+        if (habits.value.length > 0) {
+            const maxId = Math.max(...habits.value.map(h => h.id))
+            nextId = Math.max(nextId, maxId + 1)
+        }
         return nextId++
     }
 
