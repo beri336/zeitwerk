@@ -66,6 +66,14 @@ const drawerOpen = ref(false)
 
 const allRoutes = [
     {
+        path: '/dashboard',
+        label: 'Dashboard',
+        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>`,
+    },
+    {
         path: '/calender',
         label: 'Calendar',
         icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -133,6 +141,7 @@ function closeDrawer() { drawerOpen.value = false }
 
 /* Mobile */
 @media (max-width: 767px) {
+
     /* Bottom Nav */
     .bottom-nav {
         display: grid;

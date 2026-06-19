@@ -155,11 +155,12 @@ const showExportMenu = ref(false)
 const exportDropRef = ref(null)
 
 const titles = {
-    '/year-overview': 'Year Overview',
-    '/month-overview': 'Month Overview',
-    '/settings': 'Settings',
-    '/diagrams': 'Diagrams & Stats',
+    '/dashboard': 'Zeitwerk',
     '/calender': 'Calender',
+    '/month-overview': 'Month Overview',
+    '/year-overview': 'Year Overview',
+    '/diagrams': 'Diagrams & Stats',
+    '/settings': 'Settings',
 }
 
 function handleExport() {
@@ -187,7 +188,7 @@ function handleCsvConfirm({ from, to }) {
             toMonth: toMonth - 1
         })
 
-        showToast(ok? 'CSV export successful.' : 'CSV export failed.', ok ? 'ok' : 'err')
+        showToast(ok ? 'CSV export successful.' : 'CSV export failed.', ok ? 'ok' : 'err')
     } catch (error) {
         console.error(error)
         showToast('CSV export failed.', 'err')
