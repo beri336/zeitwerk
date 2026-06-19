@@ -74,6 +74,15 @@ const allRoutes = [
               </svg>`,
     },
     {
+        path: '/livetracking',
+        label: 'Live Tracker',
+        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0"/>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
+              </svg>`,
+    },
+    {
         path: '/calender',
         label: 'Calendar',
         icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

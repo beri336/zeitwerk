@@ -27,6 +27,19 @@
                 <span>Dashboard</span>
             </RouterLink>
 
+            <!-- Live Tracking -->
+            <RouterLink to="/livetracking" class="sidebar-item" :class="{ active: route.path === '/livetracking' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3" />
+                    <circle cx="12" cy="12" r="7" stroke-dasharray="3 2" />
+                    <line x1="12" y1="2" x2="12" y2="5" />
+                    <line x1="12" y1="19" x2="12" y2="22" />
+                    <line x1="2" y1="12" x2="5" y2="12" />
+                    <line x1="19" y1="12" x2="22" y2="12" />
+                </svg>
+                <span>Live Tracking</span>
+            </RouterLink>
+
             <!-- Calendar -->
             <RouterLink to="/calender" class="sidebar-item" :class="{ active: route.path === '/calender' }">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

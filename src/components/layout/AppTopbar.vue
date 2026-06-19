@@ -156,6 +156,7 @@ const exportDropRef = ref(null)
 
 const titles = {
     '/dashboard': 'Zeitwerk',
+    '/livetracking': 'Live Tracking',
     '/calender': 'Calender',
     '/month-overview': 'Month Overview',
     '/year-overview': 'Year Overview',
