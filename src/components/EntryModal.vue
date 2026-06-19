@@ -203,9 +203,9 @@ watch(() => props.modelValue, open => {
         : { ...defaultForm(), date: props.prefillDate ?? today() }
 })
 
-const currentType = computed( () => getAbsenceType(form.value.typ ?? 'on-site') )
-const showTimeFields = computed( () => currentType.value.counter )
-const previewActual = computed( () => calcActualHours(form.value) )
+const currentType = computed(() => getAbsenceType(form.value.typ ?? 'on-site'))
+const showTimeFields = computed(() => currentType.value.counter)
+const previewActual = computed(() => calcActualHours(form.value))
 
 // show salary
 const grossPreview = computed(() => {
@@ -421,6 +421,16 @@ function save() {
         left: 0;
         right: 0;
         max-height: 92dvh;
+    }
+
+    .form-input,
+    .form-input[type="date"],
+    .form-input[type="time"],
+    .form-input[type="number"],
+    .form-input[type="text"],
+    
+    textarea.form-input {
+        font-size: 16px;
     }
 }
 </style>
