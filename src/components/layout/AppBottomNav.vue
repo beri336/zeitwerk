@@ -146,6 +146,14 @@ const allRoutes = [
             <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
               </svg>`,
     },
+    {
+        path: '/habit-tracker',
+        label: 'Habits',
+        icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
+            <path d="M12 6v6l4 2"/>
+              </svg>`,
+    },
 ]
 
 // the 4 most important tabs at the bottom, rest goes into the drawer

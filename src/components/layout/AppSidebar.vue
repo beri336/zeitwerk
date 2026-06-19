@@ -120,6 +120,15 @@
                 </svg>
                 <span>Settings</span>
             </RouterLink>
+
+            <!-- Habit Tracker -->
+            <RouterLink to="/habit-tracker" class="sidebar-item" :class="{ active: route.path === '/habit-tracker' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" />
+                    <path d="M12 6v6l4 2" />
+                </svg>
+                <span>Habit Tracker</span>
+            </RouterLink>
         </nav>
 
         <div class="sidebar-month">

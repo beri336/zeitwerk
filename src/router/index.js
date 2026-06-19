@@ -11,6 +11,7 @@ import ToDoView from '@/views/ToDoView.vue'
 import DiagramsView from '@/views/DiagramsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SettingsView from '@/views/SettingsView.vue'
+import HabitTrackerView from '@/views/HabitTrackerView.vue'
 
 const routes = [
     { path: '/', redirect: '/dashboard' },
@@ -19,10 +20,11 @@ const routes = [
     { path: '/month-overview', name: 'month-overview', component: MonthOverviewView },
     { path: '/year-overview', name: 'year-overview', component: YearView },
     { path: '/calender', name: 'calender', component: CalenderView },
+    { path: '/todo', name: 'todo', component: ToDoView },
     { path: '/diagrams', name: 'diagrams', component: DiagramsView },
     { path: '/profile', name: 'profile', component: ProfileView },
     { path: '/settings', name: 'settings', component: SettingsView },
-    { path: '/todo', name: 'todo', component: ToDoView },
+    { path: '/habit-tracker', name: 'habit-tracker', component: HabitTrackerView },
 ]
 
 export default createRouter({

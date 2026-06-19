@@ -164,6 +164,7 @@ const titles = {
     '/diagrams': 'Diagrams & Stats',
     '/profile': 'Profile',
     '/settings': 'Settings',
+    '/habit-tracker': 'Habit Tracker',
 }
 
 function handleExport() {
