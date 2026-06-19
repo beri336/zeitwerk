@@ -121,6 +121,16 @@
                 <span>Settings</span>
             </RouterLink>
 
+            <!-- Export -->
+            <RouterLink to="/export" class="sidebar-item" :class="{ active: route.path === '/export' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 11 12 16 7 11" />
+                    <polyline points="17 6 12 11 7 6" />
+                </svg>
+                <span>Export</span>
+            </RouterLink>
+
             <!-- Habit Tracker -->
             <RouterLink to="/habit-tracker" class="sidebar-item" :class="{ active: route.path === '/habit-tracker' }">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

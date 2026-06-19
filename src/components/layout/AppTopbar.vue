@@ -165,6 +165,7 @@ const titles = {
     '/profile': 'Profile',
     '/settings': 'Settings',
     '/habit-tracker': 'Habit Tracker',
+    '/exports': 'Export',
 }
 
 function handleExport() {

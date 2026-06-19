@@ -12,6 +12,7 @@ import DiagramsView from '@/views/DiagramsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import HabitTrackerView from '@/views/HabitTrackerView.vue'
+import ExportView from '@/views/ExportView.vue'
 
 const routes = [
     { path: '/', redirect: '/dashboard' },
@@ -25,6 +26,7 @@ const routes = [
     { path: '/profile', name: 'profile', component: ProfileView },
     { path: '/settings', name: 'settings', component: SettingsView },
     { path: '/habit-tracker', name: 'habit-tracker', component: HabitTrackerView },
+    { path: '/export', name: 'export', component: ExportView },
 ]
 
 export default createRouter({
