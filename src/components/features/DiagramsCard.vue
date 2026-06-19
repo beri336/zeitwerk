@@ -2,7 +2,7 @@
 
 <template>
     <main class="main">
-
+        
         <div v-if="!hasData" class="empty-state">
             <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <line x1="18" y1="20" x2="18" y2="10" />
@@ -27,6 +27,12 @@
                 <DayLengthHistogramChart />
                 <AbsenceBreakdownChart />
                 <GrossEarningsChart v-if="store.grossHourlyRate > 0" />
+                <p v-if="store.grossHourlyRate === 0"
+                    style="color: var(--color-text-muted); font-size: var(--text-sm); border: 1px solid var(--color-border); padding: var(--space-4); border-radius: var(--space-2);">
+                    Set your 'Gross Monthly Salary (Brutto)' in the <a href="/#/settings"
+                        style="color: var(--color-link); text-decoration: underline;">settings</a> to see earnings
+                    charts.
+                </p>
             </div>
 
             <!-- Section: This Year -->
@@ -36,6 +42,12 @@
                 <MonthComparisonChart />
                 <YearlyOvertimeChart />
                 <YearlyGrossChart v-if="store.grossHourlyRate > 0" />
+                <p v-if="store.grossHourlyRate === 0"
+                    style="color: var(--color-text-muted); font-size: var(--text-sm); border: 1px solid var(--color-border); padding: var(--space-4); border-radius: var(--space-2);">
+                    Set your 'Gross Monthly Salary (Brutto)' in the <a href="/#/settings"
+                        style="color: var(--color-link); text-decoration: underline;">settings</a> to see earnings
+                    charts.
+                </p>
             </div>
         </template>
     </main>
