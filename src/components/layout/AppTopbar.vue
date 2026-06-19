@@ -140,6 +140,7 @@ import { useZeitwerkStore, chartExportTrigger } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import ExportCsvModal from '@/components/ExportCsvModal.vue'
 import { usePrivacy } from '@/composables/usePrivacy'
+import { useExport } from '@/composables/useExport'
 
 const { privacyMode, toggle } = usePrivacy()
 
@@ -150,6 +151,8 @@ const route = useRoute()
 const store = useZeitwerkStore()
 const { showToast } = useToast()
 const showCsvModal = ref(false)
+
+const { importJSON, exportJSON: exportFullJSON } = useExport()
 
 const showExportMenu = ref(false)
 const exportDropRef = ref(null)
@@ -170,7 +173,7 @@ const titles = {
 
 function handleExport() {
     try {
-        store.exportJSON()
+        exportFullJSON()
         showToast('Export successful.', 'ok')
     } catch {
         showToast('Export failed.', 'err')
@@ -204,21 +207,12 @@ function handleImport() { document.getElementById('importFileInput').click() }
 
 function onFileChange(event) {
     const file = event.target.files[0]
-    if (!file)
-        return
+    if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = ev => {
-        try {
-            const data = JSON.parse(ev.target.result)
-            const count = store.importJSON(data)
-            showToast(`${count} entries imported.`, 'ok')
-        } catch {
-            showToast('Error during import.', 'err')
-        }
-    }
+    importJSON(file)
+        .then(() => showToast('Import successful.', 'ok'))
+        .catch(() => showToast('Error during import.', 'err'))
 
-    reader.readAsText(file)
     event.target.value = ''
 }
 

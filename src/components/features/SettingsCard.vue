@@ -289,6 +289,7 @@ function confirmDeleteAll() {
     profileStore.resetProfile()        // Profile
     habitStore.deleteAllEntries()      // Habits
 
+    reset() // call to also reset settings to default values
     calculate() // update size
 
     showDeleteConfirm.value = false

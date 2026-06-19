@@ -204,6 +204,12 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours, MONTH_NAMES } from '@/composables/useTime'
 import { useToast } from '@/composables/useToast'
 
+import { useExport } from '@/composables/useExport'
+import { useCalendarStore } from '@/composables/useCalendarStore'
+import { useHabitStore } from '@/composables/useHabitStore'
+import { useTodoStore } from '@/composables/useTodoStore'
+import { useProfileStore } from '@/composables/useProfileStore'
+
 const store = useZeitwerkStore()
 const { showToast } = useToast()
 
@@ -221,6 +227,12 @@ const PRESETS = [
     { value: 'all', label: 'All Data' },
     { value: 'custom', label: 'Custom Range…' },
 ]
+
+const { exportJSON: exportFullJSON } = useExport()
+const calendar = useCalendarStore()
+const habits = useHabitStore()
+const todos = useTodoStore()
+const profile = useProfileStore()
 
 // derive all available months from the entries
 const availableMonths = computed(() => {
@@ -408,15 +420,40 @@ function exportCSV() {
 }
 
 // JSON
+function collectOtherStores() {
+    return {
+        calendar: { events: calendar.events },
+        habits: {
+            habits: habits.habits,
+            completions: Object.fromEntries(
+                Object.entries(habits.completions).map(([k, v]) => [k, [...v]])
+            ),
+        },
+        todos: { todos: todos.todos },
+        profile: { ...profile.profile },
+    }
+}
+
 function exportJSON() {
+    // continue to take time entries into account
     const payload = {
         exported: new Date().toISOString(),
         scope: scopeLabel.value,
         ...(include.value.summary ? { summary: summary.value } : {}),
-        entries: exportEntries.value,
+        // zeitwerk entries filtered by scope
+        zeitwerk: {
+            entries: exportEntries.value,
+            settings: store.settings,
+        },
+        // all other data is complete
+        ...collectOtherStores(),
     }
 
-    download(`zeitwerk-${scopeLabel.value}.json`, JSON.stringify(payload, null, 2), 'application/json')
+    download(
+        `zeitwerk-${scopeLabel.value}.json`,
+        JSON.stringify(payload, null, 2),
+        'application/json'
+    )
     showToast('JSON exported.')
 }
 
