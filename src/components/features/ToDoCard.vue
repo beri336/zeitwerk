@@ -60,7 +60,7 @@
                     <div class="todo-content">
                         <div class="todo-main-row">
                             <span class="todo-text">{{ todo.text }}</span>
-                            <span v-if="todo.urgent" class="urgent-badge" title="Dringend">⚡</span>
+                            <span v-if="todo.urgent" class="urgent-badge" title="Urgent">⚡</span>
                             <span class="priority-dot" :class="`priority-dot--${todo.priority}`"
                                 :title="priorityLabel(todo.priority)"></span>
                         </div>
@@ -277,7 +277,7 @@
                                     </div>
 
                                     <div class="field field--center">
-                                        <label class="field-label">Urgent ⚡</label>
+                                        <label class="field-label">Urgent</label>
                                         <button class="urgent-toggle" :class="{ active: form.urgent }"
                                             @click="form.urgent = !form.urgent">
                                             {{ form.urgent ? 'Yes' : 'No' }}
@@ -322,8 +322,8 @@ const filters = [
     { key: 'all', label: 'All' },
     { key: 'open', label: 'Open' },
     { key: 'done', label: 'Done' },
-    { key: 'urgent', label: '⚡ Urgent' },
-    { key: 'overdue', label: '🔴 Overdue' },
+    { key: 'urgent', label: 'Urgent' },
+    { key: 'overdue', label: 'Overdue' },
 ]
 
 const priorities = [
@@ -716,14 +716,23 @@ const badgeText = computed(() =>
 }
 
 .todo-select {
-    background: var(--color-surface, #1e2130);
-    border: 1px solid var(--color-border, #2d3148);
-    border-radius: var(--radius, 0.5rem);
-    color: var(--color-text, #e2e8f0);
-    padding: 0.35rem 0.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    padding: 0.35rem 2rem 0.35rem 0.75rem;
     font-size: 0.8rem;
     cursor: pointer;
     outline: none;
+
+    /* Remove browser styling */
+    appearance: none;
+    -webkit-appearance: none;
+
+    /* Custom arrow as SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
 }
 
 /* Tag Filter Row */
@@ -1224,9 +1233,11 @@ const badgeText = computed(() =>
 }
 
 .todo-input {
-    border: 1px solid var(--color-border, #2d3148);
-    border-radius: var(--radius, 0.5rem);
-    color: var(--color-text, #e2e8f0);
+    background: var(--color-surface-hover);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    /* war fälschlicherweise color-text-inverse */
     padding: 0.55rem 0.875rem;
     font-size: 0.9rem;
     transition: border-color 0.2s;
@@ -1236,7 +1247,7 @@ const badgeText = computed(() =>
 }
 
 .todo-input:focus {
-    border-color: var(--color-primary, #6366f1);
+    border-color: var(--color-primary);
 }
 
 /* Tag Input */
