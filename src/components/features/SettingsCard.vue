@@ -150,6 +150,9 @@
                 <button class="btn btn-secondary" @click="reset">Reset</button>
             </div>
 
+            <!-- Notification Settings -->
+            <SettingsNotification />
+
             <div class="danger-zone">
                 <div class="danger-zone__header">
                     <div class="danger-zone__title">Danger Zone</div>
@@ -222,6 +225,7 @@ import { useCalendarStore } from '@/composables/useCalendarStore'
 import { useProfileStore } from '@/composables/useProfileStore'
 import { useHabitStore } from '@/composables/useHabitStore'
 import DeviceChipExt from '@/components/ui/DeviceChipExt.vue';
+import SettingsNotification from '@/components/ui/NotificationSettings.vue';
 
 const { privacyMode, toggle, mask, toggleOffIfOn } = usePrivacy()
 const store = useZeitwerkStore()

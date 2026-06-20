@@ -23,6 +23,7 @@ import AppTopbar from '@/components/layout/AppTopbar.vue'
 import AppBottomNav from '@/components/layout/AppBottomNav.vue'
 import ToastList from '@/components/ui/ToastList.vue'
 import PwaUpdatePrompt from '@/components/ui/PwaUpdatePrompt.vue'
+import { useNotifications } from '@/composables/useNotifications'
 
 const isDark = ref(false)
 
@@ -34,6 +35,11 @@ onMounted(() => {
     : window.matchMedia('(prefers-color-scheme: dark)').matches
 
   applyTheme()
+})
+
+const notifications = useNotifications()
+onMounted(() => {
+  notifications.scheduleHabitReminder()
 })
 
 function toggleTheme() {
