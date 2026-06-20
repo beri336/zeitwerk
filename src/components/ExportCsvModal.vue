@@ -53,7 +53,7 @@ const props = defineProps({
     modelValue: { type: Boolean, default: false }
 })
 
-const emit = defineEmits( ['update:modelValue', 'confirm'] )
+const emit = defineEmits(['update:modelValue', 'confirm'])
 const store = useZeitwerkStore()
 
 const singleMonth = ref(true)
@@ -179,8 +179,10 @@ function submit() {
     background: var(--color-surface-2);
     color: var(--color-text);
     padding: 0 var(--space-3);
+    font-family: inherit;
 }
 
+/* Checkbox */
 .checkbox-row {
     display: flex;
     align-items: center;
@@ -200,8 +202,8 @@ function submit() {
 
 /* Icon Button */
 .icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: var(--radius-md);
     color: var(--color-text-muted);
     display: inline-flex;
@@ -209,10 +211,52 @@ function submit() {
     justify-content: center;
     font-size: 22px;
     line-height: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .icon-btn:hover {
     background: var(--color-surface-offset);
     color: var(--color-text);
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .modal-backdrop {
+        padding: var(--space-3);
+    }
+
+    .modal-card {
+        width: 100%;
+        max-width: 480px;
+        margin-top: auto;
+        margin-bottom: env(safe-area-inset-bottom);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    /* iOS: Inputs >= 16px to prevent zoom */
+    .field-input,
+    input[type="month"] {
+        font-size: 16px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .modal-backdrop {
+        padding: var(--space-2);
+    }
+
+    .modal-card {
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: var(--space-3);
+    }
 }
 </style>

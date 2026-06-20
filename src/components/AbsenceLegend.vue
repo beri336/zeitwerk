@@ -41,7 +41,7 @@ const stats = computed(() => {
 }
 
 .legend-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
@@ -49,6 +49,14 @@ const stats = computed(() => {
     border: 1px solid;
     font-size: var(--text-xs);
     font-weight: 500;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.legend-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .legend-count {
@@ -56,5 +64,6 @@ const stats = computed(() => {
     padding: 1px 6px;
     border-radius: var(--radius-full);
     font-weight: 600;
+    flex-shrink: 0;
 }
 </style>

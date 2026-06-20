@@ -334,15 +334,6 @@ const previewGrossDailyRate = computed(() => {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
-    /* scroll behavior is controlled by App.vue */
-}
-
-.btn-primary {
-    margin-left: var(--space-6);
-}
-
-.btn-secondary {
-    margin-left: var(--space-1);
 }
 
 /* Salary Preview */
@@ -399,6 +390,44 @@ const previewGrossDailyRate = computed(() => {
     gap: var(--space-3);
 }
 
+.btn-primary {
+    margin-left: var(--space-6);
+}
+
+.btn-secondary {
+    margin-left: var(--space-1);
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-5);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+}
+
 /* Form Input */
 .form-input {
     width: 100%;
@@ -411,6 +440,12 @@ const previewGrossDailyRate = computed(() => {
     color: var(--color-text);
     font: inherit;
     box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.form-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
 }
 
 select.form-input {
@@ -433,6 +468,7 @@ select.form-input {
     margin-top: var(--space-6);
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-divider);
+    flex-wrap: wrap;
 }
 
 .privacy-info {
@@ -499,6 +535,7 @@ select.form-input {
     margin-top: var(--space-3);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
+    flex-wrap: wrap;
 }
 
 .storage-bar-wrap {
@@ -526,7 +563,6 @@ select.form-input {
 /* Danger Zone */
 .danger-zone {
     margin: var(--space-6);
-    margin-top: var(--space-6);
     padding-top: var(--space-6);
     padding-bottom: var(--space-6);
     border-top: 1px solid var(--color-divider);
@@ -599,6 +635,83 @@ select.form-input {
     .main {
         padding: var(--space-3);
         gap: var(--space-3);
+    }
+
+    .settings-header {
+        padding: var(--space-4);
+    }
+
+    .settings-body {
+        padding: var(--space-4);
+    }
+
+    .settings-actions {
+        margin-left: var(--space-4);
+    }
+
+    .btn-primary {
+        margin-left: 0;
+    }
+
+    .btn-secondary {
+        margin-left: 0;
+    }
+
+    .danger-zone {
+        margin: var(--space-4);
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+
+    .privacy-row {
+        gap: var(--space-3);
+    }
+
+    .danger-confirm__actions {
+        flex-direction: column;
+    }
+
+    .danger-confirm__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .storage-usage {
+        gap: var(--space-1);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+
+    .settings-header {
+        padding: var(--space-3);
+    }
+
+    .settings-body {
+        padding: var(--space-3);
+    }
+
+    .settings-actions {
+        margin-left: var(--space-3);
+        padding-bottom: var(--space-1);
+    }
+
+    .danger-zone {
+        margin: var(--space-3);
+        padding-top: var(--space-4);
+        padding-bottom: var(--space-4);
+    }
+
+    .form-input {
+        height: 40px;
     }
 }
 </style>

@@ -94,6 +94,24 @@
                 </button>
             </template>
 
+            <template v-if="route.path === '/settings'">
+                <a class="btn btn-ghost icon-btn" href="https://github.com/beri336/zeitwerk" target="_blank"
+                    rel="noopener noreferrer" title="View source on GitHub" aria-label="View source on GitHub">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.36 7.86 10.88.58.11.79-.25.79-.56
+                            0-.28-.01-1.02-.02-2-3.19.69-3.87-1.54-3.87-1.54-.53-1.33-1.3-1.68-1.3-1.68
+                            -1.06-.72.08-.71.08-.71 1.17.08 1.78 1.22 1.78 1.22 1.04 1.78 2.73 1.27
+                            3.4.97.11-.76.41-1.27.75-1.56-2.55-.29-5.23-1.28-5.23-5.69
+                            0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18
+                            .92-.26 1.9-.39 2.88-.39s1.96.13 2.88.39C17.9 4.2 18.87 4.5 18.87 4.5
+                            c.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1
+                            0 4.42-2.68 5.4-5.24 5.68.42.36.8 1.08.8 2.18
+                            0 1.57-.01 2.83-.01 3.22 0 .31.21.68.8.56C20.21 21.36 23.5 17.09 23.5 12
+                            23.5 5.65 18.35.5 12 .5Z" />
+                    </svg>
+                </a>
+            </template>
+
             <button class="theme-btn" @click="emit('toggle-theme')" :title="isDark ? 'Light mode' : 'Dark mode'">
                 <svg v-if="isDark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
@@ -245,17 +263,22 @@ function triggerExport(format) {
     top: 0;
     z-index: 10;
     min-height: 52px;
+    flex-shrink: 0;
 }
 
 .topbar-title {
     font-size: var(--text-base);
     font-weight: 600;
     flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
+/* Logo: Desktop kommt aus Sidebar */
 .topbar-logo {
     display: none;
-    /* Desktop: Logo comes from the sidebar */
 }
 
 /* Actions */
@@ -263,6 +286,7 @@ function triggerExport(format) {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    flex-shrink: 0;
 }
 
 .topbar-action-btn {
@@ -272,6 +296,7 @@ function triggerExport(format) {
     gap: var(--space-2);
     min-height: 36px;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .topbar-action-label {
@@ -295,11 +320,28 @@ function triggerExport(format) {
     height: 36px;
     border-radius: var(--radius-md);
     color: var(--color-text-muted);
+    border: none;
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--transition), color var(--transition);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .theme-btn:hover {
     background: var(--color-surface-offset);
     color: var(--color-text);
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Export Dropdown */
@@ -333,6 +375,9 @@ function triggerExport(format) {
     border-radius: var(--radius-sm);
     cursor: pointer;
     text-align: left;
+    min-height: 36px;
+    transition: background var(--transition);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .export-menu button:hover {
@@ -355,6 +400,10 @@ function triggerExport(format) {
 @media (max-width: 767px) {
     .topbar {
         padding: 0 var(--space-3);
+        padding-left: max(var(--space-3), env(safe-area-inset-left));
+        padding-right: max(var(--space-3), env(safe-area-inset-right));
+        gap: var(--space-2);
+        min-height: 48px;
     }
 
     .topbar-logo {
@@ -365,16 +414,45 @@ function triggerExport(format) {
         color: var(--color-primary);
         font-size: var(--text-sm);
         white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .topbar-action-btn {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         padding: var(--space-2);
+        flex-shrink: 0;
     }
 
     .topbar-action-label {
         display: none;
+    }
+
+    .theme-btn,
+    .icon-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .export-menu {
+        right: 0;
+        left: auto;
+        min-width: 150px;
+    }
+
+    .export-menu button {
+        min-height: 44px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .topbar {
+        gap: var(--space-1);
+    }
+
+    .topbar-actions {
+        gap: var(--space-1);
     }
 }
 </style>

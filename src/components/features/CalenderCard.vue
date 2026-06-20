@@ -123,7 +123,7 @@
                                 <div class="agenda-item-time">
                                     <span v-if="event.allDay">Ganztägig</span>
                                     <span v-else>{{ event.startTime }}{{ event.endTime ? ' – ' + event.endTime : ''
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                         </div>
@@ -1197,8 +1197,8 @@ function removeTag(tag) {
 }
 
 .icon-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: none;
     border-radius: calc(var(--radius, 0.5rem) - 2px);
     background: transparent;
@@ -1400,6 +1400,7 @@ function removeTag(tag) {
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.15s;
+    min-height: 44px;
 }
 
 .urgent-toggle.active {
@@ -1436,5 +1437,124 @@ function removeTag(tag) {
 .slide-up-leave-to {
     opacity: 0;
     transform: translateY(10px);
+}
+
+/* Tablet */
+@media (max-width: 767px) {
+    .main {
+        padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem) calc(var(--space-3, 0.75rem) + env(safe-area-inset-bottom));
+    }
+
+    .cal-wrapper {
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .cal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .cal-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .cal-month-label {
+        min-width: 110px;
+        font-size: 0.82rem;
+    }
+
+    .cal-title {
+        font-size: 1.1rem;
+    }
+
+    .cal-cell {
+        min-height: 64px;
+        padding: 4px;
+    }
+
+    .cal-event-pill {
+        display: none;
+    }
+
+    .cal-more {
+        display: none;
+    }
+
+    .week-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+    }
+
+    .week-col {
+        min-height: 160px;
+    }
+
+    .week-wd {
+        font-size: 0.6rem;
+    }
+
+    .week-event-time {
+        display: none;
+    }
+
+    .day-detail-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal {
+        border-radius: calc(var(--radius, 0.5rem) * 1.5) calc(var(--radius, 0.5rem) * 1.5) 0 0;
+        max-height: 92dvh;
+    }
+
+    .modal-body {
+        max-height: 55vh;
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2, 0.5rem) var(--space-2, 0.5rem) calc(var(--space-2, 0.5rem) + env(safe-area-inset-bottom));
+    }
+
+    .cal-cell {
+        min-height: 48px;
+        padding: 3px;
+    }
+
+    .cal-day-num {
+        font-size: 0.7rem;
+    }
+
+    .week-col {
+        min-height: 120px;
+    }
+
+    .week-num {
+        font-size: 0.75rem;
+    }
+
+    .cal-header-right {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .filter-btn {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.75rem;
+    }
 }
 </style>

@@ -114,10 +114,10 @@ const monthDiffVariant = computed(() => {
     if (store.monthDiff > 0.25)
         return 'ok'
 
-    
+
     if (store.monthDiff < -0.25)
         return 'err'
-    
+
     return ''
 })
 
@@ -174,9 +174,9 @@ const yearDiff = computed(() =>
 const yearGrossLabel = computed(() => {
     if (!store.grossHourlyRate)
         return ''
-    
+
     const total = yearEntries.value.reduce((s, e) => s + store.grossEarnedForEntry(e), 0)
-    
+
     return new Intl.NumberFormat('de-DE', {
         style: 'currency', currency: 'EUR', maximumFractionDigits: 2
     }).format(total)
@@ -315,14 +315,27 @@ function openEdit(entry) { editEntry.value = entry; showModal.value = true }
 
 /* Laptop */
 @media (max-width: 1024px) {
-    .main    { padding: var(--space-4); gap: var(--space-4); }
-    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .main {
+        padding: var(--space-4);
+        gap: var(--space-4);
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 /* Mobile */
 @media (max-width: 767px) {
-    .main     { padding: var(--space-3); gap: var(--space-3); }
-    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+    .main {
+        padding: var(--space-3);
+        gap: var(--space-3);
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-3);
+    }
 
     .add-bar {
         flex-direction: column;
@@ -338,6 +351,8 @@ function openEdit(entry) { editEntry.value = entry; showModal.value = true }
 
 /* Small Mobile */
 @media (max-width: 420px) {
-    .kpi-grid { grid-template-columns: 1fr; }
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

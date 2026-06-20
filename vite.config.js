@@ -57,9 +57,15 @@ export default defineConfig({
         ],
         shortcuts: [
           {
+            name: 'Dashboard',
+            short_name: 'Dashboard',
+            url: '/#/dashboard',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }]
+          },
+          {
             name: 'Monthly Overview',
             short_name: 'Overview',
-            url: '/#/monthly-overview',
+            url: '/#/month-overview',
             icons: [{ src: 'icon-192.png', sizes: '192x192' }]
           },
           {

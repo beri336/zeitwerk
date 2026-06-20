@@ -32,8 +32,8 @@
                 <div class="permission-banner__body">
                     <div class="permission-banner__title">Notifications blocked</div>
                     <div class="permission-label-err">
-                            Permission: {{ store.settings.permission }}
-                        </div>
+                        Permission: {{ store.settings.permission }}
+                    </div>
                     <div class="permission-banner__sub">
                         Your browser is blocking notifications for this site. Follow the steps below to enable them,
                         then reload the page.
@@ -223,6 +223,16 @@ const browsers = [
 </script>
 
 <style scoped>
+/* Settings Section */
+.settings-section {
+    margin: 0 var(--space-6) var(--space-6) var(--space-6);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
 /* Section Header */
 .settings-title {
     font-size: var(--text-sm);
@@ -237,6 +247,7 @@ const browsers = [
     margin-top: 1px;
 }
 
+/* Labels */
 .privacy-label {
     font-size: var(--text-xs);
     font-weight: 500;
@@ -248,6 +259,7 @@ const browsers = [
 .privacy-hint {
     font-size: var(--text-xs);
     color: var(--color-text-faint);
+    margin-top: 2px;
 }
 
 .permission-label {
@@ -263,14 +275,16 @@ const browsers = [
     padding: 4px;
 }
 
-.settings-section {
-    margin: 0 var(--space-6) var(--space-6) var(--space-6);
-    padding-top: var(--space-6);
-    padding-bottom: var(--space-4);
-    border-top: none; /* ← weg */
+/* Notice */
+.notice--warn {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-warning);
+    background: var(--color-warning-highlight);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
 }
 
 /* Permission Banners */
@@ -280,6 +294,7 @@ const browsers = [
     padding: var(--space-4);
     border-radius: var(--radius-md);
     border: 1px solid;
+    flex-wrap: wrap;
 }
 
 .permission-banner--denied {
@@ -304,6 +319,7 @@ const browsers = [
     flex-direction: column;
     gap: var(--space-2);
     flex: 1;
+    min-width: 0;
 }
 
 .permission-banner__title {
@@ -326,6 +342,21 @@ const browsers = [
     font-size: var(--text-xs);
     font-weight: 600;
     color: var(--color-success);
+    flex-wrap: wrap;
+}
+
+/* Privacy Row (Master Toggle) */
+.privacy-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.privacy-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 /* How-To */
@@ -340,6 +371,8 @@ const browsers = [
     border: none;
     cursor: pointer;
     padding: 0;
+    min-height: 32px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .howto__toggle:hover {
@@ -395,30 +428,55 @@ const browsers = [
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 26px;
+    border-radius: var(--radius-full);
+    background: var(--color-border);
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition);
+    flex-shrink: 0;
+}
+
+.toggle-switch.active {
+    background: var(--color-primary);
+}
+
+.toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition);
+}
+
+.toggle-switch.active .toggle-thumb {
+    transform: translateX(18px);
 }
 
 /* Checkbox */
 .notif-check {
     appearance: none;
     -webkit-appearance: none;
-
     position: relative;
-
     width: 18px;
     height: 18px;
-
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-
     background: var(--color-surface-2);
-
     cursor: pointer;
     flex-shrink: 0;
-
-    transition:
-        background var(--transition),
-        border-color var(--transition),
-        box-shadow var(--transition);
+    transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
 .notif-check:hover {
@@ -432,23 +490,15 @@ const browsers = [
 
 .notif-check::after {
     content: "";
-
     position: absolute;
-
     width: 4px;
     height: 8px;
-
     border: solid white;
     border-width: 0 2px 2px 0;
-
     left: 50%;
     top: 50%;
-
-    transform:
-        translate(-50%, -60%) rotate(45deg);
-
+    transform: translate(-50%, -60%) rotate(45deg);
     opacity: 0;
-
     transition: opacity var(--transition);
 }
 
@@ -458,31 +508,16 @@ const browsers = [
 
 .notif-check:focus-visible {
     outline: none;
-
-    box-shadow:
-        0 0 0 2px color-mix(in oklch,
-            var(--color-primary) 20%,
-            transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-primary) 20%, transparent);
 }
 
+/* Reminder Time */
 .reminder-time {
     padding-top: var(--space-2);
 }
 
 .time-input {
     max-width: 140px;
-}
-
-/* Notice */
-.notice--warn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    color: var(--color-warning);
-    background: var(--color-warning-highlight);
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
 }
 
 /* Animations */
@@ -505,5 +540,34 @@ const browsers = [
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .settings-section {
+        margin: 0 var(--space-4) var(--space-4) var(--space-4);
+        padding-top: var(--space-4);
+    }
+
+    .permission-banner {
+        gap: var(--space-2);
+        padding: var(--space-3);
+    }
+
+    .notif-row {
+        gap: var(--space-2);
+    }
+
+    .howto__steps {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .settings-section {
+        margin: 0 var(--space-3) var(--space-3) var(--space-3);
+    }
 }
 </style>

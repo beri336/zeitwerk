@@ -32,6 +32,9 @@ const props = defineProps({
     border-radius: var(--radius-lg);
     padding: var(--space-4) var(--space-5);
     box-shadow: var(--shadow-sm);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .kpi-label {
@@ -41,22 +44,39 @@ const props = defineProps({
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: var(--space-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .kpi-value {
     font-size: var(--text-lg);
     font-weight: 600;
     font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .kpi-sub {
     font-size: var(--text-xs);
     color: var(--color-text-faint);
     margin-top: var(--space-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Status Colors */
-.kpi-ok  { color: var(--color-success); }
-.kpi-warn { color: var(--color-warning); }
-.kpi-err  { color: var(--color-error); }
+.kpi-ok {
+    color: var(--color-success);
+}
+
+.kpi-warn {
+    color: var(--color-warning);
+}
+
+.kpi-err {
+    color: var(--color-error);
+}
 </style>

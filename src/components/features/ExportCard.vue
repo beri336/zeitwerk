@@ -623,28 +623,6 @@ function toast(msg) {
     gap: var(--space-5);
 }
 
-/* Page Heading */
-.main h1 {
-    font-size: var(--text-2xl, 1.5rem);
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0;
-    letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    width: 100%;
-}
-
-.main h1::before,
-.main h1::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--color-border);
-    opacity: 0.6;
-}
-
 /* Export Header */
 .export-header h1 {
     font-size: var(--text-2xl, 1.5rem);
@@ -745,8 +723,8 @@ function toast(msg) {
 }
 
 .checkbox-item input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
     accent-color: var(--color-primary);
     cursor: pointer;
 }
@@ -754,6 +732,7 @@ function toast(msg) {
 .preview-hint {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-2);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
@@ -858,7 +837,7 @@ function toast(msg) {
 /* Toast */
 .toast {
     position: fixed;
-    bottom: var(--space-6);
+    bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     background: var(--color-surface);
@@ -871,6 +850,7 @@ function toast(msg) {
     box-shadow: var(--shadow-md);
     z-index: 999;
     pointer-events: none;
+    white-space: nowrap;
 }
 
 /* Animations */
@@ -900,10 +880,16 @@ function toast(msg) {
 @media (max-width: 767px) {
     .main {
         padding: var(--space-3);
+        gap: var(--space-3);
+    }
+
+    .card-body {
+        padding: var(--space-4);
     }
 
     .filter-row {
         grid-template-columns: 1fr;
+        gap: var(--space-4);
     }
 
     .custom-range {
@@ -913,6 +899,43 @@ function toast(msg) {
 
     .range-sep {
         display: none;
+    }
+
+    .format-card {
+        gap: var(--space-3);
+        padding: var(--space-3);
+    }
+
+    .format-desc {
+        display: none;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+
+    .toast {
+        bottom: calc(80px + env(safe-area-inset-bottom));
+        width: calc(100% - var(--space-6));
+        text-align: center;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+
+    .card-body {
+        padding: var(--space-3);
+    }
+
+    .format-icon {
+        width: 34px;
+        height: 34px;
     }
 }
 </style>

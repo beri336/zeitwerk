@@ -171,13 +171,13 @@ const store = useZeitwerkStore()
 <style scoped>
 /* Sidebar */
 .sidebar {
-    /* grid-row: 1 / -1 entfernt — App.vue übernimmt Grid-Zuweisung */
     background: var(--color-surface);
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     overscroll-behavior: contain;
+    min-width: 0;
 }
 
 /* Logo */
@@ -187,6 +187,7 @@ const store = useZeitwerkStore()
     align-items: center;
     gap: var(--space-3);
     border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
 }
 
 .sidebar-logo-icon {
@@ -197,11 +198,13 @@ const store = useZeitwerkStore()
 .sidebar-logo-text {
     font-size: var(--text-sm);
     font-weight: 600;
+    white-space: nowrap;
 }
 
 /* Navigation */
 .sidebar-section {
     padding: var(--space-4) var(--space-3);
+    flex: 1;
 }
 
 .sidebar-section-label {
@@ -211,6 +214,7 @@ const store = useZeitwerkStore()
     text-transform: uppercase;
     letter-spacing: 0.08em;
     padding: 0 var(--space-2) var(--space-2);
+    white-space: nowrap;
 }
 
 .sidebar-item {
@@ -225,6 +229,8 @@ const store = useZeitwerkStore()
     text-decoration: none;
     width: 100%;
     transition: background var(--transition), color var(--transition);
+    white-space: nowrap;
+    min-height: 36px;
 }
 
 .sidebar-item:hover {
@@ -238,11 +244,16 @@ const store = useZeitwerkStore()
     font-weight: 500;
 }
 
+.sidebar-item svg {
+    flex-shrink: 0;
+}
+
 /* Month Navigator */
 .sidebar-month {
     padding: var(--space-4) var(--space-5);
     margin-top: auto;
     border-top: 1px solid var(--color-border);
+    flex-shrink: 0;
 }
 
 .sidebar-month-label {
@@ -251,6 +262,7 @@ const store = useZeitwerkStore()
     margin-bottom: var(--space-2);
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    white-space: nowrap;
 }
 
 .month-nav {
@@ -267,6 +279,11 @@ const store = useZeitwerkStore()
     height: 36px;
     border-radius: var(--radius-sm);
     color: var(--color-text-muted);
+    border: none;
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--transition), color var(--transition);
 }
 
 .month-nav-btn:hover {
@@ -279,5 +296,14 @@ const store = useZeitwerkStore()
     font-size: var(--text-sm);
     font-weight: 500;
     text-align: center;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Mobile: Hide sidebar - navigation is handled by AppBottomNav */
+@media (max-width: 767px) {
+    .sidebar {
+        display: none;
+    }
 }
 </style>

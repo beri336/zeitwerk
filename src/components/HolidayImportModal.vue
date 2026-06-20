@@ -43,7 +43,8 @@
                             :class="{ 'holiday-item--exists': isAlreadyImported(holiday.date) }">
                             <div class="holiday-date">
                                 {{ new Date(holiday.date + 'T00:00:00').toLocaleDateString('de-DE', {
-                                    weekday: 'short', day: '2-digit', month: '2-digit' }) }}
+                                    weekday: 'short', day: '2-digit', month: '2-digit'
+                                }) }}
                             </div>
                             <div class="holiday-name">{{ holiday.name }}</div>
                             <div class="holiday-status">
@@ -81,8 +82,8 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useToast } from '@/composables/useToast'
 import { STATES, getHolidaysForMonth } from '@/composables/useHolidays'
 
-const props = defineProps( { modelValue: { type: Boolean, default: false } } )
-const emit = defineEmits( ['update:modelValue'] )
+const props = defineProps({ modelValue: { type: Boolean, default: false } })
+const emit = defineEmits(['update:modelValue'])
 
 const store = useZeitwerkStore()
 const { showToast } = useToast()
@@ -133,6 +134,7 @@ function doImport() {
     display: flex;
     align-items: center;
     gap: var(--space-3);
+    flex-wrap: wrap;
 }
 
 .preview-count {
@@ -164,6 +166,8 @@ function doImport() {
     gap: var(--space-2);
     max-height: 320px;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .holiday-item {
@@ -208,5 +212,35 @@ function doImport() {
     font-size: var(--text-sm);
     background: var(--color-surface-offset);
     border-radius: var(--radius-md);
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .holiday-list {
+        max-height: 260px;
+    }
+
+    .holiday-item {
+        grid-template-columns: 80px 1fr;
+        grid-template-rows: auto auto;
+        row-gap: var(--space-1);
+    }
+
+    .holiday-status {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+
+    .auto-hint {
+        padding: var(--space-2) var(--space-3);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .holiday-item {
+        padding: var(--space-2) var(--space-3);
+        grid-template-columns: 70px 1fr;
+    }
 }
 </style>

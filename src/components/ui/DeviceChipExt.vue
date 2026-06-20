@@ -188,11 +188,13 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .device-icon {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: var(--color-primary);
   flex-shrink: 0;
 }
@@ -209,11 +211,17 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .device-sub {
   font-size: 0.7rem;
   color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Online Dot */
@@ -242,6 +250,7 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
   text-transform: uppercase;
   letter-spacing: 0.05em;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .badge--pwa {
@@ -278,11 +287,18 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
   gap: 0.4rem;
   font-size: 0.75rem;
   color: var(--color-text-muted);
+  min-width: 0;
 }
 
 .stat-item svg {
   flex-shrink: 0;
   color: var(--color-text-faint);
+}
+
+.stat-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Battery */
@@ -294,6 +310,7 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
 
 .battery-bar-wrap {
   flex: 1;
+  min-width: 0;
 }
 
 .battery-bar {
@@ -316,5 +333,17 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
   white-space: nowrap;
   min-width: 36px;
   text-align: right;
+  flex-shrink: 0;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .device-card {
+    max-width: 100%;
+  }
+
+  .device-stats {
+    gap: 0.4rem 0.75rem;
+  }
 }
 </style>

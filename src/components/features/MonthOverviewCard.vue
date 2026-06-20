@@ -269,8 +269,14 @@ const workdays = computed(() =>
     white-space: nowrap;
 }
 
-.cal-today-chip:hover    { background: var(--color-surface-offset); }
-.cal-today-chip:disabled { opacity: 0.55; cursor: default; }
+.cal-today-chip:hover {
+    background: var(--color-surface-offset);
+}
+
+.cal-today-chip:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
 
 /* Stats */
 .cal-stats {
@@ -299,8 +305,13 @@ const workdays = computed(() =>
     font-variant-numeric: tabular-nums;
 }
 
-.stat-ok  { color: var(--color-success); }
-.stat-err { color: var(--color-error); }
+.stat-ok {
+    color: var(--color-success);
+}
+
+.stat-err {
+    color: var(--color-error);
+}
 
 /* Grid */
 .cal-grid-wrap {
@@ -329,15 +340,42 @@ const workdays = computed(() =>
 
 /* Tablet */
 @media (max-width: 900px) {
-    .cal-grid  { gap: var(--space-1); }
-    .cal-stats { gap: var(--space-4); }
+    .cal-grid {
+        gap: var(--space-1);
+    }
+
+    .cal-stats {
+        gap: var(--space-4);
+    }
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .main {
         padding: var(--space-3);
         gap: var(--space-3);
+    }
+
+    .cal-hint {
+        margin-top: 0;
+    }
+
+    .cal-header {
+        gap: var(--space-3);
+    }
+
+    .cal-grid {
+        gap: 3px;
+    }
+
+    .cal-weekday {
+        font-size: 0.65rem;
+        padding: var(--space-1) 0;
+        letter-spacing: 0;
+    }
+
+    .cal-weekday--weekend {
+        color: var(--color-warning);
     }
 
     .cal-toolbar {
@@ -347,18 +385,24 @@ const workdays = computed(() =>
             "today today today";
     }
 
-    .cal-toolbar > .cal-nav-btn:first-child   { grid-area: prev; }
-    .cal-toolbar > .cal-nav-btn:nth-of-type(2) { grid-area: next; justify-self: end; }
-    .cal-month-label { grid-area: month; font-size: var(--text-sm); }
+    .cal-toolbar>.cal-nav-btn:first-child {
+        grid-area: prev;
+    }
+
+    .cal-toolbar>.cal-nav-btn:nth-of-type(2) {
+        grid-area: next;
+        justify-self: end;
+    }
+
+    .cal-month-label {
+        grid-area: month;
+    }
 
     .cal-today-chip {
         grid-area: today;
         width: 100%;
         margin-top: var(--space-1);
     }
-
-    .cal-hint   { margin-top: 0; }
-    .cal-header { gap: var(--space-3); }
 
     .cal-stats {
         display: grid;
@@ -372,6 +416,49 @@ const workdays = computed(() =>
         background: var(--color-surface);
         border: 1px solid var(--color-border);
         border-radius: var(--radius-md);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+
+    .cal-grid {
+        gap: 2px;
+    }
+
+    .cal-weekday {
+        font-size: 0.6rem;
+    }
+
+    .cal-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-2);
+    }
+
+    .cal-stat {
+        padding: var(--space-1-5, 0.375rem) var(--space-2);
+    }
+
+    .cal-stat-value {
+        font-size: var(--text-sm);
+    }
+
+    .cal-toolbar {
+        padding: var(--space-1-5, 0.375rem) var(--space-2);
+        gap: var(--space-1);
+    }
+
+    .cal-nav-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .cal-today-chip {
+        height: 32px;
     }
 }
 </style>

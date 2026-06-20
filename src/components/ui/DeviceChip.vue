@@ -58,44 +58,54 @@ const icons = {
   </svg>`,
 }
 
-const deviceIcon = computed( () => icons[device.value.deviceType] ?? icons.windows )
+const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.windows)
 </script>
 
 <style scoped>
 /* Device Chip */
 .device-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: var(--color-surface, #252840);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius, 0.5rem);
-    padding: 0.5rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-surface, #252840);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius, 0.5rem);
+  padding: 0.5rem 0.75rem;
+  min-width: 0;
 }
 
 .device-icon {
-    display: flex;
-    align-items: center;
-    color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .device-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
 .device-label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--color-text);
-    line-height: 1.2;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .device-sub {
-    font-size: 0.7rem;
-    color: var(--color-text-muted);
-    line-height: 1.2;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

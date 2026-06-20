@@ -2,7 +2,7 @@
 
 <template>
     <main class="main">
-        
+
         <div v-if="!hasData" class="empty-state">
             <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <line x1="18" y1="20" x2="18" y2="10" />
@@ -150,17 +150,38 @@ watch(chartExportTrigger, format => {
     font-size: var(--text-sm);
 }
 
-/* Responsive */
+/* Tablet */
 @media (max-width: 900px) {
     .charts-grid {
         grid-template-columns: 1fr;
     }
 }
 
+/* Mobile */
 @media (max-width: 767px) {
     .main {
         padding: var(--space-3);
-        gap: var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .charts-wide {
+        gap: var(--space-3);
+    }
+
+    .charts-grid {
+        gap: var(--space-3);
+    }
+
+    .empty-state {
+        padding: var(--space-8) var(--space-4);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
     }
 }
 </style>

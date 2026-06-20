@@ -657,6 +657,7 @@ const badgeText = computed(() =>
     display: flex;
     align-items: center;
     gap: var(--space-3, 0.75rem);
+    flex-wrap: wrap;
 }
 
 .todo-title {
@@ -708,6 +709,7 @@ const badgeText = computed(() =>
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
     white-space: nowrap;
+    min-height: 32px;
 }
 
 .filter-btn.active {
@@ -724,15 +726,12 @@ const badgeText = computed(() =>
     font-size: 0.8rem;
     cursor: pointer;
     outline: none;
-
-    /* Remove browser styling */
     appearance: none;
     -webkit-appearance: none;
-
-    /* Custom arrow as SVG */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.6rem center;
+    min-height: 32px;
 }
 
 /* Tag Filter Row */
@@ -827,7 +826,6 @@ const badgeText = computed(() =>
     opacity: 0.6;
 }
 
-/* Priority left-border accent */
 .todo-item.priority-middle {
     border-left: 3px solid #f59e0b;
 }
@@ -836,7 +834,6 @@ const badgeText = computed(() =>
     border-left: 3px solid #ef4444;
 }
 
-/* Urgent golden glow */
 .todo-item.urgent {
     border-color: #d97706;
     box-shadow: 0 0 0 1px #d9770640, 0 0 12px 1px #d9770620;
@@ -845,8 +842,8 @@ const badgeText = computed(() =>
 /* Checkbox */
 .todo-check {
     flex-shrink: 0;
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: 2px solid var(--color-border, #2d3148);
     background: transparent;
@@ -865,8 +862,8 @@ const badgeText = computed(() =>
 }
 
 .todo-check--sm {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Content */
@@ -1066,8 +1063,8 @@ const badgeText = computed(() =>
 }
 
 .icon-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: none;
     border-radius: calc(var(--radius, 0.5rem) - 2px);
     background: transparent;
@@ -1104,6 +1101,8 @@ const badgeText = computed(() =>
     font-size: 0.8rem;
     padding-top: var(--space-2, 0.5rem);
     border-top: 1px solid var(--color-border, #2d3148);
+    flex-wrap: wrap;
+    gap: var(--space-2);
 }
 
 /* Buttons */
@@ -1197,6 +1196,7 @@ const badgeText = computed(() =>
     gap: 1rem;
     overflow-y: auto;
     max-height: 65vh;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-footer {
@@ -1237,7 +1237,6 @@ const badgeText = computed(() =>
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     color: var(--color-text);
-    /* war fälschlicherweise color-text-inverse */
     padding: 0.55rem 0.875rem;
     font-size: 0.9rem;
     transition: border-color 0.2s;
@@ -1294,6 +1293,7 @@ const badgeText = computed(() =>
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.15s;
+    min-height: 36px;
 }
 
 .priority-btn--low.active {
@@ -1329,6 +1329,7 @@ const badgeText = computed(() =>
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.15s;
+    min-height: 36px;
 }
 
 .urgent-toggle.active {
@@ -1362,5 +1363,100 @@ const badgeText = computed(() =>
 .modal-leave-to {
     opacity: 0;
     transform: scale(0.96);
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .main {
+        padding: var(--space-3) var(--space-3, 0.75rem);
+        gap: var(--space-3);
+    }
+
+    .todo-wrapper {
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .todo-header {
+        gap: var(--space-2);
+    }
+
+    .todo-title {
+        font-size: 1.1rem;
+    }
+
+    .todo-actions {
+        opacity: 1;
+    }
+
+    .subtask-actions {
+        opacity: 1;
+    }
+
+    .todo-item {
+        padding: 0.65rem 0.75rem;
+        gap: 0.6rem;
+    }
+
+    .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal {
+        border-radius: calc(var(--radius, 0.5rem) * 1.5) calc(var(--radius, 0.5rem) * 1.5) 0 0;
+        max-height: 92dvh;
+    }
+
+    .modal-body {
+        max-height: 55vh;
+    }
+
+    .field-row {
+        flex-direction: column;
+    }
+
+    .toolbar {
+        gap: var(--space-1);
+    }
+
+    .todo-filters {
+        width: 100%;
+    }
+
+    .toolbar-right {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .todo-select {
+        width: 100%;
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+
+    .todo-item {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .filter-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .todo-check {
+        width: 24px;
+        height: 24px;
+    }
 }
 </style>

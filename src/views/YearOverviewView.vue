@@ -12,6 +12,7 @@ import YearOverviewCard from '@/components/features/YearOverviewCard.vue';
 </script>
 
 <style scoped>
+/* Main Layout */
 .main {
     overflow-y: auto;
     padding: var(--space-6);
@@ -20,7 +21,7 @@ import YearOverviewCard from '@/components/features/YearOverviewCard.vue';
     gap: var(--space-4);
 }
 
-/* Page Headings */
+/* Page Heading */
 .main h1 {
     font-size: var(--text-2xl, 1.5rem);
     font-weight: 700;
@@ -39,5 +40,25 @@ import YearOverviewCard from '@/components/features/YearOverviewCard.vue';
     height: 1px;
     background: var(--color-border);
     opacity: 0.6;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .main {
+        padding: var(--space-3);
+        gap: var(--space-3);
+    }
+
+    .main h1 {
+        font-size: var(--text-xl, 1.25rem);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
 }
 </style>

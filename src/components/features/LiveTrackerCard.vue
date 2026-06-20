@@ -476,7 +476,7 @@ function onFinishWorkDay() { store.finishWorkDay(); showToast('Work day finished
     animation: pulse 1.8s ease-in-out infinite;
 }
 
-/* Header */
+/* Main Panel */
 .live-card__main {
     display: flex;
     flex-direction: column;
@@ -732,6 +732,7 @@ function onFinishWorkDay() { store.finishWorkDay(); showToast('Work day finished
     gap: var(--space-2);
     overflow-y: auto;
     max-height: 280px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .live-block {
@@ -847,7 +848,7 @@ function onFinishWorkDay() { store.finishWorkDay(); showToast('Work day finished
     }
 }
 
-/* Responsive */
+/* Tablet */
 @media (max-width: 900px) {
     .live-card {
         grid-template-columns: 1fr;
@@ -860,6 +861,58 @@ function onFinishWorkDay() { store.finishWorkDay(); showToast('Work day finished
         width: 100%;
         min-width: 0;
         justify-content: center;
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .live-card {
+        padding: var(--space-3);
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+    }
+
+    .live-card__hero {
+        padding: var(--space-4);
+        gap: var(--space-2);
+    }
+
+    .live-card__clock {
+        font-size: clamp(2.2rem, 12vw, 3rem);
+    }
+
+    .live-card__hint {
+        display: none;
+    }
+
+    .live-blocks {
+        max-height: 200px;
+    }
+
+    .live-card__side {
+        padding: var(--space-3);
+    }
+
+    .live-card__actions {
+        gap: var(--space-2);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .live-card {
+        padding: var(--space-2);
+        border-radius: var(--radius-md);
+    }
+
+    .live-meta-chip {
+        font-size: 0.65rem;
+        padding: 0 var(--space-2);
+        min-height: 26px;
+    }
+
+    .live-card__hero {
+        padding: var(--space-3);
     }
 }
 </style>

@@ -122,7 +122,7 @@ const isWeekend = computed(() => {
 .cal-day {
     position: relative;
     min-height: 96px;
-    min-width: 44px;
+    min-width: 0;
     padding: var(--space-2);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
@@ -138,12 +138,17 @@ const isWeekend = computed(() => {
         border-color var(--transition),
         box-shadow var(--transition),
         transform var(--transition);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cal-day:hover {
     border-color: var(--color-primary);
     box-shadow: var(--shadow-sm);
     transform: translateY(-1px);
+}
+
+.cal-day:active {
+    transform: translateY(0);
 }
 
 .cal-day:focus-visible {
@@ -194,12 +199,12 @@ const isWeekend = computed(() => {
     font-weight: 700;
 }
 
-
 /* Header */
 .cal-day__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 .cal-day__num {
@@ -211,6 +216,7 @@ const isWeekend = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .cal-day--today .cal-day__num {
@@ -222,12 +228,14 @@ const isWeekend = computed(() => {
     line-height: 1;
 }
 
-/*  Body: Time & Labels */
+/* Body */
 .cal-day__body {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .cal-day__ist {
@@ -236,6 +244,7 @@ const isWeekend = computed(() => {
     color: var(--color-text);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
+    white-space: nowrap;
 }
 
 .cal-day__time {
@@ -243,6 +252,9 @@ const isWeekend = computed(() => {
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cal-day__gross {
@@ -251,6 +263,7 @@ const isWeekend = computed(() => {
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     line-height: 1.2;
+    white-space: nowrap;
 }
 
 .cal-day__note {
@@ -261,7 +274,7 @@ const isWeekend = computed(() => {
     text-overflow: ellipsis;
 }
 
-/*  Progress Bar */
+/* Progress Bar */
 .cal-day__bar-track {
     position: absolute;
     bottom: 0;
@@ -301,20 +314,20 @@ const isWeekend = computed(() => {
     }
 }
 
-/* Responsive: Mobile */
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 767px) {
     .cal-day {
         min-height: 72px;
         padding: var(--space-2);
     }
 
     .cal-day__num {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
     }
 
     .cal-day__ist {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .cal-day__gross {
@@ -324,6 +337,29 @@ const isWeekend = computed(() => {
     .cal-day__time,
     .cal-day__note {
         display: none;
+    }
+
+    .cal-day:hover {
+        transform: none;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .cal-day {
+        min-height: 60px;
+        padding: var(--space-1);
+        gap: 1px;
+    }
+
+    .cal-day__num {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+
+    .cal-day__ist {
+        font-size: 10px;
     }
 }
 </style>

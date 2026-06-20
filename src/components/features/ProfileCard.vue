@@ -519,6 +519,7 @@ function removeSkill(skill) {
     padding: 0.65rem 0.9rem;
     text-decoration: none;
     transition: border-color 0.15s, background 0.15s;
+    min-width: 0;
 }
 
 .contact-item:hover {
@@ -640,6 +641,7 @@ function removeSkill(skill) {
     gap: 1rem;
     overflow-y: auto;
     max-height: 65vh;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-footer {
@@ -797,8 +799,8 @@ function removeSkill(skill) {
 }
 
 .icon-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: none;
     border-radius: calc(var(--radius, 0.5rem) - 2px);
     background: transparent;
@@ -825,5 +827,85 @@ function removeSkill(skill) {
 .modal-leave-to {
     opacity: 0;
     transform: scale(0.96);
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .profile-hero {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .hero-name {
+        font-size: 1.15rem;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field-row {
+        flex-direction: column;
+    }
+
+    .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal {
+        border-radius: calc(var(--radius, 0.5rem) * 1.5) calc(var(--radius, 0.5rem) * 1.5) 0 0;
+        max-height: 92dvh;
+    }
+
+    .modal-body {
+        max-height: 60vh;
+    }
+
+    .edit-hero-btn {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+        margin-top: var(--space-1);
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .profile-hero {
+        padding: 0.875rem;
+    }
+
+    .profile-card {
+        padding: 1rem;
+    }
+
+    .avatar-ring,
+    .avatar-img,
+    .avatar-initials {
+        width: 60px;
+        height: 60px;
+    }
+
+    .avatar-initials {
+        font-size: 1.2rem;
+    }
+
+    .hero-name {
+        font-size: 1rem;
+    }
+
+    .hero-role {
+        font-size: 0.82rem;
+    }
+
+    .contact-item {
+        padding: 0.55rem 0.75rem;
+    }
 }
 </style>

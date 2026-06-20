@@ -166,7 +166,7 @@ const allRoutes = [
 ]
 
 // the 4 most important tabs at the bottom, rest goes into the drawer
-const primaryTabs = ['/dashboard', '/month-overview', '/year-overview', '/settings']
+const primaryTabs = ['/dashboard', '/livetracking', '/month-overview', '/settings']
 const primaryRoutes = allRoutes.filter(r => primaryTabs.includes(r.path))
 
 function closeDrawer() { drawerOpen.value = false }
@@ -195,6 +195,9 @@ function closeDrawer() { drawerOpen.value = false }
         background: var(--color-surface);
         border-top: 1px solid var(--color-border);
         padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+        /* Prevent content from shifting under the nav */
+        padding-left: max(var(--space-2), env(safe-area-inset-left));
+        padding-right: max(var(--space-2), env(safe-area-inset-right));
     }
 
     .bottom-nav__item {
@@ -203,15 +206,17 @@ function closeDrawer() { drawerOpen.value = false }
         align-items: center;
         justify-content: center;
         gap: 4px;
-        min-height: 44px;
+        min-height: 48px;
         color: var(--color-text-muted);
         text-decoration: none;
         border-radius: var(--radius-md);
-        font-size: 11px;
+        font-size: 10px;
+        font-weight: 500;
         background: none;
         border: none;
         cursor: pointer;
         transition: color 0.15s, background 0.15s;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .bottom-nav__item.active {
@@ -245,8 +250,8 @@ function closeDrawer() { drawerOpen.value = false }
         background: var(--color-surface);
         border-top: 1px solid var(--color-border);
         border-radius: 1.25rem 1.25rem 0 0;
-        max-height: 80vh;
-        padding-bottom: env(safe-area-inset-bottom);
+        max-height: 82dvh;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
         box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.4);
     }
 
@@ -257,6 +262,7 @@ function closeDrawer() { drawerOpen.value = false }
         padding: 1rem 1.25rem 0.75rem;
         border-bottom: 1px solid var(--color-border);
         flex-shrink: 0;
+        position: relative;
     }
 
     /* Drag Handle: Pill (Top) */
@@ -279,8 +285,8 @@ function closeDrawer() { drawerOpen.value = false }
     }
 
     .drawer-close {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         border: none;
         border-radius: 50%;
         background: var(--color-surface-hover, #252840);
@@ -289,10 +295,17 @@ function closeDrawer() { drawerOpen.value = false }
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        flex-shrink: 0;
+    }
+
+    .drawer-close:active {
+        background: var(--color-surface-offset);
     }
 
     .drawer-body {
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         padding: 0.5rem 0.75rem 1rem;
         display: flex;
         flex-direction: column;
@@ -310,7 +323,8 @@ function closeDrawer() { drawerOpen.value = false }
         font-size: 0.925rem;
         font-weight: 500;
         transition: background 0.15s, color 0.15s;
-        min-height: 48px;
+        min-height: 52px;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .drawer-item:active {
@@ -367,6 +381,20 @@ function closeDrawer() { drawerOpen.value = false }
     .drawer-enter-from,
     .drawer-leave-to {
         transform: translateY(100%);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .bottom-nav__item {
+        font-size: 9px;
+        gap: 3px;
+        min-height: 44px;
+    }
+
+    .drawer-item {
+        font-size: 0.875rem;
+        min-height: 48px;
     }
 }
 </style>

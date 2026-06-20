@@ -264,32 +264,12 @@ function save() {
 </script>
 
 <style scoped>
-/* Modal */
+/* Modal Content Scroll Container */
 .modal-content {
     max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-}
-
-/* Preview Bar */
-.preview-bar {
-    margin-top: var(--space-4);
-    padding-top: var(--space-1);
-    padding-bottom: var(--space-2);
-    background: var(--color-surface-offset);
-    border-radius: var(--radius-md);
-    display: flex;
-    gap: var(--space-3);
-}
-
-.preview-salary {
-    color: var(--color-gold);
-}
-
-.preview-hint {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
 }
 
 /* Type Selector */
@@ -312,6 +292,9 @@ function save() {
     color: var(--color-text-muted);
     cursor: pointer;
     transition: all var(--transition);
+    white-space: nowrap;
+    min-height: 36px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .typ-btn:hover {
@@ -323,7 +306,29 @@ function save() {
     font-weight: 600;
 }
 
-/* Out-of-Office Message */
+/* Preview Bar */
+.preview-bar {
+    grid-column: 1 / -1;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface-offset);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.preview-salary {
+    color: var(--color-gold);
+    font-variant-numeric: tabular-nums;
+}
+
+.preview-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+}
+
+/* Out-of-Office Hint */
 .absence-hint {
     display: flex;
     align-items: center;
@@ -333,6 +338,7 @@ function save() {
     border-radius: var(--radius-md);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+    flex-wrap: wrap;
 }
 
 /* Time Blocks */
@@ -408,6 +414,7 @@ function save() {
 .form-textarea {
     min-height: 110px;
     resize: vertical;
+    font-family: inherit;
 }
 
 /* Mobile */
@@ -423,14 +430,42 @@ function save() {
         max-height: 92dvh;
     }
 
+    .block-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .typ-btn {
+        min-height: 40px;
+    }
+
+    /* iOS zoom prevention - inputs under 16px trigger auto-zoom */
     .form-input,
-    .form-input[type="date"],
-    .form-input[type="time"],
-    .form-input[type="number"],
-    .form-input[type="text"],
-    
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    input[type="text"],
     textarea.form-input {
         font-size: 16px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .block-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .typ-selector {
+        gap: var(--space-1);
+    }
+
+    .typ-btn {
+        padding: var(--space-2);
+        font-size: 10px;
+    }
+
+    .absence-hint {
+        font-size: var(--text-xs);
     }
 }
 </style>

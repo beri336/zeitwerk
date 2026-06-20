@@ -143,7 +143,7 @@
             <!-- Weekday Labels -->
             <div class="month-grid-header">
                 <span v-for="day in ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']" :key="day" class="month-wd">{{ day
-                    }}</span>
+                }}</span>
             </div>
 
             <!-- Day Grid -->
@@ -847,6 +847,7 @@ const yearBestStreak = computed(() => {
     display: flex;
     align-items: center;
     gap: var(--space-3, 0.75rem);
+    flex-wrap: wrap;
 }
 
 .habit-title {
@@ -987,8 +988,8 @@ const yearBestStreak = computed(() => {
 /* Check Button */
 .habit-check {
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 2px solid var(--color-border, #2d3148);
     background: transparent;
@@ -1285,6 +1286,7 @@ const yearBestStreak = computed(() => {
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
+    min-height: 36px;
 }
 
 .freq-btn.active {
@@ -1337,8 +1339,8 @@ const yearBestStreak = computed(() => {
 }
 
 .icon-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: none;
     border-radius: calc(var(--radius, 0.5rem) - 2px);
     background: transparent;
@@ -1540,6 +1542,7 @@ const yearBestStreak = computed(() => {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
+    min-height: 32px;
 }
 
 .year-habit-tab:hover {
@@ -1550,6 +1553,7 @@ const yearBestStreak = computed(() => {
 .year-heatmap-scroll {
     overflow-x: auto;
     padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .year-heatmap {
@@ -1654,5 +1658,95 @@ const yearBestStreak = computed(() => {
 .habit-list-leave-to {
     opacity: 0;
     transform: translateY(-8px);
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .habit-wrapper {
+        gap: var(--space-3, 0.75rem);
+    }
+
+    .habit-header {
+        gap: var(--space-2);
+    }
+
+    .habit-title {
+        font-size: 1.1rem;
+    }
+
+    .week-strip {
+        padding: 0.5rem;
+        gap: 3px;
+    }
+
+    .week-day {
+        padding: 5px 4px;
+    }
+
+    .week-num {
+        font-size: 0.8rem;
+    }
+
+    .habit-check {
+        width: 32px;
+        height: 32px;
+    }
+
+    .habit-actions {
+        opacity: 1;
+    }
+
+    .month-cell {
+        min-height: 44px;
+        padding: 3px;
+    }
+
+    .history-card {
+        padding: 0.75rem;
+    }
+
+    .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal {
+        border-radius: calc(var(--radius, 0.5rem) * 1.5) calc(var(--radius, 0.5rem) * 1.5) 0 0;
+        max-height: 92dvh;
+    }
+
+    .modal-body {
+        max-height: 55vh;
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+    .week-day {
+        padding: 4px 2px;
+        gap: 3px;
+    }
+
+    .week-wd {
+        font-size: 0.6rem;
+    }
+
+    .week-num {
+        font-size: 0.72rem;
+    }
+
+    .habit-item {
+        padding: 0.6rem 0.65rem;
+        gap: 0.6rem;
+    }
+
+    .month-cell {
+        min-height: 36px;
+    }
 }
 </style>

@@ -55,6 +55,7 @@ function update() { updateServiceWorker(true) }
     gap: var(--space-4);
     white-space: nowrap;
     animation: slideUp 0.25s ease;
+    max-width: calc(100vw - var(--space-6) * 2);
 }
 
 .pwa-banner__text {
@@ -64,11 +65,13 @@ function update() { updateServiceWorker(true) }
     font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-text);
+    white-space: nowrap;
 }
 
 .pwa-banner__actions {
     display: flex;
     gap: var(--space-2);
+    flex-shrink: 0;
 }
 
 @keyframes slideUp {
@@ -80,6 +83,43 @@ function update() { updateServiceWorker(true) }
     to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .pwa-banner {
+        bottom: calc(64px + env(safe-area-inset-bottom) + var(--space-3));
+        left: var(--space-3);
+        right: var(--space-3);
+        transform: none;
+        white-space: normal;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        max-width: none;
+    }
+
+    .pwa-banner__actions {
+        width: 100%;
+    }
+
+    .pwa-banner__actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 }
 </style>

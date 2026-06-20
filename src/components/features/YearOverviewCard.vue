@@ -288,7 +288,8 @@ const yearGrossLabel = computed(() => {
     border: 1px solid var(--color-border);
 }
 
-.year-nav-btn:hover {
+.year-nav-btn:hover,
+.year-nav-btn:active {
     background: var(--color-surface-offset);
     color: var(--color-text);
 }
@@ -422,6 +423,8 @@ const yearGrossLabel = computed(() => {
     justify-content: center;
     position: relative;
     font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
 }
 
 .year-day-number {
@@ -453,7 +456,6 @@ const yearGrossLabel = computed(() => {
     border-color: color-mix(in oklch, var(--color-error) 20%, var(--color-border));
 }
 
-/* Today — overrides all state variants */
 .year-day--today,
 .year-day--today.year-day--entry,
 .year-day--today.year-day--absence,
@@ -484,10 +486,32 @@ const yearGrossLabel = computed(() => {
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .main {
         padding: var(--space-3);
         gap: var(--space-3);
+    }
+
+    .year-hint {
+        margin-top: 0;
+    }
+
+    .year-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+
+    .year-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .year-day {
+        min-height: 30px;
+    }
+
+    .year-month {
+        padding: var(--space-2);
+        gap: var(--space-2);
     }
 
     .year-toolbar {
@@ -515,17 +539,49 @@ const yearGrossLabel = computed(() => {
         width: 100%;
         margin-top: var(--space-1);
     }
+}
 
-    .year-summary {
-        grid-template-columns: 1fr 1fr;
+/* Small Mobile */
+@media (max-width: 420px) {
+    .main {
+        padding: var(--space-2);
+        gap: var(--space-2);
     }
 
     .year-grid {
-        grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+
+    .year-month {
+        padding: var(--space-2);
+        gap: var(--space-2);
+    }
+
+    .year-weekdays,
+    .year-days {
+        gap: 2px;
+    }
+
+    .year-weekday {
+        font-size: 9px;
+        letter-spacing: 0;
     }
 
     .year-day {
-        min-height: 30px;
+        min-height: 26px;
+    }
+
+    .year-day-number {
+        font-size: 10px;
+    }
+
+    .year-nav-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .year-current-btn {
+        height: 32px;
     }
 }
 </style>

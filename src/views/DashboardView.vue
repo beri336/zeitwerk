@@ -28,6 +28,7 @@ const isPWA = computed(() =>
 </script>
 
 <style scoped>
+/* Main Layout */
 .main {
   padding: var(--space-6);
   display: flex;
@@ -36,7 +37,7 @@ const isPWA = computed(() =>
   min-width: 0;
 }
 
-/* Page Headings */
+/* Page Heading */
 .main h1 {
   font-size: var(--text-2xl, 1.5rem);
   font-weight: 700;
@@ -69,5 +70,25 @@ const isPWA = computed(() =>
   border-radius: var(--radius-md);
   font-size: var(--text-xs);
   font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .main {
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .main h1 {
+    font-size: var(--text-xl, 1.25rem);
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 420px) {
+  .main {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
 }
 </style>

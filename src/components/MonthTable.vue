@@ -245,12 +245,15 @@ function cancelDelete() { pendingDelete.value = null }
     overflow: hidden;
 }
 
+/* Header */
 .table-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid var(--color-divider);
+    gap: var(--space-3);
+    flex-wrap: wrap;
 }
 
 .table-title {
@@ -261,8 +264,11 @@ function cancelDelete() { pendingDelete.value = null }
 .table-badges {
     display: flex;
     gap: var(--space-2);
+    align-items: center;
+    flex-wrap: wrap;
 }
 
+/* Scroll-Container */
 .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -314,6 +320,7 @@ function cancelDelete() { pendingDelete.value = null }
     border-bottom: none;
 }
 
+/* Hover-Effekte (werden unten für Hover‑Geräte begrenzt) */
 .data-table tr:hover td {
     background: var(--color-surface-offset);
 }
@@ -372,22 +379,10 @@ function cancelDelete() { pendingDelete.value = null }
     opacity: 0.72;
 }
 
-.row-actions button:hover,
-.row-actions button:focus-visible {
-    opacity: 1;
-    background: var(--color-surface-2);
-    border-color: var(--color-border);
-}
-
 .row-actions button svg {
     width: 14px;
     height: 14px;
     color: var(--color-text-muted);
-}
-
-.row-actions button:hover svg,
-.row-actions button:focus-visible svg {
-    color: var(--color-text);
 }
 
 .row-actions button.btn-danger {
@@ -411,7 +406,7 @@ function cancelDelete() { pendingDelete.value = null }
 
 /* Inline Edit */
 .editable {
-    cursor: pointer;
+    cursor: text;
 }
 
 td.editable:hover {
@@ -462,7 +457,7 @@ td.editable:hover {
     max-width: 180px;
 }
 
-/* Absence Row */
+/* Absence Row (wird über JS nicht genutzt, aber gelassen) */
 tr[data-absence="true"] td {
     background: color-mix(in oklch, var(--color-primary-highlight) 30%, var(--color-surface));
 }
