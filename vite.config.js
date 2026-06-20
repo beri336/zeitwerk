@@ -59,7 +59,7 @@ export default defineConfig({
           {
             name: 'Monthly Overview',
             short_name: 'Overview',
-            url: '/#/tracking',
+            url: '/#/monthly-overview',
             icons: [{ src: 'icon-192.png', sizes: '192x192' }]
           },
           {
