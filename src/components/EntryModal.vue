@@ -63,6 +63,7 @@
                                                 <label class="form-label">Start</label>
                                                 <input class="form-input" type="time" v-model="block.start" />
                                             </div>
+
                                             <div class="form-group">
                                                 <label class="form-label">End</label>
                                                 <input class="form-input" type="time" v-model="block.end" />
@@ -102,7 +103,7 @@
                             <div class="absence-hint">
                                 <span>{{ currentType.icon }}</span>
                                 <span>{{ currentType.label }} — Actual is automatically interpreted as Planned ({{
-                                    form.plannedDay }}h)</span>
+                                    form.plannedHours }}h)</span>
                             </div>
                         </div>
 
@@ -121,7 +122,7 @@
                         </div>
 
                         <!-- Preview Total-Actual -->
-                        <div v-if="showTimeFields && previewIst > 0" class="preview-bar">
+                        <div v-if="showTimeFields && previewActual > 0" class="preview-bar">
                             <span class="form-label">Preview Actual total:</span>
                             <strong>{{ formatHours(previewActual) }}</strong>
                             <span class="preview-hint">
@@ -187,7 +188,11 @@ const { mask } = usePrivacy()
 const defaultForm = () => ({
     date: today(),
     typ: 'on-site',
-    timeEntries: [{ start: '', end: '', pause: store.settings.defaultBreak }],
+    timeEntries: [{
+        start: '08:00',
+        end: '17:00',
+        pause: 30,
+    }],
     plannedHours: store.settings.hoursPerDay,
     notes: '',
     remarks: '',
@@ -198,14 +203,28 @@ watch(() => props.modelValue, open => {
     if (!open)
         return
 
-    form.value = props.editEntry
-        ? { ...props.editEntry }
-        : { ...defaultForm(), date: props.prefillDate ?? today() }
+    if (props.editEntry) {
+        form.value = {
+            ...props.editEntry,
+            timeEntries: props.editEntry.timeEntries
+                ? props.editEntry.timeEntries.map(block => ({ ...block }))
+                : []
+        }
+    } else {
+        form.value = {
+            ...defaultForm(),
+            date: props.prefillDate ?? today()
+        }
+    }
 })
 
-const currentType = computed(() => getAbsenceType(form.value.typ ?? 'on-site'))
+const currentType = computed(() =>
+    getAbsenceType(form.value?.typ ?? 'on-site')
+)
 const showTimeFields = computed(() => currentType.value.counter)
-const previewActual = computed(() => calcActualHours(form.value))
+const previewActual = computed(() =>
+    form.value ? calcActualHours(form.value) : 0
+)
 
 // show salary
 const grossPreview = computed(() => {
@@ -216,7 +235,11 @@ const grossPreview = computed(() => {
 
 // timeEntries helper
 function addBlock() {
-    form.value.timeEntries.push({ start: '', end: '', pause: 0 })
+    form.value.timeEntries.push({
+        start: '08:00',
+        end: '17:00',
+        pause: 30
+    })
 }
 
 function removeBlock(index) {
@@ -446,6 +469,7 @@ function save() {
     input[type="text"],
     textarea.form-input {
         font-size: 16px;
+        color: red !important;
     }
 }
 

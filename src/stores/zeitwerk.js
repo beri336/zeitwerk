@@ -18,7 +18,7 @@ const DEFAULT_SETTINGS = {
     workDays: 5,
     state: 'BW',
     grossMonthlySalary: 0,
-    vacationDaysPerYear: 30
+    vacationDaysPerYear: 30,
 }
 
 function loadStorage() {
