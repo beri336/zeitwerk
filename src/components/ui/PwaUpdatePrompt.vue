@@ -1,6 +1,7 @@
 <!-- src/components/ui/PwaUpdatePrompt.vue -->
 
 <template>
+
     <Teleport to="body">
         <div v-if="needRefresh" class="pwa-banner">
             <div class="pwa-banner__text">
@@ -8,14 +9,14 @@
                     <polyline points="23 4 23 10 17 10" />
                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
                 </svg>
-                New version available
+                {{ $t('pwa.new_version') }}
             </div>
             <div class="pwa-banner__actions">
                 <button class="btn btn-primary btn-sm" @click="update">
-                    Update now
+                    {{ $t('pwa.update_now') }}
                 </button>
                 <button class="btn btn-ghost btn-sm" @click="needRefresh = false">
-                    Later
+                    {{ $t('pwa.later') }}
                 </button>
             </div>
         </div>
@@ -24,6 +25,9 @@
 
 <script setup>
 import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const { needRefresh, updateServiceWorker } = useRegisterSW({
     onRegistered(r) {

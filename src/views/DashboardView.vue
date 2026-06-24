@@ -2,16 +2,23 @@
 
 <template>
   <main class="main">
-    <h1>Dashboard</h1>
+    <h1>{{ $t("nav.dashboard") }}</h1>
 
     <!-- PWA Banner -->
     <div v-if="isPWA" class="pwa-banner">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <path d="M12 2L2 7l10 5 10-5-10-5z" />
         <path d="M2 17l10 5 10-5" />
         <path d="M2 12l10 5 10-5" />
       </svg>
-      PWA Mode
+      {{ $t("dashboard.pwa_mode") }}
     </div>
 
     <Dashboard />
@@ -19,12 +26,17 @@
 </template>
 
 <script setup>
-import Dashboard from '@/components/features/DashboardCard.vue'
-import { computed } from 'vue'
+import Dashboard from "@/components/features/DashboardCard.vue";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-const isPWA = computed(() =>
-  window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone
-)
+const { t } = useI18n();
+
+const isPWA = computed(
+  () =>
+    window.matchMedia("(display-mode: standalone)").matches ||
+    !!window.navigator.standalone,
+);
 </script>
 
 <style scoped>
@@ -51,7 +63,7 @@ const isPWA = computed(() =>
 
 .main h1::before,
 .main h1::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-border);

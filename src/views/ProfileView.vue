@@ -2,13 +2,16 @@
 
 <template>
   <main class="main">
-    <h1>Profile</h1>
+    <h1>{{ $t("nav.profile") }}</h1>
     <ProfileCard />
   </main>
 </template>
 
 <script setup>
-import ProfileCard from '@/components/features/ProfileCard.vue'
+import ProfileCard from "@/components/features/ProfileCard.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <style scoped>
@@ -39,7 +42,7 @@ import ProfileCard from '@/components/features/ProfileCard.vue'
 
 .main h1::before,
 .main h1::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-border);

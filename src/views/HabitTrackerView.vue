@@ -2,13 +2,16 @@
 
 <template>
   <main class="main">
-    <h1>Habit Tracker</h1>
+    <h1>{{ $t("nav.habits") }}</h1>
     <HabitTrackerCard />
   </main>
 </template>
 
 <script setup>
-import HabitTrackerCard from '@/components/features/HabitTrackerCard.vue'
+import HabitTrackerCard from "@/components/features/HabitTrackerCard.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <style scoped>
@@ -39,7 +42,7 @@ import HabitTrackerCard from '@/components/features/HabitTrackerCard.vue'
 
 .main h1::before,
 .main h1::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-border);
@@ -49,7 +52,8 @@ import HabitTrackerCard from '@/components/features/HabitTrackerCard.vue'
 /* Mobile */
 @media (max-width: 767px) {
   .main {
-    padding: var(--space-3) var(--space-3, 0.75rem) calc(var(--space-3) + env(safe-area-inset-bottom));
+    padding: var(--space-3) var(--space-3, 0.75rem)
+      calc(var(--space-3) + env(safe-area-inset-bottom));
     gap: var(--space-3);
   }
 
@@ -61,7 +65,8 @@ import HabitTrackerCard from '@/components/features/HabitTrackerCard.vue'
 /* Small Mobile */
 @media (max-width: 420px) {
   .main {
-    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+    padding: var(--space-2) var(--space-2)
+      calc(var(--space-2) + env(safe-area-inset-bottom));
     gap: var(--space-2);
   }
 }

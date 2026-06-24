@@ -2,13 +2,16 @@
 
 <template>
   <main class="main">
-    <h1>Live Tracking</h1>
+    <h1>{{ $t("nav.live") }}</h1>
     <LiveTrackerCard />
   </main>
 </template>
 
 <script setup>
-import LiveTrackerCard from '@/components/features/LiveTrackerCard.vue'
+import LiveTrackerCard from "@/components/features/LiveTrackerCard.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <style scoped>
@@ -35,7 +38,7 @@ import LiveTrackerCard from '@/components/features/LiveTrackerCard.vue'
 
 .main h1::before,
 .main h1::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-border);

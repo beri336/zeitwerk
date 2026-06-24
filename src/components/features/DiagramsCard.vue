@@ -9,14 +9,14 @@
                 <line x1="12" y1="20" x2="12" y2="4" />
                 <line x1="6" y1="20" x2="6" y2="14" />
             </svg>
-            <h3>No data for {{ store.currMonthLabel }}</h3>
-            <p>Add entries for this month to see your charts.</p>
+            <h3>{{ $t('diagrams.empty_title', { month: store.currMonthLabel }) }}</h3>
+            <p>{{ $t('diagrams.empty_sub') }}</p>
         </div>
 
         <template v-else>
 
             <!-- Section: This Month -->
-            <div class="section-label">This Month</div>
+            <div class="section-label">{{ $t('diagrams.this_month') }}</div>
             <div class="charts-wide">
                 <WeekBarChart />
                 <RunningBalanceChart />
@@ -29,14 +29,12 @@
                 <GrossEarningsChart v-if="store.grossHourlyRate > 0" />
                 <p v-if="store.grossHourlyRate === 0"
                     style="color: var(--color-text-muted); font-size: var(--text-sm); border: 1px solid var(--color-border); padding: var(--space-4); border-radius: var(--space-2);">
-                    Set your 'Gross Monthly Salary (Brutto)' in the <a href="/#/settings"
-                        style="color: var(--color-link); text-decoration: underline;">settings</a> to see earnings
-                    charts.
+                    {{ $t('diagrams.gross_hint_pre') }} <a href="/#/settings" style="color: var(--color-link); text-decoration: underline;">{{ $t('nav.settings') }}</a> {{ $t('diagrams.gross_hint_post') }}
                 </p>
             </div>
 
             <!-- Section: This Year -->
-            <div class="section-label">This Year</div>
+            <div class="section-label">{{ $t('diagrams.this_year') }}</div>
             <div class="charts-wide">
                 <MonthOverviewChart />
                 <MonthComparisonChart />
@@ -44,9 +42,7 @@
                 <YearlyGrossChart v-if="store.grossHourlyRate > 0" />
                 <p v-if="store.grossHourlyRate === 0"
                     style="color: var(--color-text-muted); font-size: var(--text-sm); border: 1px solid var(--color-border); padding: var(--space-4); border-radius: var(--space-2);">
-                    Set your 'Gross Monthly Salary (Brutto)' in the <a href="/#/settings"
-                        style="color: var(--color-link); text-decoration: underline;">settings</a> to see earnings
-                    charts.
+                    {{ $t('diagrams.gross_hint_pre') }} <a href="/#/settings" style="color: var(--color-link); text-decoration: underline;">{{ $t('nav.settings') }}</a> {{ $t('diagrams.gross_hint_post') }}
                 </p>
             </div>
         </template>
@@ -57,6 +53,7 @@
 import { computed, watch } from 'vue'
 import { useZeitwerkStore, chartExportTrigger } from '@/stores/zeitwerk'
 import { useChartExport } from '@/composables/useChartExport'
+import { useI18n } from 'vue-i18n'
 
 import WeekBarChart from '@/components/charts/WeekBarChart.vue'
 import MonthOverviewChart from '@/components/charts/MonthOverviewChart.vue'
@@ -70,6 +67,7 @@ import DayLengthHistogramChart from '@/components/charts/DayLengthHistogramChart
 import GrossEarningsChart from '@/components/charts/GrossEarningsChart.vue'
 
 const store = useZeitwerkStore()
+const { t, locale } = useI18n()
 const hasData = computed(() => store.entriesForMonth.length > 0)
 const { exportAllCharts } = useChartExport()
 

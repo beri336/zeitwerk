@@ -1,0 +1,462 @@
+{
+    "app": {
+        "title": "Zeitwerk"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "livetracking": "Live Tracking",
+        "month": "Month Overview",
+        "year": "Year Overview",
+        "calendar": "Calendar",
+        "todo": "To-Do List",
+        "diagrams": "Diagrams",
+        "habits": "Habit Tracker",
+        "export": "Export",
+        "profile": "Profile",
+        "settings": "Settings"
+    },
+    "pwa": {
+        "mode-enabled": "PWA Mode"
+    },
+    "common": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "create": "Create",
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "update": "Update",
+        "close": "Close",
+        "today": "Today",
+        "from": "From",
+        "to": "To",
+        "yes": "Yes",
+        "no": "No",
+        "all": "All",
+        "none": "None",
+        "total": "Total",
+        "planned": "Planned",
+        "actual": "Actual",
+        "entries": "Entries",
+        "entry_one": "{count} entry",
+        "entry_other": "{count} entries"
+    },
+    "type": {
+        "on-site": "On Site",
+        "home-office": "Homeoffice",
+        "vacation": "Vacation",
+        "sick": "Sick",
+        "pub-hol": "Public Holiday",
+        "other": "Other"
+    },
+    "topbar": {
+        "import": "Import",
+        "export": "Export",
+        "csv": "CSV"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "btn-add-entry": "Add new Entry",
+        "month": {
+            "title": "Month Overview",
+            "actual": "Month Actual",
+            "diff": "Month Difference",
+            "overtime": "Overtime",
+            "missed-hours": "Missed Hours",
+            "week_actual": "Week Actual",
+            "avg_hours": "Ø Hours / Day",
+            "avg_sub": "Daily average",
+            "active_days": "Active Days",
+            "active_sub": "Days worked",
+            "longest": "Longest Day",
+            "gross": "Month Gross",
+            "gross_sub": "Gross earnings",
+            "vac_used": "Used Vacation",
+            "vac_used_sub": "Days taken",
+            "vac_left": "Remaining Vacation",
+            "vac_left_sub": "Days left",
+            "work_days": "Work Days",
+            "daily_average": "Daily Average"
+        },
+        "year": {
+            "title": "Year Overview",
+            "months": "Months With Entries",
+            "missed-hours": "Missed Hours",
+            "diff": "Year Difference",
+            "overtime": "Overtime",
+            "gross": "Year Gross",
+            "gross_sub": "Gross earnings",
+            "vac_used": "Used Vacation",
+            "vac_left": "Remaining Vacation",
+            "vac_day_left_sub": "Day left",
+            "vac_days_left_sub": "Days left",
+            "vac_used_sub": "Days taken"
+        },
+        "table": {
+            "date": "Date",
+            "time_entries": "Time Entries",
+            "pauses": "Pauses",
+            "actual": "Actual (Day)",
+            "planned": "Planned (Day)",
+            "notes": "Notes",
+            "actions": "Actions",
+            "week_total": "KW {week} Week Total",
+            "month_total": "Month Total"
+        },
+        "working_time": "Working time {date}",
+        "toast_added": "Entry added."
+    },
+    "entry_modal": {
+        "title_new": "New Entry",
+        "title_edit": "Edit Entry",
+        "date": "Date",
+        "planned_hours": "Planned Hours (h/Day)",
+        "preview_salary": "Preview Salary {val}",
+        "time_entries": "Time Entries",
+        "block": "Block {n}",
+        "start": "Start",
+        "end": "End",
+        "remove": "Remove Entry",
+        "pause": "Pause (min)",
+        "add_entry": "Add new time entry",
+        "vac_hint": "Actual is automatically interpreted as Planned",
+        "notes": "Notes",
+        "notes_hint": "e.g.,",
+        "remarks": "Remarks",
+        "remarks_hint": "Longer daily notes, observations, notable events ...",
+        "preview_total": "Preview Actual Total",
+        "summary_one": "over {count} entry",
+        "summary_other": "over {count} entries",
+        "delete_confirm": "Are you sure you want to delete this entry?",
+        "delete_confirm_yes": "Yes, delete"
+    },
+    "live": {
+        "title": "Live Tracking",
+        "subtitle": "Start your day with one click.",
+        "not_started": "Not started",
+        "tracked_today": "{val} today",
+        "start_work": "Start work",
+        "blocks_title": "Today's blocks",
+        "break_30": "30 min break",
+        "total_tracked": "Total tracked",
+        "status_working": "Working",
+        "started_at": "Started {time}",
+        "goal_reached": "Goal reached",
+        "start_break": "Start break",
+        "finish_day": "Finish day",
+        "running": "running",
+        "break_duration": "Break {val}",
+        "on_break": "On break",
+        "resume": "Resume work",
+        "toast_started": "Work started.",
+        "toast_overtime": "Over 8h worked - consider wrapping up.",
+        "toast_break": "Break started.",
+        "toast_finished": "Work day finished. Great job!",
+        "started": "Started",
+        "no_sessions": "No sessions yet today.",
+        "on_working_session": "Your work session is currently running.",
+        "on_break_session": "Your work is paused right now.",
+        "not_started_session": "Start your day with one click.",
+        "left_time": "{time}m left"
+    },
+    "month": {
+        "title": "Month Overview",
+        "hint": "Tap a day to add or edit an entry.",
+        "working_days": "Working Days",
+        "actual": "Month Actual",
+        "planned": "Month Planned",
+        "diff": "Difference",
+        "toast_added": "Entry added.",
+        "toast_updated": "Entry updated."
+    },
+    "year": {
+        "title": "Year Overview",
+        "this_year": "This year",
+        "hint": "Tap a day to open or create an entry. Colored days indicate tracked work, absences, or public holidays.",
+        "entry_one": "{count} entry",
+        "entry_other": "{count} entries"
+    },
+    "calendar": {
+        "title": "Calendar",
+        "appointments": "Appointments",
+        "event": "{count} Event | {count} Events",
+        "more": "more",
+        "all_day": "All day",
+        "views": {
+            "month": "Month",
+            "week": "Week",
+            "agenda": "Agenda"
+        },
+        "no_events": "No appointments this month.",
+        "modal": {
+            "title_new": "New Appointment",
+            "name": "Title *",
+            "name_hint": "e.g., Team Meeting",
+            "desc": "Description",
+            "desc_hint": "Optional Details...",
+            "date": "Date *",
+            "allday": "All-Day",
+            "time_from": "From",
+            "time_to": "To",
+            "location": "Location",
+            "location_hint": "Address or Online Link",
+            "color": "Color",
+            "tags": "Tags",
+            "tags_hint": "Tag + Enter",
+            "reminder": "Reminder",
+            "reminder_none": "None",
+            "reminder_0": "At the time",
+            "reminder_5": "5 minutes before",
+            "reminder_15": "15 minutes before",
+            "reminder_30": "30 minutes before",
+            "reminder_60": "1 hour before",
+            "reminder_1440": "1 day before",
+            "edit_appointment": "Edit Appointment",
+            "delete_appointment": "Delete Appointment",
+            "new_appointment": "New Appointment"
+        }
+    },
+    "todo": {
+        "title": "To-Do's Overview",
+        "all_done": "All done!",
+        "add_btn": "Add new To-Do",
+        "empty": "No tasks yet. Add one!",
+        "pending_one": "{count} pending",
+        "pending_other": "{done} of {total} pending",
+        "filter": {
+            "all": "All",
+            "open": "Open",
+            "done": "Done",
+            "urgent": "Urgent",
+            "overdue": "Overdue"
+        },
+        "sort": {
+            "created": "Created",
+            "due": "Due Date",
+            "priority": "Priority"
+        },
+        "priority": {
+            "low": "Low",
+            "middle": "Middle",
+            "high": "High"
+        },
+        "urgent": "Urgent",
+        "modal": {
+            "title_new": "Task Create",
+            "title_sub": "Subtask Create",
+            "name": "Title *",
+            "name_hint": "Describe your task...",
+            "date": "Date",
+            "time": "Time",
+            "link": "Link",
+            "tags": "Tags",
+            "tags_hint": "Enter the tag + press Enter",
+            "priority": "Priority",
+            "urgent": "Urgent"
+        }
+    },
+    "diagrams": {
+        "title": "Diagrams",
+        "this_month": "This Month",
+        "this_year": "This Year",
+        "charts": {
+            "week_bar": {
+                "title": "Actual vs. Planned",
+                "planned": "Planned (h)",
+                "actual": "Actual (h)"
+            },
+            "balance": {
+                "title": "Running Balance",
+                "sub": "Cumulative overtime {date}"
+            },
+            "weekday": {
+                "title": "Avg. Hours by Weekday",
+                "sub": "{date} Weekdays vs. Weekend"
+            },
+            "histogram": {
+                "title": "Day Length Distribution",
+                "sub": "How long were your workdays {date}",
+                "day_one": "{count} day",
+                "day_other": "{count} days"
+            },
+            "breakdown": {
+                "title": "Entry Breakdown",
+                "sub_one": "{count} entry {date}",
+                "sub_other": "{count} entries {date}"
+            },
+            "gross_week": {
+                "title": "Gross Earnings by Week",
+                "sub": "{date} Privacy-masked"
+            },
+            "comparison": {
+                "title": "6-Month Comparison",
+                "sub": "Actual vs. Planned - last 6 months",
+                "actual": "Actual",
+                "diff": "Diff",
+                "planned": "Planned"
+            },
+            "yearly_overtime": {
+                "title": "Yearly Overtime Balance",
+                "sub": "Cumulative overtime {year}",
+                "cumulative": "Cumulative (h)",
+                "monthly": "Monthly diff (h)"
+            },
+            "yearly_gross": {
+                "title": "Yearly Gross Earning",
+                "sub": "{year} Total: {val} € (masked)",
+                "trend": "Trend",
+                "gross": "Gross (€)"
+            }
+        }
+    },
+    "profile": {
+        "title": "Profile",
+        "no_contact": "No contact info yet. Click \"Edit Profile\" to add some.",
+        "status": {
+            "available": "Available",
+            "busy": "Busy",
+            "away": "Away"
+        },
+        "modal": {
+            "title": "Edit Profile",
+            "name": "Display Name",
+            "role": "Role / Title",
+            "location": "Location",
+            "status": "Status",
+            "bio": "Bio",
+            "bio_hint": "A few words about you...",
+            "email": "E-Mail",
+            "phone": "Phone",
+            "website": "Website",
+            "github": "GitHub Username",
+            "skills": "Skills",
+            "skills_hint": "Enter skill + press Enter"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "defaults_title": "Defaults",
+        "defaults_sub": "These values will be automatically applied to new entries.",
+        "fields": {
+            "hours_day": "Working Hours / Day (Planned)",
+            "hours_day_hint": "e.g., 8 for 8h/Day",
+            "hours_week": "Working Hours / Week (Planned)",
+            "hours_week_hint": "e.g., 40 for 40h/Week",
+            "break": "Default Break (min)",
+            "break_sub": "Will be automatically entered",
+            "work_days": "Working Days / Week",
+            "work_days_hint": "e.g., 5 for Mon–Fri",
+            "state": "State",
+            "state_sub": "For automatic holiday detection",
+            "vacation": "Vacation Days / Year",
+            "vacation_hint": "e.g., 30 for 30 vacation days/year",
+            "salary": "Gross Monthly Salary (Brutto)",
+            "salary_hint": "e.g., 3000 for 3000€/Month",
+            "salary_sub": "Used to calculate gross hourly and daily earnings",
+            "auto_stop": "Auto-Stop After (h)",
+            "auto_stop_sub": "Work session stops automatically",
+            "overtime_warn": "Overtime Warning After (h)",
+            "auto_pause": "Auto-Pause After Inactivity (min)",
+            "auto_pause_hint": "e.g., 30 = pause after 30 min no input"
+        },
+        "preview": {
+            "title": "Preview",
+            "formula": "Hourly rate = monthly salary ÷ 4 weeks ÷ 5 days ÷ 8h",
+            "hourly": "{val} €/h gross",
+            "daily": "{val} €/day gross"
+        },
+        "privacy": {
+            "title": "Privacy Mode",
+            "visible": "All numbers are visible.",
+            "hidden": "The salary is now masked and are hidden."
+        },
+        "notifications": {
+            "title": "Notifications",
+            "sub": "Choose when Zeitwerk sends you alerts.",
+            "allow_text": "Zeitwerk needs permission to send you alerts for overtime, inactivity, and habit reminders.",
+            "allow_btn": "Allow Notifications",
+            "blocked": "Notifications blocked",
+            "blocked_sub": "Permission: denied",
+            "blocked_desc": "Your browser is blocking notifications for this site. Follow the steps below to enable them, then reload the page.",
+            "how_to": "How to enable notifications",
+            "hide": "Hide instructions",
+            "granted": "Notifications allowed | Permission: granted",
+            "enable": "Enable Notifications",
+            "enable_sub": "Tick to enable your notifications",
+            "overtime": "Overtime Warning",
+            "overtime_sub": "Alert when exceeding your overtime threshold",
+            "inactivity": "Inactivity Auto-Pause",
+            "inactivity_sub": "Notify when timer is paused due to inactivity",
+            "habit": "Daily Habit Reminder",
+            "habit_sub": "Remind you to check your habits each day"
+        },
+        "danger": {
+            "title": "Danger Zone",
+            "sub": "Delete all stored entries permanently. This action cannot be undone.",
+            "storage": "LocalStorage Usage: {val}",
+            "btn": "Delete all entries",
+            "confirm_text": "You are about to permanently remove all tracked entries, including work days, absences, and imported holidays.",
+            "confirm_label": "Type DELETE to confirm",
+            "confirm_btn": "Yes, delete everything"
+        }
+    },
+    "export": {
+        "title": "Export",
+        "sub": "Export your data in different formats",
+        "scope": {
+            "title": "Scope",
+            "sub": "What data do you want to export?",
+            "range": "Range",
+            "include": "Include"
+        },
+        "include": {
+            "entries": "Work Entries",
+            "absences": "Absences",
+            "summary": "Summary / KPIs",
+            "gross": "Gross Earnings"
+        },
+        "format": {
+            "title": "Format",
+            "sub": "Choose your export format",
+            "csv_desc": "Spreadsheet-compatible, Excel/Sheets ready",
+            "json_desc": "Raw data, developer-friendly, full backup",
+            "pdf_desc": "Download HTML → open → Ctrl+P → Save as PDF",
+            "clip_desc": "Copy as tab-separated table"
+        },
+        "btn": {
+            "export": "Export",
+            "copy": "Copy",
+            "copied": "Copied ✓"
+        }
+    },
+    "habits": {
+        "title": "Habit Tracker Overview",
+        "today_count": "{done}/{total} today",
+        "add_btn": "Add Habit",
+        "empty": "No habits yet. Start building a routine! 💪",
+        "streak_one": "{count} day streak",
+        "streak_other": "{count} day streak",
+        "stats": {
+            "this_week": "This Week",
+            "best_streak": "Best Streak",
+            "week_rate": "This week rate"
+        },
+        "freq": {
+            "daily": "Daily",
+            "weekdays": "Weekdays",
+            "weekend": "Weekend"
+        },
+        "modal": {
+            "title_new": "New Habit",
+            "title_edit": "Edit Habit",
+            "icon": "Icon",
+            "name": "Habit Name *",
+            "name_hint": "e.g., Morning Run",
+            "goal": "Goal / Description",
+            "goal_hint": "e.g., 30 min, 2km, 8 glasses",
+            "color": "Color",
+            "frequency": "Frequency"
+        }
+    }
+}

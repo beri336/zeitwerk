@@ -88,7 +88,7 @@ export function today() {
 }
 
 export const MONTH_NAMES = [
-    'January',
+    'Januar',
     'February',
     'March',
     'April',

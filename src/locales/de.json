@@ -1,0 +1,611 @@
+{
+    "absence": {
+        "on-site": "Vor Ort",
+        "homeoffice": "Homeoffice",
+        "vacation": "Urlaub",
+        "sick": "Krank",
+        "publicholiday": "Feiertag",
+        "other": "Sonstiges"
+    },
+    "monthTable": {
+        "title": "Arbeitszeit {month}",
+        "actual": "Ist",
+        "planned": "Plan",
+        "empty_title": "Keine Einträge für {month}",
+        "empty_sub": "Füge deinen ersten Zeiteintrag hinzu.",
+        "col_date": "Datum",
+        "col_time_entries": "Zeitblöcke",
+        "col_pauses": "Pausen",
+        "col_actual_day": "Ist (Tag)",
+        "col_planned_day": "Plan (Tag)",
+        "col_notes": "Notizen",
+        "col_actions": "Aktionen",
+        "pauses_value": "{minutes} Min",
+        "week_total": "KW {week} · Wochen­summe",
+        "month_total": "Monats­summe",
+        "toast_deleted": "Eintrag gelöscht."
+    },
+    "holidays": {
+        "title": "Feiertage",
+        "state_label": "Bundesland",
+        "state_hint": "Wird in den Einstellungen gespeichert",
+        "preview_label": "Feiertage in {month}",
+        "preview_count": "{count} gefunden",
+        "none": "Keine gesetzlichen Feiertage in diesem Monat für {state}.",
+        "badge_available": "vorhanden",
+        "badge_new": "neu",
+        "auto_hint": "Feiertage werden automatisch hinzugefügt, wenn du das Bundesland in den Einstellungen änderst.",
+        "import_btn": "Feiertage importieren",
+        "toast_all_exist": "Alle {count} Feiertage sind bereits vorhanden.",
+        "toast_added": "{added} Feiertage hinzugefügt.",
+        "toast_added_skipped": "{added} Feiertage hinzugefügt, {skipped} übersprungen."
+    },
+    "csv": {
+        "title": "CSV exportieren",
+        "subtitle": "Wähle einen Monat oder einen Monatsbereich.",
+        "close_aria": "Exportdialog schließen",
+        "from_month": "Von Monat",
+        "to_month": "Bis Monat",
+        "only_this_month": "Nur diesen Monat exportieren",
+        "submit": "CSV exportieren"
+    },
+    "entry": {
+        "title_new": "Neuer Eintrag",
+        "title_edit": "Eintrag bearbeiten",
+        "date_label": "Datum *",
+        "planned_label": "Geplante Stunden (h/Tag)",
+        "preview_salary": "Gehaltsvorschau",
+        "time_entries": "Zeitblöcke",
+        "block_label": "Block {index}",
+        "start": "Start",
+        "end": "Ende",
+        "pause": "Pause (Min)",
+        "remove_block": "Block entfernen",
+        "add_block": "Neuen Zeitblock hinzufügen",
+        "absence_hint": "{label} — Ist-Stunden werden automatisch als Plan ({hours}h) interpretiert",
+        "notes": "Notizen",
+        "notes_placeholder": "z. B. {label}",
+        "notes_placeholder_vac": "z. B. {label}, genehmigt",
+        "remarks": "Bemerkungen",
+        "remarks_placeholder": "Längere Tagesnotizen, Beobachtungen, besondere Ereignisse ...",
+        "preview_actual_label": "Vorschau Ist-Gesamt:",
+        "preview_actual_hint": "über {count} Einträge",
+        "delete_confirm": "Möchtest du diesen Eintrag wirklich löschen?",
+        "toast_deleted": "Eintrag gelöscht.",
+        "toast_updated": "Eintrag aktualisiert.",
+        "toast_added": "Eintrag hinzugefügt.",
+        "error_no_date": "Bitte wähle ein Datum."
+    },
+    "pwa": {
+        "new_version": "Neue Version verfügbar",
+        "update_now": "Jetzt aktualisieren",
+        "later": "Später"
+    },
+    "notifications": {
+        "title": "Benachrichtigungen",
+        "sub": "Lege fest, wann Zeitwerk dir Hinweise schickt.",
+        "unsupported": "Dein Browser unterstützt keine Benachrichtigungen.",
+        "permission_label": "Berechtigung: {status}",
+        "denied": {
+            "title": "Benachrichtigungen blockiert",
+            "sub": "Dein Browser blockiert Benachrichtigungen für diese Seite. Folge den Schritten unten, um sie zu aktivieren, und lade die Seite anschließend neu.",
+            "show": "Wie Benachrichtigungen aktiviert werden",
+            "hide": "Anleitung ausblenden"
+        },
+        "default": {
+            "title": "Benachrichtigungen erlauben",
+            "sub": "Zeitwerk benötigt die Berechtigung, um dich bei Überstunden, Inaktivität und Gewohnheits-Erinnerungen zu benachrichtigen.",
+            "btn": "Benachrichtigungen erlauben"
+        },
+        "granted": {
+            "title": "Benachrichtigungen erlaubt"
+        },
+        "master": {
+            "label": "Benachrichtigungen aktivieren",
+            "hint": "Aktiviere, um Benachrichtigungen zu erhalten"
+        },
+        "overtime": {
+            "label": "Überstunden-Warnung",
+            "hint": "Hinweis, wenn du deinen Überstunden­schwellenwert überschreitest"
+        },
+        "inactivity": {
+            "label": "Inaktivitäts-Auto­pause",
+            "hint": "Benachrichtigen, wenn der Timer wegen Inaktivität pausiert"
+        },
+        "habit": {
+            "label": "Tägliche Gewohnheits-Erinnerung",
+            "hint": "Erinnert dich täglich daran, deine Gewohnheiten zu prüfen",
+            "time": "Erinnerungszeit"
+        },
+        "howto": {
+            "chrome": {
+                "name": "Chrome / Edge",
+                "step1": "Klicke auf das Schloss-Symbol in der Adressleiste",
+                "step2": "Klicke auf „Website-Einstellungen“",
+                "step3": "Setze „Benachrichtigungen“ auf „Zulassen“",
+                "step4": "Lade die Seite neu"
+            },
+            "firefox": {
+                "name": "Firefox",
+                "step1": "Klicke auf das Schloss-Symbol in der Adressleiste",
+                "step2": "Klicke auf den Pfeil neben „Verbindung sicher“",
+                "step3": "Klicke auf „Weitere Informationen“ → „Berechtigungen“",
+                "step4": "Entferne die Blockierung für Benachrichtigungen",
+                "step5": "Lade die Seite neu"
+            },
+            "safari": {
+                "name": "Safari (Mac)",
+                "step1": "Öffne Safari → Einstellungen → Websites",
+                "step2": "Wähle „Mitteilungen“ in der Seitenleiste",
+                "step3": "Suche diese Seite und setze sie auf „Erlauben“",
+                "step4": "Lade die Seite neu"
+            }
+        }
+    },
+    "device": {
+        "pwa": "PWA",
+        "online": "Online",
+        "offline": "Offline",
+        "retina": "Retina",
+        "touch": "Touch",
+        "no_touch": "Kein Touch",
+        "cores": "{count} Kerne",
+        "ram": "{gb} GB RAM",
+        "dpr": "{ratio}× DPR"
+    },
+    "topbar": {
+        "dashboard": "Dashboard",
+        "livetracking": "Live-Tracking",
+        "month": "Monatsübersicht",
+        "calendar": "Kalender",
+        "todo": "To-Do-Liste",
+        "year": "Jahresübersicht",
+        "diagrams": "Diagramme & Statistiken",
+        "profile": "Profil",
+        "settings": "Einstellungen",
+        "habits": "Gewohnheiten",
+        "export": "Export",
+        "switch_view": "Ansicht wechseln",
+        "export_charts": "Diagramme exportieren",
+        "export_png": "Als PNG exportieren",
+        "export_jpg": "Als JPG exportieren",
+        "import_json": "JSON importieren",
+        "export_json": "JSON exportieren",
+        "export_csv": "CSV exportieren",
+        "github": "Quellcode auf GitHub ansehen",
+        "light_mode": "Heller Modus",
+        "dark_mode": "Dunkler Modus",
+        "privacy_show": "Zahlen anzeigen",
+        "privacy_hide": "Zahlen ausblenden",
+        "toast_export_ok": "Export erfolgreich.",
+        "toast_export_err": "Export fehlgeschlagen.",
+        "toast_csv_ok": "CSV-Export erfolgreich.",
+        "toast_csv_err": "CSV-Export fehlgeschlagen.",
+        "toast_import_ok": "Import erfolgreich.",
+        "toast_import_err": "Fehler beim Import."
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "live": "Live-Tracker",
+        "month": "Monat",
+        "year": "Jahr",
+        "calendar": "Kalender",
+        "todo": "To-Do",
+        "stats": "Statistiken",
+        "profile": "Profil",
+        "settings": "Einstellungen",
+        "habits": "Gewohnheiten",
+        "export": "Export",
+        "more": "Mehr",
+        "drawer_title": "Navigation",
+        "month_overview": "Monatsübersicht",
+        "year_overview": "Jahresübersicht",
+        "diagrams": "Diagramme"
+    },
+    "year": {
+        "title": "Jahresübersicht",
+        "this_year": "Dieses Jahr",
+        "hint": "Tippe auf einen Tag, um einen Eintrag zu öffnen oder zu erstellen. Farbige Tage zeigen erfasste Arbeit, Abwesenheiten oder Feiertage."
+    },
+    "todos": {
+        "title": "To-Do-Übersicht",
+        "add_btn": "Neues To-Do hinzufügen",
+        "add_subtask": "Unteraufgabe hinzufügen",
+        "badge_pending": "{count} offen",
+        "badge_done": "Alles erledigt!",
+        "subtask_count": "{done}/{total} Unteraufgaben",
+        "footer_pending": "{remaining} von {total} offen",
+        "clear_completed": "Erledigte löschen ({count})",
+        "filter": {
+            "all": "Alle",
+            "open": "Offen",
+            "done": "Erledigt",
+            "urgent": "Dringend",
+            "overdue": "Überfällig"
+        },
+        "sort": {
+            "created": "Erstellt",
+            "due": "Fälligkeitsdatum",
+            "priority": "Priorität"
+        },
+        "priority": {
+            "low": "Niedrig",
+            "middle": "Mittel",
+            "high": "Hoch"
+        },
+        "empty": {
+            "all": "Noch keine Aufgaben. Lege eine an!",
+            "open": "Alles erledigt! 🎉",
+            "done": "Bisher ist nichts erledigt. Leg los! 💪",
+            "urgent": "Keine dringenden Aufgaben.",
+            "overdue": "Nichts überfällig. 👍"
+        },
+        "modal": {
+            "type_task": "Aufgabe",
+            "type_sub": "Unteraufgabe",
+            "title_label": "Titel *",
+            "title_hint": "Beschreibe deine Aufgabe ...",
+            "link": "Link",
+            "tags_hint": "Tag eingeben + Enter drücken",
+            "priority": "Priorität",
+            "urgent": "Dringend"
+        }
+    },
+    "settings": {
+        "title": "Standardwerte",
+        "source_code": "Quellcode:",
+        "sub": "Diese Werte werden automatisch auf neue Einträge angewendet.",
+        "toast_saved": "Einstellungen gespeichert.",
+        "toast_reset": "Einstellungen zurückgesetzt.",
+        "toast_deleted": "Alle Einträge gelöscht.",
+        "toast_state": "Bundesland auf {state} geändert – Feiertage aktualisiert.",
+        "storage_usage": "LocalStorage-Nutzung",
+        "preview_hourly": "{val} €/h brutto",
+        "preview_daily": "{val} €/Tag brutto",
+        "fields": {
+            "hours_day": "Arbeitsstunden / Tag (Plan)",
+            "hours_week": "Arbeitsstunden / Woche (Plan)",
+            "default_break": "Standardpause (Min)",
+            "work_days": "Arbeitstage / Woche",
+            "state": "Bundesland",
+            "vacation_days": "Urlaubstage / Jahr",
+            "gross_salary": "Bruttogehalt pro Monat",
+            "autostop": "Auto-Stopp nach (h)",
+            "overtime_warn": "Überstundenwarnung nach (h)",
+            "inactivity": "Auto-Pause nach Inaktivität (Min)",
+            "preview": "Vorschau",
+            "language": "Sprache"
+        },
+        "hints": {
+            "hours_day": "z.B. 8 für 8h/Tag",
+            "hours_week": "z.B. 40 für 40h/Woche",
+            "default_break": "Wird automatisch eingetragen",
+            "work_days": "z.B. 5 für Mo–Fr",
+            "state": "Für automatische Feiertagserkennung",
+            "vacation_days": "z.B. 30 für 30 Urlaubstage/Jahr",
+            "gross_salary": "z.B. 3000 für 3000 €/Monat",
+            "gross_salary_sub": "Wird zur Berechnung des brutto Stunden- und Tagessatzes verwendet",
+            "autostop": "Arbeitssitzung stoppt automatisch",
+            "inactivity": "z.B. 30 = Pause nach 30 Min ohne Eingabe",
+            "preview": "Stundensatz = Monatsgehalt ÷ 4 Wochen ÷ {days} Tage ÷ {hours}h"
+        },
+        "privacy": {
+            "label": "Privatsphäre-Modus",
+            "on": "Das Gehalt wird jetzt maskiert und verborgen.",
+            "off": "Alle Zahlen sind sichtbar.",
+            "enable": "Privatsphäre-Modus aktivieren",
+            "disable": "Privatsphäre-Modus deaktivieren"
+        },
+        "danger": {
+            "title": "Gefahrenzone",
+            "sub": "Alle gespeicherten Einträge dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+            "delete_btn": "Alle Einträge löschen",
+            "warning": "Du bist dabei, alle erfassten Einträge dauerhaft zu entfernen – inklusive Arbeitstagen, Abwesenheiten und importierten Feiertagen.",
+            "confirm_label": "Tippe",
+            "confirm_btn": "Ja, alles löschen"
+        }
+    },
+    "profile": {
+        "edit_btn": "Profil bearbeiten",
+        "avatar_change": "Bild ändern",
+        "placeholder_name": "Dein Name",
+        "placeholder_role": "Rolle / Titel",
+        "about": "Über dich",
+        "contact": "Kontakt",
+        "contact_empty": "Noch keine Kontaktinfos. Klicke auf „Profil bearbeiten“, um welche hinzuzufügen.",
+        "skills": "Fähigkeiten",
+        "status": {
+            "none": "Keiner",
+            "available": "Verfügbar",
+            "busy": "Beschäftigt",
+            "away": "Abwesend"
+        },
+        "fields": {
+            "display_name": "Anzeigename",
+            "role": "Rolle / Titel",
+            "location": "Ort",
+            "status": "Status",
+            "bio": "Kurzbeschreibung",
+            "email": "E‑Mail",
+            "phone": "Telefon",
+            "website": "Website",
+            "github": "GitHub-Benutzername"
+        },
+        "placeholders": {
+            "role": "Softwareentwickler",
+            "location": "Stuttgart, DE",
+            "bio": "Ein paar Worte über dich ...",
+            "email": "mail@example.com",
+            "phone": "+49 123 456789",
+            "skills": "Fähigkeit eingeben + Enter"
+        }
+    },
+    "month": {
+        "title": "Monatsübersicht",
+        "hint": "Tippe auf einen Tag, um einen Eintrag hinzuzufügen oder zu bearbeiten.",
+        "working_days": "Arbeitstage",
+        "actual": "Monat Ist",
+        "planned": "Monat Plan",
+        "diff": "Differenz",
+        "toast_added": "Eintrag hinzugefügt.",
+        "toast_updated": "Eintrag aktualisiert."
+    },
+    "live": {
+        "progress_title": "von {hours}h Ziel",
+        "title": "Live-Tracking",
+        "subtitle": "Starte deinen Tag mit einem Klick.",
+        "not_started": "Nicht gestartet",
+        "tracked_today": "{val} heute",
+        "start_work": "Arbeit starten",
+        "blocks_title": "Blöcke heute",
+        "total_tracked": "Insgesamt erfasst",
+        "status_working": "Am Arbeiten",
+        "started_at": "Gestartet um {time}",
+        "goal_reached": "Ziel erreicht 🎯",
+        "start_break": "Pause starten",
+        "finish_day": "Tag beenden",
+        "running": "läuft",
+        "break_duration": "Pause {val}",
+        "block_pause": "{val} Min Pause",
+        "on_break": "In der Pause",
+        "resume": "Arbeit fortsetzen",
+        "toast_started": "Arbeit gestartet.",
+        "toast_overtime": "Über 8h gearbeitet – Zeit zum Feierabend.",
+        "toast_overtime_warn": "⚠️ Über {val}h gearbeitet – Zeit zum Feierabend.",
+        "toast_autostop": "🛑 Automatisch nach {val}h gestoppt. Gönn dir eine Pause!",
+        "toast_break": "Pause gestartet.",
+        "toast_resumed": "Arbeit fortgesetzt.",
+        "toast_finished": "Arbeitstag beendet. Gute Arbeit! 🎉",
+        "started": "Gestartet",
+        "no_sessions": "Heute noch keine Sitzungen.",
+        "on_working_session": "Deine Arbeitssitzung läuft gerade.",
+        "on_break_session": "Deine Arbeit ist momentan pausiert.",
+        "not_started_session": "Starte deinen Tag mit einem Klick.",
+        "left_time": "{time} Min übrig",
+        "left_time_h": "{h}h übrig",
+        "left_time_hm": "{h}h {m}m übrig",
+        "notif_inactivity_title": "Automatisch pausiert",
+        "notif_inactivity_body": "Keine Aktivität seit {val} Minuten.",
+        "toast_inactivity": "⏸️ Automatisch nach {val} Min Inaktivität pausiert.",
+        "notif_overtime_title": "Überstundenwarnung",
+        "notif_overtime_body": "Du arbeitest heute seit über {val} Stunden.",
+        "notif_autostop_title": "Arbeitstag automatisch beendet",
+        "notif_autostop_body": "Du hast {val} Stunden erreicht. Deine Sitzung wurde automatisch gespeichert."
+    },
+    "of": "von",
+    "title": "Zeitwerk",
+    "goal": "Ziel",
+    "habits": {
+        "title": "Gewohnheitsübersicht",
+        "today_count": "{done}/{total} heute",
+        "add_btn": "Gewohnheit hinzufügen",
+        "empty": "Noch keine Gewohnheiten. Starte deine Routine! 💪",
+        "streak_one": "{count} Tag in Folge",
+        "streak_other": "{count} Tage in Folge",
+        "stats": {
+            "this_week": "Diese Woche",
+            "best_streak": "Beste Serie",
+            "week_rate": "Quote dieser Woche"
+        },
+        "freq": {
+            "daily": "Täglich",
+            "weekdays": "Wochentage",
+            "weekend": "Wochenende"
+        },
+        "year": {
+            "days_completed": "Abgeschlossene Tage",
+            "completion_rate": "Erfüllungsquote",
+            "best_streak": "Beste Serie"
+        },
+        "modal": {
+            "title_new": "Neue Gewohnheit",
+            "title_edit": "Gewohnheit bearbeiten",
+            "icon": "Icon",
+            "name": "Name der Gewohnheit *",
+            "name_hint": "z. B. Morgenlauf",
+            "goal": "Ziel / Beschreibung",
+            "goal_hint": "z. B. 30 Min, 2 km, 8 Gläser",
+            "color": "Farbe",
+            "frequency": "Frequenz"
+        }
+    },
+    "export": {
+        "title": "Export",
+        "sub": "Exportiere deine Daten in verschiedenen Formaten",
+        "scope": {
+            "title": "Umfang",
+            "sub": "Welche Daten möchtest du exportieren?",
+            "range": "Zeitraum",
+            "include": "Enthalten",
+            "presets": {
+                "month": "Aktueller Monat",
+                "lastmonth": "Letzter Monat",
+                "3months": "Letzte 3 Monate",
+                "6months": "Letzte 6 Monate",
+                "year": "Aktuelles Jahr",
+                "lastyear": "Letztes Jahr",
+                "all": "Alle Daten",
+                "custom": "Benutzerdefinierter Zeitraum …"
+            }
+        },
+        "include": {
+            "entries": "Arbeitseinträge",
+            "absences": "Abwesenheiten",
+            "summary": "Zusammenfassung / KPIs",
+            "gross": "Bruttoeinnahmen"
+        },
+        "format": {
+            "title": "Format",
+            "sub": "Wähle dein Exportformat",
+            "csv_desc": "Tabellenkompatibel, bereit für Excel/Sheets",
+            "json_desc": "Rohdaten, Entwickler-freundlich, komplettes Backup",
+            "pdf_desc": "HTML herunterladen → öffnen → Strg+P → als PDF speichern",
+            "clip_desc": "Als tab-getrennte Tabelle kopieren"
+        },
+        "btn": {
+            "export": "Exportieren",
+            "copy": "Kopieren",
+            "copied": "Kopiert ✓"
+        },
+        "toast": {
+            "csv": "CSV exportiert.",
+            "json": "JSON exportiert.",
+            "pdf": "HTML heruntergeladen – öffne es und drücke Strg+P, um als PDF zu speichern.",
+            "clipboard": "In die Zwischenablage kopiert."
+        }
+    },
+    "diagrams": {
+        "title": "Diagramme",
+        "this_month": "Dieser Monat",
+        "this_year": "Dieses Jahr",
+        "empty_title": "Keine Daten für {month}",
+        "empty_sub": "Füge Einträge für diesen Monat hinzu, um deine Diagramme zu sehen.",
+        "gross_hint_pre": "Setze dein „Bruttogehalt pro Monat“ in den",
+        "gross_hint_post": "um Verdienst-Diagramme zu sehen.",
+        "days": "Tage"
+    },
+    "common": {
+        "today": "Heute",
+        "no": "Nein",
+        "yes": "Ja",
+        "create": "Erstellen",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "save": "Speichern",
+        "entries": "Einträge",
+        "planned": "Plan",
+        "actual": "Ist",
+        "from": "Von",
+        "to": "Bis",
+        "diff": "Differenz",
+        "edit": "Bearbeiten",
+        "reset": "Zurücksetzen",
+        "time": "Zeit",
+        "date": "Datum",
+        "tags": "Tags",
+        "entries_count": "{count} Einträge",
+        "import": "Import",
+        "export": "Export",
+        "delete_confirm_yes": "Ja, löschen",
+        "add": "Hinzufügen",
+        "update": "Aktualisieren"
+    },
+    "weekdays": {
+        "mon": "Mo",
+        "tue": "Di",
+        "wed": "Mi",
+        "thu": "Do",
+        "fri": "Fr",
+        "sat": "Sa",
+        "sun": "So"
+    },
+    "calendar": {
+        "title": "Kalender",
+        "appointments": "Termine",
+        "event": "{count} Termin | {count} Termine",
+        "event_one": "{count} Termin",
+        "event_other": "{count} Termine",
+        "more": "mehr",
+        "all_day": "Ganztägig",
+        "add_event": "Neuen Termin hinzufügen",
+        "views": {
+            "month": "Monat",
+            "week": "Woche",
+            "agenda": "Agenda",
+            "year": "Jahr"
+        },
+        "no_events": "Keine Termine in diesem Monat.",
+        "modal": {
+            "title_new": "Neuer Termin",
+            "title_edit": "Termin bearbeiten",
+            "name": "Titel *",
+            "name_hint": "z.B. Teammeeting",
+            "desc": "Beschreibung",
+            "desc_hint": "Optionale Details ...",
+            "date": "Datum *",
+            "allday": "Ganztägig",
+            "time_from": "Von",
+            "time_to": "Bis",
+            "location": "Ort",
+            "location_hint": "Adresse oder Online-Link",
+            "color": "Farbe",
+            "tags": "Tags",
+            "tags_hint": "Tag + Enter",
+            "reminder": "Erinnerung",
+            "reminder_none": "Keine",
+            "reminder_0": "Zum Zeitpunkt",
+            "reminder_5": "5 Minuten vorher",
+            "reminder_15": "15 Minuten vorher",
+            "reminder_30": "30 Minuten vorher",
+            "reminder_60": "1 Stunde vorher",
+            "reminder_1440": "1 Tag vorher",
+            "delete_appointment": "Termin löschen",
+            "new_appointment": "Neuer Termin",
+            "edit_appointment": "Termin bearbeiten"
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "btn-add-entry": "Neuen Eintrag hinzufügen",
+        "pwa_mode": "PWA-Modus",
+        "month": {
+            "title": "Monatsübersicht",
+            "actual": "Monat Ist",
+            "diff": "Monatsdifferenz",
+            "overtime": "Überstunden",
+            "missed-hours": "Fehlstunden",
+            "week_actual": "Woche Ist",
+            "avg_hours": "Ø Stunden / Tag",
+            "avg_sub": "Tagesdurchschnitt",
+            "active_days": "Aktive Tage",
+            "active_sub": "Gearbeitete Tage",
+            "longest": "Längster Tag",
+            "gross": "Monat Brutto",
+            "gross_sub": "Bruttoeinnahmen",
+            "vac_used": "Genutzter Urlaub",
+            "vac_used_sub": "Genommene Tage",
+            "vac_left": "Verbleibender Urlaub",
+            "vac_left_sub": "Verbleibende Tage",
+            "vac_day_left_sub": "Verbleibender Tag",
+            "work_days": "Arbeitstage",
+            "daily_average": "Tagesdurchschnitt"
+        },
+        "year": {
+            "title": "Jahresübersicht",
+            "months": "Monate mit Einträgen",
+            "entries": "Einträge",
+            "actual": "Ist",
+            "planned": "Plan",
+            "missed-hours": "Fehlstunden",
+            "diff": "Jahresdifferenz",
+            "overtime": "Überstunden",
+            "gross": "Jahr Brutto",
+            "gross_sub": "Bruttoeinnahmen",
+            "vac_used": "Genutzter Urlaub",
+            "vac_left": "Verbleibender Urlaub",
+            "vac_day_left_sub": "Verbleibender Tag",
+            "vac_days_left_sub": "Verbleibende Tage",
+            "vac_used_sub": "Genommene Tage"
+        }
+    }
+}

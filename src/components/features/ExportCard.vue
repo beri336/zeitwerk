@@ -2,21 +2,22 @@
 
 <template>
     <main class="main">
+
         <div class="export-header">
-            <p class="export-sub">Export your data in different formats</p>
+            <p class="export-sub">{{ $t('export.sub') }}</p>
         </div>
 
         <!-- Filters -->
         <section class="card">
             <div class="card-head">
-                <h2>Scope</h2>
-                <p>What data do you want to export?</p>
+                <h2>{{ $t('export.scope.title') }}</h2>
+                <p>{{ $t('export.scope.sub') }}</p>
             </div>
             <div class="card-body">
                 <div class="filter-row">
 
                     <div class="form-group">
-                        <label class="form-label">Range</label>
+                        <label class="form-label">{{ $t('export.scope.range') }}</label>
                         <select class="form-input" v-model="scope">
                             <option v-for="preset in PRESETS" :key="preset.value" :value="preset.value">
                                 {{ preset.label }}
@@ -28,7 +29,7 @@
                     <Transition name="fade">
                         <div v-if="scope === 'custom'" class="custom-range">
                             <div class="form-group">
-                                <label class="form-label">From</label>
+                                <label class="form-label">{{ $t('common.from') }}</label>
                                 <select class="form-input" :value="`${customFrom.year}-${customFrom.month}`" @change="event => {
                                     const [year, month] = event.target.value.split('-').map(Number)
                                     customFrom = { year: year, month: month }
@@ -43,7 +44,7 @@
                             <span class="range-sep">→</span>
 
                             <div class="form-group">
-                                <label class="form-label">To</label>
+                                <label class="form-label">{{ $t('common.to') }}</label>
                                 <!-- To -->
                                 <select class="form-input" :value="`${customTo.year}-${customTo.month}`" @change="event => {
                                     const [year, month] = event.target.value.split('-').map(Number)
@@ -59,26 +60,26 @@
                     </Transition>
 
                     <div class="form-group">
-                        <label class="form-label">Include</label>
+                        <label class="form-label">{{ $t('export.scope.include') }}</label>
                         <div class="checkbox-group">
                             <label class="checkbox-item">
                                 <input type="checkbox" v-model="include.entries" />
-                                <span>Work Entries</span>
+                                <span>{{ $t('export.include.entries') }}</span>
                             </label>
 
                             <label class="checkbox-item">
                                 <input type="checkbox" v-model="include.absences" />
-                                <span>Absences</span>
+                                <span>{{ $t('export.include.absences') }}</span>
                             </label>
 
                             <label class="checkbox-item">
                                 <input type="checkbox" v-model="include.summary" />
-                                <span>Summary / KPIs</span>
+                                <span>{{ $t('export.include.summary') }}</span>
                             </label>
 
                             <label class="checkbox-item" v-if="store.grossHourlyRate > 0">
                                 <input type="checkbox" v-model="include.gross" />
-                                <span>Gross Earnings</span>
+                                <span>{{ $t('export.include.gross') }}</span>
                             </label>
                         </div>
                     </div>
@@ -92,13 +93,13 @@
                         <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
 
-                    <strong>{{ filteredEntries.length }}</strong> entries ·
-                    <strong>{{ formatHours(summary.actual) }}</strong> actual ·
+                    <strong>{{ filteredEntries.length }}</strong> {{ $t('common.entries') }} ·
+                    <strong>{{ formatHours(summary.actual) }}</strong> {{ $t('common.actual') }} ·
 
                     <span :style="{ color: summary.diff >= 0 ? 'var(--color-success)' : 'var(--color-error)' }">
                         {{ summary.diff >= 0 ? '+' : '' }}{{ formatHours(summary.diff) }}
                     </span>
-                    diff · {{ scopeLabel }}
+                    {{ $t('common.diff') }} · {{ scopeLabel }}
                 </div>
             </div>
         </section>
@@ -106,8 +107,8 @@
         <!-- Export Formats -->
         <section class="card">
             <div class="card-head">
-                <h2>Format</h2>
-                <p>Choose your export format</p>
+                <h2>{{ $t('export.format.title') }}</h2>
+                <p>{{ $t('export.format.sub') }}</p>
             </div>
 
             <div class="card-body">
@@ -127,9 +128,9 @@
 
                         <div class="format-info">
                             <div class="format-name">CSV</div>
-                            <div class="format-desc">Spreadsheet-compatible, Excel/Sheets ready</div>
+                            <div class="format-desc">{{ $t('export.format.csv_desc') }}</div>
                         </div>
-                        <button class="btn btn-secondary" @click="exportCSV">Export</button>
+                        <button class="btn btn-secondary" @click="exportCSV">{{ $t('export.btn.export') }}</button>
                     </div>
 
                     <!-- JSON -->
@@ -144,9 +145,9 @@
 
                         <div class="format-info">
                             <div class="format-name">JSON</div>
-                            <div class="format-desc">Raw data, developer-friendly, full backup</div>
+                            <div class="format-desc">{{ $t('export.format.json_desc') }}</div>
                         </div>
-                        <button class="btn btn-secondary" @click="exportJSON">Export</button>
+                        <button class="btn btn-secondary" @click="exportJSON">{{ $t('export.btn.export') }}</button>
                     </div>
 
                     <!-- PDF -->
@@ -162,9 +163,9 @@
 
                         <div class="format-info">
                             <div class="format-name">PDF</div>
-                            <div class="format-desc">Download HTML -> open -> Ctrl+P -> Save as PDF</div>
+                            <div class="format-desc">{{ $t('export.format.pdf_desc') }}</div>
                         </div>
-                        <button class="btn btn-secondary" @click="exportPDF">Export</button>
+                        <button class="btn btn-secondary" @click="exportPDF">{{ $t('export.btn.export') }}</button>
                     </div>
 
                     <!-- Clipboard -->
@@ -179,11 +180,11 @@
 
                         <div class="format-info">
                             <div class="format-name">Clipboard</div>
-                            <div class="format-desc">Copy as tab-separated table</div>
+                            <div class="format-desc">{{ $t('export.format.clip_desc') }}</div>
                         </div>
 
                         <button class="btn btn-secondary" @click="exportClipboard">
-                            {{ copied ? 'Copied ✓' : 'Copy' }}
+                            {{ copied ? $t('export.btn.copied') : $t('export.btn.copy') }}
                         </button>
                     </div>
                 </div>
@@ -203,6 +204,7 @@ import { ref, computed } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours, MONTH_NAMES } from '@/composables/useTime'
 import { useToast } from '@/composables/useToast'
+import { useI18n } from 'vue-i18n'
 
 import { useExport } from '@/composables/useExport'
 import { useCalendarStore } from '@/composables/useCalendarStore'
@@ -212,21 +214,22 @@ import { useProfileStore } from '@/composables/useProfileStore'
 
 const store = useZeitwerkStore()
 const { showToast } = useToast()
+const { t, locale } = useI18n()
 
 const scope = ref('month')
 const customFrom = ref({ year: new Date().getFullYear(), month: new Date().getMonth() })
 const customTo = ref({ year: new Date().getFullYear(), month: new Date().getMonth() })
 
-const PRESETS = [
-    { value: 'month', label: 'Current Month' },
-    { value: 'lastmonth', label: 'Last Month' },
-    { value: '3months', label: 'Last 3 Months' },
-    { value: '6months', label: 'Last 6 Months' },
-    { value: 'year', label: 'Current Year' },
-    { value: 'lastyear', label: 'Last Year' },
-    { value: 'all', label: 'All Data' },
-    { value: 'custom', label: 'Custom Range…' },
-]
+const PRESETS = computed(() => [
+    { value: 'month', label: t('export.scope.presets.month') },
+    { value: 'lastmonth', label: t('export.scope.presets.lastmonth') },
+    { value: '3months', label: t('export.scope.presets.3months') },
+    { value: '6months', label: t('export.scope.presets.6months') },
+    { value: 'year', label: t('export.scope.presets.year') },
+    { value: 'lastyear', label: t('export.scope.presets.lastyear') },
+    { value: 'all', label: t('export.scope.presets.all') },
+    { value: 'custom', label: t('export.scope.presets.custom') },
+])
 
 const { exportJSON: exportFullJSON } = useExport()
 const calendar = useCalendarStore()
@@ -251,7 +254,7 @@ const availableMonths = computed(() => {
 })
 
 const scopeLabel = computed(() => {
-    const preset = PRESETS.find(p => p.value === scope.value)
+    const preset = PRESETS.value.find(p => p.value === scope.value)
 
     if (scope.value === 'custom') {
         const from = `${MONTH_NAMES[customFrom.value.month].slice(0, 3)} ${customFrom.value.year}`
@@ -416,7 +419,7 @@ function buildCSVRows() {
 
 function exportCSV() {
     download(`zeitwerk-${scopeLabel.value}.csv`, buildCSVRows(), 'text/csv')
-    showToast('CSV exported.')
+    showToast(t('export.toast.csv'))
 }
 
 // JSON
@@ -454,7 +457,7 @@ function exportJSON() {
         JSON.stringify(payload, null, 2),
         'application/json'
     )
-    showToast('JSON exported.')
+    showToast(t('export.toast.json'))
 }
 
 // PDF
@@ -527,7 +530,7 @@ function exportPDF() {
 </head><body>
 <div class="header">
   <h1>Zeitwerk Export</h1>
-  <div class="meta">${scopeLabel.value} · ${rows.length} entries · ${new Date().toLocaleDateString('de-DE')}</div>
+  <div class="meta">${scopeLabel.value} · ${rows.length} entries · ${new Date().toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-GB')}</div>
 </div>
 <button class="print-btn" onclick="window.print()">
   🖨️ Print / Save as PDF
@@ -550,7 +553,7 @@ function exportPDF() {
         'text/html'
     )
 
-    showToast('HTML downloaded — open it and press Ctrl+P to save as PDF.')
+    showToast(t('export.toast.pdf'))
 }
 
 // Clipboard
@@ -591,7 +594,7 @@ async function exportClipboard() {
 
     copied.value = true
     setTimeout(() => copied.value = false, 2000)
-    showToast('Copied to clipboard.')
+    showToast(t('export.toast.clipboard'))
 }
 
 // Helpers

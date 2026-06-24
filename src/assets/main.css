@@ -41,6 +41,7 @@
     --shadow-lg: 0 12px 32px oklch(0.2 0.01 80 / 0.12);
     --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
     --font-body: 'Inter', sans-serif;
+    --text-xxs: clamp(0.65rem, 0.7rem + 0.25vw, 0.8rem);
     --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
     --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
     --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);

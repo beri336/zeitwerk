@@ -1,19 +1,27 @@
 <!-- src/components/ui/DeviceChipExt.vue -->
 
 <template>
-  <div class="device-card">
 
+  <div class="device-card">
     <!-- Header Row -->
     <div class="device-header">
       <span class="device-icon" v-html="deviceIcon"></span>
       <div class="device-info">
         <span class="device-label">{{ device.deviceLabel }}</span>
-        <span class="device-sub">{{ device.osLabel }} · {{ device.browserLabel }} {{ device.browserVersion }}</span>
+        <span class="device-sub"
+          >{{ device.osLabel }} · {{ device.browserLabel }}
+          {{ device.browserVersion }}</span
+        >
       </div>
 
-      <span v-if="device.isPWA" class="badge badge--pwa">PWA</span>
-      <span class="online-dot" :class="isOnline ? 'online-dot--on' : 'online-dot--off'"
-        :title="isOnline ? 'Online' : 'Offline'">
+      <span v-if="device.isPWA" class="badge badge--pwa">{{
+        $t("device.pwa")
+      }}</span>
+      <span
+        class="online-dot"
+        :class="isOnline ? 'online-dot--on' : 'online-dot--off'"
+        :title="isOnline ? $t('device.online') : $t('device.offline')"
+      >
       </span>
     </div>
 
@@ -22,10 +30,16 @@
 
     <!-- Stats Grid -->
     <div class="device-stats">
-
       <!-- Screen -->
       <div class="stat-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <rect x="2" y="4" width="20" height="13" rx="2" />
           <path d="M2 20h20" />
           <path d="M8 20l1-3h6l1 3" />
@@ -33,57 +47,103 @@
 
         <span>
           {{ device.screenW }}×{{ device.screenH }}
-          <span v-if="device.isRetina" class="badge badge--retina">Retina</span>
+          <span v-if="device.isRetina" class="badge badge--retina">{{
+            $t("device.retina")
+          }}</span>
         </span>
       </div>
 
       <!-- Touch -->
       <div class="stat-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M18 11V6a2 2 0 0 0-4 0v5" />
           <path d="M14 10V4a2 2 0 0 0-4 0v6" />
-          <path d="M10 10.5V6a2 2 0 0 0-4 0v8l-1.2-1.2a1.5 1.5 0 0 0-2.1 2.1L6 18a6 6 0 0 0 6 0v-1" />
+          <path
+            d="M10 10.5V6a2 2 0 0 0-4 0v8l-1.2-1.2a1.5 1.5 0 0 0-2.1 2.1L6 18a6 6 0 0 0 6 0v-1"
+          />
           <path d="M18 8a2 2 0 0 1 4 0v6a8 8 0 0 1-8 8h-2" />
         </svg>
 
-        <span>{{ device.isTouch ? 'Touch' : 'No Touch' }}</span>
+        <span>{{
+          device.isTouch ? $t("device.touch") : $t("device.no_touch")
+        }}</span>
       </div>
 
       <!-- CPU cores -->
       <div v-if="device.cpuCores" class="stat-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <rect x="7" y="7" width="10" height="10" rx="1" />
-          <path d="M9 7V3M12 7V3M15 7V3M9 21v-4M12 21v-4M15 21v-4M3 9h4M3 12h4M3 15h4M21 9h-4M21 12h-4M21 15h-4" />
+          <path
+            d="M9 7V3M12 7V3M15 7V3M9 21v-4M12 21v-4M15 21v-4M3 9h4M3 12h4M3 15h4M21 9h-4M21 12h-4M21 15h-4"
+          />
         </svg>
 
-        <span>{{ device.cpuCores }} Cores</span>
+        <span>{{ $t("device.cores", { count: device.cpuCores }) }}</span>
       </div>
 
       <!-- RAM -->
       <div v-if="device.deviceMemory" class="stat-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <rect x="2" y="8" width="20" height="8" rx="1" />
-          <path d="M6 8V6M10 8V6M14 8V6M18 8V6M6 16v2M10 16v2M14 16v2M18 16v2" />
+          <path
+            d="M6 8V6M10 8V6M14 8V6M18 8V6M6 16v2M10 16v2M14 16v2M18 16v2"
+          />
         </svg>
-        <span>{{ device.deviceMemory }} GB RAM</span>
+        <span>{{ $t("device.ram", { gb: device.deviceMemory }) }}</span>
       </div>
 
       <!-- Language -->
       <div class="stat-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <circle cx="12" cy="12" r="10" />
           <path
-            d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+          />
         </svg>
         <span>{{ device.language }}</span>
       </div>
 
       <!-- Pixel Ratio -->
       <div class="stat-item">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
         </svg>
-        <span>{{ device.pixelRatio }}× DPR</span>
+        <span>{{ $t("device.dpr", { ratio: device.pixelRatio }) }}</span>
       </div>
     </div>
 
@@ -91,44 +151,60 @@
     <template v-if="battery.supported.value">
       <div class="device-divider"></div>
       <div class="battery-row">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <rect x="2" y="7" width="18" height="10" rx="2" />
           <path d="M20 11v2" stroke-linecap="round" stroke-width="3" />
         </svg>
 
         <div class="battery-bar-wrap">
           <div class="battery-bar">
-            <div class="battery-bar-fill"
-              :style="{ width: (battery.percent.value ?? 0) + '%', background: batteryColor }">
-            </div>
+            <div
+              class="battery-bar-fill"
+              :style="{
+                width: (battery.percent.value ?? 0) + '%',
+                background: batteryColor,
+              }"
+            ></div>
           </div>
         </div>
 
         <span class="battery-label">
-          {{ battery.percent.value ?? '...' }}%
+          {{ battery.percent.value ?? "..." }}%
           <span v-if="battery.charging.value"> ⚡</span>
         </span>
       </div>
     </template>
-
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useDevice, useBattery, useOnlineStatus } from '@/composables/useDevice'
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+import {
+  useDevice,
+  useBattery,
+  useOnlineStatus,
+} from "@/composables/useDevice";
 
-const device = useDevice()
-const battery = useBattery()
-const { isOnline } = useOnlineStatus()
+const device = useDevice();
+const battery = useBattery();
+const { isOnline } = useOnlineStatus();
+const { t } = useI18n();
 
 const batteryColor = computed(() => {
-  const p = battery.percent.value
-  if (p === null) return 'var(--color-border)'
-  if (p <= 20) return '#ef4444'
-  if (p <= 40) return '#f59e0b'
-  return '#22c55e'
-})
+  const p = battery.percent.value;
+  if (p === null) return "var(--color-border)";
+  if (p <= 20) return "#ef4444";
+  if (p <= 40) return "#f59e0b";
+  return "#22c55e";
+});
 
 const icons = {
   iphone: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -164,9 +240,11 @@ const icons = {
         <path d="M2 20h20"/>
         <path d="M8 20l1-3h6l1 3"/>
          </svg>`,
-}
+};
 
-const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.windows)
+const deviceIcon = computed(
+  () => icons[device.value.deviceType] ?? icons.windows,
+);
 </script>
 
 <style scoped>
@@ -323,7 +401,9 @@ const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.window
 .battery-bar-fill {
   height: 100%;
   border-radius: 999px;
-  transition: width 0.5s ease, background 0.3s ease;
+  transition:
+    width 0.5s ease,
+    background 0.3s ease;
 }
 
 .battery-label {

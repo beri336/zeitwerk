@@ -2,11 +2,11 @@
 
 <template>
     <main class="main">
-        <h1>Settings</h1>
+        <h1>{{ $t('nav.settings') }}</h1>
         <SettingsCard />
 
         <div class="settings-about">
-            <span>Source code:</span>
+            <span>{{ $t('settings.source_code') }}</span>
 
             <a href="https://github.com/beri336/zeitwerk" target="_blank" rel="noopener noreferrer"
                 class="settings-about-link">
@@ -35,6 +35,9 @@
 
 <script setup>
 import SettingsCard from '@/components/features/SettingsCard.vue';
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <style scoped>

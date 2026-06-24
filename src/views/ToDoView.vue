@@ -2,13 +2,16 @@
 
 <template>
   <main class="main">
-    <h1>To-Do List</h1>
+    <h1>{{ $t("nav.todo") }}</h1>
     <ToDoCard />
   </main>
 </template>
 
 <script setup>
-import ToDoCard from '@/components/features/ToDoCard.vue'
+import ToDoCard from "@/components/features/ToDoCard.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <style scoped>
@@ -34,7 +37,7 @@ import ToDoCard from '@/components/features/ToDoCard.vue'
 
 .main h1::before,
 .main h1::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--color-border);

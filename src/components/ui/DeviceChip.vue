@@ -2,19 +2,22 @@
 
 <template>
   <div class="device-chip">
+
     <span class="device-icon" v-html="deviceIcon"></span>
     <div class="device-info">
       <span class="device-label">{{ device.deviceLabel }}</span>
-      <span class="device-sub">{{ device.osLabel }} · {{ device.browserLabel }}</span>
+      <span class="device-sub"
+        >{{ device.osLabel }} · {{ device.browserLabel }}</span
+      >
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useDevice } from '@/composables/useDevice'
+import { computed } from "vue";
+import { useDevice } from "@/composables/useDevice";
 
-const device = useDevice()
+const device = useDevice();
 
 const icons = {
   iphone: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -56,9 +59,11 @@ const icons = {
     <path d="M2 20h20"/>
     <path d="M8 20l1-3h6l1 3"/>
   </svg>`,
-}
+};
 
-const deviceIcon = computed(() => icons[device.value.deviceType] ?? icons.windows)
+const deviceIcon = computed(
+  () => icons[device.value.deviceType] ?? icons.windows,
+);
 </script>
 
 <style scoped>

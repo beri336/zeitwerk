@@ -7,7 +7,7 @@
             <!-- Center Label -->
             <div class="donut-center">
                 <span class="donut-value">{{ total }}</span>
-                <span class="donut-label">Days</span>
+                <span class="donut-label">{{ $t('diagrams.days') }}</span>
             </div>
         </div>
     </ChartCard>
@@ -17,6 +17,7 @@
 import { computed } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { useI18n } from 'vue-i18n'
 
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useChartTheme } from '@/composables/useChartTheme'
@@ -24,12 +25,13 @@ import ChartCard from './ChartCard.vue'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
+const { t } = useI18n()
 const store = useZeitwerkStore()
 const { colors } = useChartTheme()
 
 const TYPE_LABELS = {
     'on-site': 'On-Site',
-    'remote': 'Remote',
+    'homeoffice': 'Homeoffice',
     'vacation': 'Vacation',
     'sick': 'Sick',
     'publicholiday': 'Public Holiday',
@@ -38,7 +40,7 @@ const TYPE_LABELS = {
 
 const TYPE_COLORS = {
     'on-site': '#6366f1',
-    'remote': '#06b6d4',
+    'homeoffice': '#06b6d4',
     'vacation': '#f59e0b',
     'sick': '#ef4444',
     'publicholiday': '#22c55e',
