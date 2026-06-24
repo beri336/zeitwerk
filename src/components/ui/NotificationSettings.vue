@@ -1,7 +1,6 @@
 <!-- src/components/ui/NotificationSettings.vue -->
 
 <template>
-
   <div class="settings-section">
     <!-- Header -->
     <div class="settings-header">
@@ -182,88 +181,88 @@
           class="notification-options"
           :class="{ disabled: !store.settings.enabled }"
         />
+        <!-- <div class="notif-row">
+          <div>
+            <div class="privacy-label">
+              {{ $t("notifications.overtime.label") }}
+            </div>
+            <div class="privacy-hint">
+              {{ $t("notifications.overtime.hint") }}
+            </div>
+          </div>
+
+          <button
+            class="toggle-switch"
+            :class="{ active: store.settings.overtime }"
+            @click="store.settings.overtime = !store.settings.overtime"
+          >
+            <span class="toggle-thumb" />
+          </button>
+        </div> -->
+
         <div class="notif-row">
           <div>
             <div class="privacy-label">
-              {{ $t("notifications.overtime.label") }}/div>
-              <div class="privacy-hint">
-                {{ $t("notifications.overtime.hint") }}
-              </div>
+              {{ $t("notifications.overtime.label") }}
             </div>
-
-            <button
-              class="toggle-switch"
-              :class="{ active: store.settings.overtime }"
-              @click="store.settings.overtime = !store.settings.overtime"
-            >
-              <span class="toggle-thumb" />
-            </button>
+            <div class="privacy-hint">
+              {{ $t("notifications.overtime.hint") }}
+            </div>
           </div>
-
-          <div class="notif-row">
-            <div>
-              <div class="privacy-label">
-                {{ $t("notifications.overtime.label") }}
-              </div>
-              <div class="privacy-hint">
-                {{ $t("notifications.overtime.hint") }}
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              v-model="store.settings.overtime"
-              class="notif-check"
-            />
-          </div>
-
-          <div class="notif-row">
-            <div>
-              <div class="privacy-label">
-                {{ $t("notifications.inactivity.label") }}
-              </div>
-              <div class="privacy-hint">
-                {{ $t("notifications.inactivity.hint") }}
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              v-model="store.settings.inactivity"
-              class="notif-check"
-            />
-          </div>
-
-          <div class="notif-row">
-            <div>
-              <div class="privacy-label">
-                {{ $t("notifications.habit.label") }}
-              </div>
-              <div class="privacy-hint">
-                {{ $t("notifications.habit.hint") }}
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              v-model="store.settings.habitReminder"
-              class="notif-check"
-            />
-          </div>
-
-          <Transition name="fade">
-            <div
-              v-if="store.settings.habitReminder"
-              class="form-group reminder-time"
-            >
-              <label class="form-label">{{
-                $t("notifications.habit.time")
-              }}</label>
-              <input
-                type="time"
-                class="form-input time-input"
-                v-model="store.settings.habitReminderTime"
-              />
-            </div>
-          </Transition>
+          <input
+            type="checkbox"
+            v-model="store.settings.overtime"
+            class="notif-check"
+          />
         </div>
+
+        <div class="notif-row">
+          <div>
+            <div class="privacy-label">
+              {{ $t("notifications.inactivity.label") }}
+            </div>
+            <div class="privacy-hint">
+              {{ $t("notifications.inactivity.hint") }}
+            </div>
+          </div>
+          <input
+            type="checkbox"
+            v-model="store.settings.inactivity"
+            class="notif-check"
+          />
+        </div>
+
+        <div class="notif-row">
+          <div>
+            <div class="privacy-label">
+              {{ $t("notifications.habit.label") }}
+            </div>
+            <div class="privacy-hint">
+              {{ $t("notifications.habit.hint") }}
+            </div>
+          </div>
+          <input
+            type="checkbox"
+            v-model="store.settings.habitReminder"
+            class="notif-check"
+          />
+        </div>
+
+        <Transition name="fade">
+          <div
+            v-if="store.settings.habitReminder"
+            class="form-group reminder-time"
+          >
+            <label class="form-label">{{
+              $t("notifications.habit.time")
+            }}</label>
+            <input
+              type="time"
+              class="form-input time-input"
+              v-model="store.settings.habitReminderTime"
+            />
+          </div>
+        </Transition>
       </template>
     </template>
   </div>
