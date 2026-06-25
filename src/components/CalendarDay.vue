@@ -1,4 +1,4 @@
-<!-- src/components/CalenderDay.vue -->
+<!-- src/components/CalendarDay.vue -->
 
 <template>
 

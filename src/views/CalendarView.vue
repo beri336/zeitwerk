@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import CalendarCard from "@/components/features/CalenderCard.vue";
+import CalendarCard from "@/components/features/CalendarCard.vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

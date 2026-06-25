@@ -581,11 +581,6 @@
             "longest": "Längster Tag",
             "gross": "Monat Brutto",
             "gross_sub": "Bruttoeinnahmen",
-            "vac_used": "Genutzter Urlaub",
-            "vac_used_sub": "Genommene Tage",
-            "vac_left": "Verbleibender Urlaub",
-            "vac_left_sub": "Verbleibende Tage",
-            "vac_day_left_sub": "Verbleibender Tag",
             "work_days": "Arbeitstage",
             "daily_average": "Tagesdurchschnitt"
         },

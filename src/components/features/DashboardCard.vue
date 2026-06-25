@@ -69,22 +69,6 @@
           variant="ok"
           :private="true"
         />
-
-        <KpiCard
-          :label="$t('dashboard.month.vac_used')"
-          :value="String(store.usedVacationDays)"
-          :sub="$t('dashboard.month.vac_used_sub')"
-        />
-
-        <KpiCard
-          :label="$t('dashboard.month.vac_left')"
-          :value="String(store.remainingVacationDays)"
-          :sub="
-            store.remainingVacationDays === 1
-              ? $t('dashboard.month.vac_day_left_sub')
-              : $t('dashboard.month.vac_left_sub')
-          "
-        />
       </div>
     </section>
 

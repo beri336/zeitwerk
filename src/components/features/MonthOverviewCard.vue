@@ -110,7 +110,7 @@
           {{ header }}
         </div>
 
-        <CalenderDay
+        <CalendarDay
           v-for="day in calendarDays"
           :key="day.date"
           :date="day.date"
@@ -134,7 +134,7 @@
 import { computed, ref, nextTick } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { formatHours } from "@/composables/useTime";
-import CalenderDay from "@/components/CalenderDay.vue";
+import CalendarDay from "@/components/CalendarDay.vue";
 import EntryModal from "@/components/EntryModal.vue";
 import HolidayImportModal from "@/components/HolidayImportModal.vue";
 import { useI18n } from "vue-i18n";

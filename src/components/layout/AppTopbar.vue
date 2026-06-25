@@ -297,7 +297,7 @@ const titleKeys = {
   "/dashboard": "topbar.dashboard",
   "/livetracking": "topbar.livetracking",
   "/month-overview": "topbar.month",
-  "/calender": "topbar.calendar",
+  "/calendar": "topbar.calendar",
   "/todo": "topbar.todo",
   "/year-overview": "topbar.year",
   "/diagrams": "topbar.diagrams",

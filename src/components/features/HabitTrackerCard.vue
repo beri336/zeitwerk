@@ -1963,9 +1963,14 @@ const yearBestStreak = computed(() => {
     padding: 0;
   }
 
-  .modal {
-    border-radius: calc(var(--radius, 0.5rem) * 1.5)
-      calc(var(--radius, 0.5rem) * 1.5) 0 0;
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     max-height: 92dvh;
   }
 
@@ -1976,6 +1981,16 @@ const yearBestStreak = computed(() => {
   .icon-btn {
     width: 36px;
     height: 36px;
+  }
+
+  /* iOS zoom prevention - inputs under 16px trigger auto-zoom */
+  .form-input,
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  input[type="text"],
+  textarea.form-input {
+    font-size: 16px;
   }
 }
 

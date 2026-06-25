@@ -1,9 +1,8 @@
-<!-- src/components/features/CalenderCard.vue -->
+<!-- src/components/features/CalendarCard.vue -->
 
 <template>
   <main class="main">
     <div class="cal-wrapper">
-
       <!-- Header -->
       <header class="cal-header">
         <div class="cal-header-left">
@@ -1712,8 +1711,17 @@ function removeTag(tag) {
   transform: translateY(10px);
 }
 
-/* Tablet */
+/* Tablet / Mobile Bottom Sheet */
 @media (max-width: 767px) {
+  .field-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .field {
+    width: 100%;
+  }
+
   .main {
     padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem)
       calc(var(--space-3, 0.75rem) + env(safe-area-inset-bottom));
@@ -1778,24 +1786,46 @@ function removeTag(tag) {
     gap: 0.5rem;
   }
 
+  /* Backdrop: Modal als Bottom Sheet andocken */
   .modal-backdrop {
     align-items: flex-end;
     padding: 0;
   }
 
   .modal {
+    width: 100%;
+    max-width: 100%;
     border-radius: calc(var(--radius, 0.5rem) * 1.5)
       calc(var(--radius, 0.5rem) * 1.5) 0 0;
     max-height: 92dvh;
+    height: auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    overflow-x: hidden;
   }
 
   .modal-body {
-    max-height: 55vh;
+    max-height: calc(92dvh - 64px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .icon-btn {
     width: 36px;
     height: 36px;
+  }
+
+  /* iOS zoom prevention - inputs under 16px trigger auto-zoom */
+  .form-input,
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  input[type="text"],
+  textarea.form-input {
+    font-size: 16px;
   }
 }
 

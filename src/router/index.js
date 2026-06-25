@@ -6,7 +6,7 @@ import DashboardView from '@/views/DashboardView.vue'
 import LiveTrackingView from '@/views/LiveTrackingView.vue'
 import MonthOverviewView from '@/views/MonthOverviewView.vue'
 import YearOverviewView from '@/views/YearOverviewView.vue'
-import CalenderView from '@/views/CalenderView.vue'
+import CalendarView from '@/views/CalendarView.vue'
 import ToDoView from '@/views/ToDoView.vue'
 import DiagramsView from '@/views/DiagramsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
@@ -20,7 +20,7 @@ const routes = [
     { path: '/livetracking', name: 'livetracking', component: LiveTrackingView },
     { path: '/month-overview', name: 'month-overview', component: MonthOverviewView },
     { path: '/year-overview', name: 'year-overview', component: YearOverviewView },
-    { path: '/calender', name: 'calender', component: CalenderView },
+    { path: '/calendar', name: 'calendar', component: CalendarView },
     { path: '/todo', name: 'todo', component: ToDoView },
     { path: '/diagrams', name: 'diagrams', component: DiagramsView },
     { path: '/profile', name: 'profile', component: ProfileView },

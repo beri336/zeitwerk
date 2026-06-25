@@ -142,9 +142,9 @@
 
       <!-- Calendar -->
       <RouterLink
-        to="/calender"
+        to="/calendar"
         class="sidebar-item"
-        :class="{ active: route.path === '/calender' }"
+        :class="{ active: route.path === '/calendar' }"
       >
         <svg
           width="16"
@@ -470,7 +470,6 @@ const { t } = useI18n();
   flex: 1;
   min-width: 0;
   max-width: 150px;
-  /* font-size: 13px; */
   font-size: var(--text-xxs);
   font-weight: 500;
   text-align: center;

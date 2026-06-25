@@ -581,11 +581,6 @@
             "longest": "Longest Day",
             "gross": "Month Gross",
             "gross_sub": "Gross earnings",
-            "vac_used": "Used Vacation",
-            "vac_used_sub": "Days taken",
-            "vac_left": "Remaining Vacation",
-            "vac_left_sub": "Days left",
-            "vac_day_left_sub": "Day left",
             "work_days": "Work Days",
             "daily_average": "Daily Average"
         },

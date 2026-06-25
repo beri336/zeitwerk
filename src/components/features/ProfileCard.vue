@@ -1054,6 +1054,16 @@ function removeSkill(skill) {
     width: 36px;
     height: 36px;
   }
+
+  /* iOS zoom prevention - inputs under 16px trigger auto-zoom */
+  .form-input,
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  input[type="text"],
+  textarea.form-input {
+    font-size: 16px;
+  }
 }
 
 /* Small Mobile */

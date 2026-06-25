@@ -603,7 +603,6 @@ function save() {
   input[type="text"],
   textarea.form-input {
     font-size: 16px;
-    color: red !important;
   }
 }
 
