@@ -248,13 +248,20 @@ All data is stored in `localStorage`. No server communication ever occurs. All d
 
 [![GitHub](https://img.shields.io/badge/GitHub-beri336-24292e?style=for-the-badge&logo=github)](https://github.com/beri336) [![Bitbucket](https://img.shields.io/badge/Bitbucket-berkants-0052cc?style=for-the-badge&logo=bitbucket)](https://bitbucket.org/berkants/workspace/projects/DEV)
 
-<br>
+---
 
 ## License
 
-This project is licensed under the **MIT License** - see [`docs/LICENSE`](docs/LICENSE) for details.
+Copyright © 2026 beri336. All rights reserved.
 
-<br>
+This repository is publicly available for personal use and personal
+modification only. Copying, redistribution, publishing derivative
+repositories and commercial use of this project are not permitted
+without prior written permission. Attribution to the original author
+and repository must be preserved in all copies and modified versions,
+including private ones.
+
+See [LICENSE](./LICENSE) for the full terms.
 
 ---
 
