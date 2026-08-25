@@ -10,14 +10,7 @@
             {{ editEntry ? $t("entry.title_edit") : $t("entry.title_new") }}
           </div>
           <button class="btn btn-ghost" @click="close">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -27,21 +20,13 @@
         <div class="modal-body">
           <!-- Type selector -->
           <div class="typ-selector">
-            <button
-              v-for="(type, key) in ABSENCE_TYPES"
-              :key="key"
-              class="typ-btn"
-              :class="{ active: form.typ === key }"
-              :style="
-                form.typ === key
-                  ? `background:${type.highlight};color:${type.color};border-color:${type.color}`
-                  : ''
-              "
-              @click="form.typ = key"
-            >
+            <button v-for="(type, key) in ABSENCE_TYPES" :key="key" class="typ-btn"
+              :class="{ active: form.typ === key }" :style="form.typ === key
+                ? `background:${type.highlight};color:${type.color};border-color:${type.color}`
+                : ''
+                " @click="form.typ = key">
               <span>{{ type.icon }}</span>
-              <span>{{ type.label }}</span>
-              <!-- <span>{{ $t(type.labelKey) }}</span> -->
+              <span>{{ t(`absence.${key}`) }}</span>
             </button>
           </div>
 
@@ -53,25 +38,15 @@
             </div>
             <div class="form-group">
               <label class="form-label">{{ $t("entry.planned_label") }}</label>
-              <input
-                class="form-input"
-                type="number"
-                step="0.5"
-                min="0"
-                max="24"
-                v-model.number="form.plannedHours"
-              />
+              <input class="form-input" type="number" step="0.5" min="0" max="24" v-model.number="form.plannedHours" />
             </div>
 
             <!-- Gross Preview -->
-            <div
-              v-if="
-                showTimeFields &&
-                form.timeEntries?.some((entry) => entry.start && entry.end) &&
-                store.grossHourlyRate > 0
-              "
-              class="preview-bar"
-            >
+            <div v-if="
+              showTimeFields &&
+              form.timeEntries?.some((entry) => entry.start && entry.end) &&
+              store.grossHourlyRate > 0
+            " class="preview-bar">
               <span class="form-label">{{ $t("entry.preview_salary") }}</span>
               <strong class="preview-salary">
                 {{
@@ -91,11 +66,7 @@
                 <label class="form-label">{{ $t("entry.time_entries") }}</label>
 
                 <div class="time-blocks">
-                  <div
-                    v-for="(block, index) in form.timeEntries"
-                    :key="index"
-                    class="time-block"
-                  >
+                  <div v-for="(block, index) in form.timeEntries" :key="index" class="time-block">
                     <span class="block-label">{{
                       $t("entry.block_label", { index: index + 1 })
                     }}</span>
@@ -105,49 +76,25 @@
                         <label class="form-label">{{
                           $t("entry.start")
                         }}</label>
-                        <input
-                          class="form-input"
-                          type="time"
-                          v-model="block.start"
-                        />
+                        <input class="form-input" type="time" v-model="block.start" />
                       </div>
 
                       <div class="form-group">
                         <label class="form-label">{{ $t("entry.end") }}</label>
-                        <input
-                          class="form-input"
-                          type="time"
-                          v-model="block.end"
-                        />
+                        <input class="form-input" type="time" v-model="block.end" />
                       </div>
                       <div class="form-group">
                         <label class="form-label">{{
                           $t("entry.pause")
                         }}</label>
-                        <input
-                          class="form-input"
-                          type="number"
-                          min="0"
-                          max="240"
-                          v-model.number="block.pause"
-                        />
+                        <input class="form-input" type="number" min="0" max="240" v-model.number="block.pause" />
                       </div>
                     </div>
 
-                    <button
-                      v-if="form.timeEntries.length > 1"
-                      class="btn btn-ghost btn-sm block-remove"
-                      @click="removeBlock(index)"
-                      :title="$t('entry.remove_block')"
-                    >
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
+                    <button v-if="form.timeEntries.length > 1" class="btn btn-ghost btn-sm block-remove"
+                      @click="removeBlock(index)" :title="$t('entry.remove_block')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
                       </svg>
@@ -155,18 +102,8 @@
                   </div>
                 </div>
 
-                <button
-                  class="btn btn-secondary btn-sm add-block-btn"
-                  @click="addBlock"
-                >
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
+                <button class="btn btn-secondary btn-sm add-block-btn" @click="addBlock">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19" />
                     <line x1="5" y1="12" x2="19" y2="12" />
                   </svg>
@@ -191,33 +128,21 @@
             <!-- Notes -->
             <div class="form-group full">
               <label class="form-label">{{ $t("entry.notes") }}</label>
-              <input
-                class="form-input"
-                type="text"
-                maxlength="200"
-                v-model="form.notes"
-                :placeholder="
-                  form.typ === 'vacation'
-                    ? $t('entry.notes_placeholder_vac', {
-                        label: currentType.label,
-                      })
-                    : $t('entry.notes_placeholder', {
-                        label: currentType.label,
-                      })
-                "
-              />
+              <input class="form-input" type="text" maxlength="200" v-model="form.notes" :placeholder="form.typ === 'vacation'
+                ? $t('entry.notes_placeholder_vac', {
+                  label: currentType.label,
+                })
+                : $t('entry.notes_placeholder', {
+                  label: currentType.label,
+                })
+                " />
             </div>
 
             <!-- Remarks -->
             <div class="form-group full">
               <label class="form-label">{{ $t("entry.remarks") }}</label>
-              <textarea
-                class="form-input form-textarea"
-                v-model="form.remarks"
-                rows="4"
-                maxlength="2000"
-                :placeholder="$t('entry.remarks_placeholder')"
-              />
+              <textarea class="form-input form-textarea" v-model="form.remarks" rows="4" maxlength="2000"
+                :placeholder="$t('entry.remarks_placeholder')" />
             </div>
 
             <!-- Preview Total-Actual -->
@@ -254,20 +179,8 @@
               </template>
 
               <!-- Normal condition -->
-              <button
-                v-else
-                class="btn btn-ghost btn-sm delete-btn"
-                @click="askDelete"
-                style="margin-right: auto"
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
+              <button v-else class="btn btn-ghost btn-sm delete-btn" @click="askDelete" style="margin-right: auto">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6l-1 14H6L5 6" />
                   <path d="M10 11v6M14 11v6M9 6V4h6v2" />
@@ -349,9 +262,10 @@ watch(
   },
 );
 
-const currentType = computed(() =>
-  getAbsenceType(form.value?.typ ?? "on-site"),
-);
+const currentType = computed(() => ({
+  ...getAbsenceType(form.value?.typ ?? "on-site"),
+  label: t(`absence.${form.value?.typ ?? "on-site"}`),
+}));
 const showTimeFields = computed(() => currentType.value.counter);
 const previewActual = computed(() =>
   form.value ? calcActualHours(form.value) : 0,
@@ -421,9 +335,7 @@ function save() {
 <style scoped>
 /* Modal Content Scroll Container */
 .modal-content {
-  max-height: calc(
-    100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px
-  );
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;

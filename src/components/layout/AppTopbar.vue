@@ -17,19 +17,9 @@
 
         <!-- Export Dropdown -->
         <div class="export-dropdown" ref="exportDropRef">
-          <button
-            class="btn btn-secondary btn-sm topbar-action-btn"
-            @click="showExportMenu = !showExportMenu"
-            :title="$t('topbar.export_charts')"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+          <button class="btn btn-secondary btn-sm topbar-action-btn" @click="showExportMenu = !showExportMenu"
+            :title="$t('topbar.export_charts')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -40,14 +30,7 @@
           <Transition name="dropdown">
             <div v-if="showExportMenu" class="export-menu">
               <button @click="triggerExport('png')">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" />
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
@@ -55,14 +38,7 @@
                 {{ $t("topbar.export_png") }}
               </button>
               <button @click="triggerExport('jpg')">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" />
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
@@ -75,21 +51,10 @@
       </template>
 
       <template v-if="route.path === '/dashboard'">
-        <button
-          class="btn btn-secondary btn-sm topbar-action-btn"
-          @click="handleImport"
-          :title="$t('topbar.import_json')"
-          :aria-label="$t('topbar.import_json')"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
+        <button class="btn btn-secondary btn-sm topbar-action-btn" @click="handleImport"
+          :title="$t('topbar.import_json')" :aria-label="$t('topbar.import_json')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
@@ -97,21 +62,10 @@
           <span class="topbar-action-label">{{ $t("common.import") }}</span>
         </button>
 
-        <button
-          class="btn btn-secondary btn-sm topbar-action-btn"
-          @click="handleExport"
-          :title="$t('topbar.export_json')"
-          :aria-label="$t('topbar.export_json')"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
+        <button class="btn btn-secondary btn-sm topbar-action-btn" @click="handleExport"
+          :title="$t('topbar.export_json')" :aria-label="$t('topbar.export_json')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
@@ -119,24 +73,11 @@
           <span class="topbar-action-label">{{ $t("common.export") }}</span>
         </button>
 
-        <button
-          class="btn btn-secondary btn-sm topbar-action-btn"
-          @click="handleCSV"
-          :title="$t('topbar.export_csv')"
-          :aria-label="$t('topbar.export_csv')"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
-            <path
-              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-            />
+        <button class="btn btn-secondary btn-sm topbar-action-btn" @click="handleCSV" :title="$t('topbar.export_csv')"
+          :aria-label="$t('topbar.export_csv')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
             <line x1="16" y1="13" x2="8" y2="13" />
             <line x1="16" y1="17" x2="8" y2="17" />
@@ -146,24 +87,10 @@
       </template>
 
       <template v-if="route.path === '/settings'">
-        <a
-          class="btn btn-ghost icon-btn"
-          href="https://github.com/beri336/zeitwerk"
-          target="_blank"
-          rel="noopener noreferrer"
-          :title="$t('topbar.github')"
-          :aria-label="$t('topbar.github')"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="18"
-            height="18"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path
-              fill="currentColor"
-              d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.36 7.86 10.88.58.11.79-.25.79-.56
+        <a class="btn btn-ghost icon-btn" href="https://github.com/beri336/zeitwerk" target="_blank"
+          rel="noopener noreferrer" :title="$t('topbar.github')" :aria-label="$t('topbar.github')">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.36 7.86 10.88.58.11.79-.25.79-.56
                             0-.28-.01-1.02-.02-2-3.19.69-3.87-1.54-3.87-1.54-.53-1.33-1.3-1.68-1.3-1.68
                             -1.06-.72.08-.71.08-.71 1.17.08 1.78 1.22 1.78 1.22 1.04 1.78 2.73 1.27
                             3.4.97.11-.76.41-1.27.75-1.56-2.55-.29-5.23-1.28-5.23-5.69
@@ -172,93 +99,43 @@
                             c.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1
                             0 4.42-2.68 5.4-5.24 5.68.42.36.8 1.08.8 2.18
                             0 1.57-.01 2.83-.01 3.22 0 .31.21.68.8.56C20.21 21.36 23.5 17.09 23.5 12
-                            23.5 5.65 18.35.5 12 .5Z"
-            />
+                            23.5 5.65 18.35.5 12 .5Z" />
           </svg>
         </a>
       </template>
 
-      <button
-        class="theme-btn"
-        @click="emit('toggle-theme')"
-        :title="isDark ? $t('topbar.light_mode') : $t('topbar.dark_mode')"
-      >
-        <svg
-          v-if="isDark"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <button class="theme-btn" @click="emit('toggle-theme')"
+        :title="isDark ? $t('topbar.light_mode') : $t('topbar.dark_mode')">
+        <svg v-if="isDark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
           <circle cx="12" cy="12" r="5" />
           <path
-            d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-          />
+            d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
         </svg>
-        <svg
-          v-else
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
       </button>
 
       <!-- Privacy Toggle -->
-      <button
-        class="btn btn-ghost icon-btn"
-        :title="
-          privacyMode ? $t('topbar.privacy_show') : $t('topbar.privacy_hide')
-        "
-        @click="toggle"
-      >
+      <button class="btn btn-ghost icon-btn" :title="privacyMode ? $t('topbar.privacy_show') : $t('topbar.privacy_hide')
+        " @click="toggle">
         <!-- Eye open -->
-        <svg
-          v-if="!privacyMode"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg v-if="!privacyMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
           <circle cx="12" cy="12" r="3" />
         </svg>
         <!-- Eye crossed out (closed) -->
-        <svg
-          v-else
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
-          />
-          <path
-            d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
-          />
+        <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
           <line x1="1" y1="1" x2="23" y2="23" />
         </svg>
       </button>
     </div>
 
-    <input
-      type="file"
-      id="importFileInput"
-      accept=".json"
-      style="display: none"
-      @change="onFileChange"
-    />
+    <input type="file" id="importFileInput" accept=".json" style="display: none" @change="onFileChange" />
   </header>
 
   <ExportCsvModal v-model="showCsvModal" @confirm="handleCsvConfirm" />

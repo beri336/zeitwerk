@@ -9,7 +9,7 @@
           <h1 class="cal-title">{{ $t("calendar.appointments") }}</h1>
           <span class="cal-badge">{{
             $t("calendar.event", { count: monthEvents.length })
-          }}</span>
+            }}</span>
         </div>
         <div class="cal-header-right">
           <button class="btn btn-ghost btn-sm" @click="goToday">
@@ -17,34 +17,18 @@
           </button>
           <div class="nav-group">
             <button class="icon-btn" @click="prevMonth">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                width="16"
-                height="16"
-              >
-                <path
-                  fill-rule="evenodd"
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd"
                   d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
-                  clip-rule="evenodd"
-                />
+                  clip-rule="evenodd" />
               </svg>
             </button>
             <span class="cal-month-label">{{ monthLabel }}</span>
             <button class="icon-btn" @click="nextMonth">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                width="16"
-                height="16"
-              >
-                <path
-                  fill-rule="evenodd"
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd"
                   d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                  clip-rule="evenodd"
-                />
+                  clip-rule="evenodd" />
               </svg>
             </button>
           </div>
@@ -56,13 +40,8 @@
 
       <!-- View Toggle -->
       <div class="view-toggle">
-        <button
-          v-for="v in views"
-          :key="v.key"
-          class="filter-btn"
-          :class="{ active: activeView === v.key }"
-          @click="activeView = v.key"
-        >
+        <button v-for="v in views" :key="v.key" class="filter-btn" :class="{ active: activeView === v.key }"
+          @click="activeView = v.key">
           {{ v.label }}
         </button>
       </div>
@@ -73,37 +52,24 @@
         <div class="cal-grid-header">
           <span v-for="day in weekdays" :key="day" class="cal-weekday">{{
             day
-          }}</span>
+            }}</span>
         </div>
 
         <!-- Day Grid -->
         <div class="cal-grid">
-          <div
-            v-for="cell in calendarCells"
-            :key="cell.key"
-            class="cal-cell"
-            :class="{
-              'cal-cell--outside': !cell.currentMonth,
-              'cal-cell--today': cell.isToday,
-              'cal-cell--selected':
-                selectedDate && cell.dateStr === selectedDate,
-            }"
-            @click="selectDay(cell.dateStr)"
-          >
+          <div v-for="cell in calendarCells" :key="cell.key" class="cal-cell" :class="{
+            'cal-cell--outside': !cell.currentMonth,
+            'cal-cell--today': cell.isToday,
+            'cal-cell--selected':
+              selectedDate && cell.dateStr === selectedDate,
+          }" @click="selectDay(cell.dateStr)">
             <span class="cal-day-num">{{ cell.day }}</span>
             <div class="cal-cell-events">
-              <div
-                v-for="evt in cell.events.slice(0, 3)"
-                :key="evt.id"
-                class="cal-event-pill"
-                :style="{
-                  background: evt.color + '33',
-                  borderColor: evt.color,
-                  color: evt.color,
-                }"
-                @click.stop="openModal(evt.id)"
-                :title="evt.title"
-              >
+              <div v-for="evt in cell.events.slice(0, 3)" :key="evt.id" class="cal-event-pill" :style="{
+                background: evt.color + '33',
+                borderColor: evt.color,
+                color: evt.color,
+              }" @click.stop="openModal(evt.id)" :title="evt.title">
                 <span v-if="evt.allDay" class="pill-dot"></span>
                 <span v-else class="pill-time">{{ evt.startTime }}</span>
                 {{ evt.title }}
@@ -119,36 +85,19 @@
       <!-- Week View -->
       <template v-else-if="activeView === 'week'">
         <div class="week-grid">
-          <div
-            v-for="day in weekCells"
-            :key="day.dateStr"
-            class="week-col"
-            :class="{ 'week-col--today': day.isToday }"
-            @click="selectDay(day.dateStr)"
-          >
+          <div v-for="day in weekCells" :key="day.dateStr" class="week-col" :class="{ 'week-col--today': day.isToday }"
+            @click="selectDay(day.dateStr)">
             <div class="week-col-header">
               <span class="week-wd">{{ day.weekday }}</span>
-              <span
-                class="week-num"
-                :class="{ 'week-num--today': day.isToday }"
-                >{{ day.day }}</span
-              >
+              <span class="week-num" :class="{ 'week-num--today': day.isToday }">{{ day.day }}</span>
             </div>
             <div class="week-col-events">
-              <div
-                v-for="event in day.events"
-                :key="event.id"
-                class="week-event"
-                :style="{
-                  background: event.color + '22',
-                  borderLeft: `3px solid ${event.color}`,
-                }"
-                @click.stop="openModal(event.id)"
-              >
-                <span class="week-event-time" v-if="!event.allDay"
-                  >{{ event.startTime
-                  }}{{ event.endTime ? " – " + event.endTime : "" }}</span
-                >
+              <div v-for="event in day.events" :key="event.id" class="week-event" :style="{
+                background: event.color + '22',
+                borderLeft: `3px solid ${event.color}`,
+              }" @click.stop="openModal(event.id)">
+                <span class="week-event-time" v-if="!event.allDay">{{ event.startTime
+                }}{{ event.endTime ? " – " + event.endTime : "" }}</span>
                 <span class="week-event-title">{{ event.title }}</span>
               </div>
               <div v-if="day.events.length === 0" class="week-empty-hint"></div>
@@ -161,52 +110,29 @@
       <template v-else-if="activeView === 'agenda'">
         <div class="agenda-list">
           <template v-if="agendaGroups.length">
-            <div
-              v-for="group in agendaGroups"
-              :key="group.label"
-              class="agenda-group"
-            >
+            <div v-for="group in agendaGroups" :key="group.label" class="agenda-group">
               <div class="agenda-group-label">{{ group.label }}</div>
-              <div
-                v-for="event in group.events"
-                :key="event.id"
-                class="agenda-item"
-                :style="{ borderLeftColor: event.color }"
-                @click="openModal(event.id)"
-              >
+              <div v-for="event in group.events" :key="event.id" class="agenda-item"
+                :style="{ borderLeftColor: event.color }" @click="openModal(event.id)">
                 <div class="agenda-item-main">
                   <span class="agenda-item-title">{{ event.title }}</span>
                   <span v-if="event.location" class="agenda-item-meta">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                      width="11"
-                      height="11"
-                    >
-                      <path
-                        fill-rule="evenodd"
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="11"
+                      height="11">
+                      <path fill-rule="evenodd"
                         d="m7.539 14.841.003.003.002.002a.755.755 0 0 0 .912 0l.002-.002.003-.003.012-.009a5.57 5.57 0 0 0 .19-.153 15.173 15.173 0 0 0 2.046-2.082c1.101-1.362 2.291-3.342 2.291-5.597A5 5 0 0 0 3 7c0 2.255 1.19 4.235 2.292 5.597a15.174 15.174 0 0 0 2.046 2.082 8.597 8.597 0 0 0 .189.153l.012.01ZM8 8.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
-                        clip-rule="evenodd"
-                      />
+                        clip-rule="evenodd" />
                     </svg>
                     {{ event.location }}
                   </span>
                   <span v-if="event.tags.length" class="agenda-item-tags">
-                    <span
-                      v-for="tag in event.tags"
-                      :key="tag"
-                      class="tag tag--sm"
-                      >{{ tag }}</span
-                    >
+                    <span v-for="tag in event.tags" :key="tag" class="tag tag--sm">{{ tag }}</span>
                   </span>
                 </div>
                 <div class="agenda-item-time">
                   <span v-if="event.allDay">{{ $t("calendar.all_day") }}</span>
-                  <span v-else
-                    >{{ event.startTime
-                    }}{{ event.endTime ? " – " + event.endTime : "" }}</span
-                  >
+                  <span v-else>{{ event.startTime
+                  }}{{ event.endTime ? " – " + event.endTime : "" }}</span>
                 </div>
               </div>
             </div>
@@ -222,41 +148,26 @@
         <div v-if="selectedDate && activeView !== 'agenda'" class="day-detail">
           <div class="day-detail-header">
             <span class="day-detail-label">{{ selectedDateLabel }}</span>
-            <button
-              class="btn btn-primary btn-sm"
-              @click="openModal(null, selectedDate)"
-            >
+            <button class="btn btn-primary btn-sm" @click="openModal(null, selectedDate)">
               + {{ $t("calendar.modal.new_appointment") }}
             </button>
             <button class="icon-btn" @click="selectedDate = null">✕</button>
           </div>
           <div v-if="selectedEvents.length" class="day-detail-list">
-            <div
-              v-for="event in selectedEvents"
-              :key="event.id"
-              class="day-detail-item"
-              :style="{ borderLeftColor: event.color }"
-              @click="openModal(event.id)"
-            >
+            <div v-for="event in selectedEvents" :key="event.id" class="day-detail-item"
+              :style="{ borderLeftColor: event.color }" @click="openModal(event.id)">
               <div class="day-detail-item-main">
                 <span class="day-detail-title">{{ event.title }}</span>
                 <span v-if="event.description" class="day-detail-desc">{{
                   event.description
-                }}</span>
+                  }}</span>
                 <div class="day-detail-meta">
                   <span v-if="event.location" class="meta-item">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                      width="11"
-                      height="11"
-                    >
-                      <path
-                        fill-rule="evenodd"
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="11"
+                      height="11">
+                      <path fill-rule="evenodd"
                         d="m7.539 14.841.003.003.002.002a.755.755 0 0 0 .912 0l.002-.002.003-.003.012-.009a5.57 5.57 0 0 0 .19-.153 15.173 15.173 0 0 0 2.046-2.082c1.101-1.362 2.291-3.342 2.291-5.597A5 5 0 0 0 3 7c0 2.255 1.19 4.235 2.292 5.597a15.174 15.174 0 0 0 2.046 2.082 8.597 8.597 0 0 0 .189.153l.012.01ZM8 8.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
-                        clip-rule="evenodd"
-                      />
+                        clip-rule="evenodd" />
                     </svg>
                     {{ event.location }}
                   </span>
@@ -266,32 +177,17 @@
                   </span>
                   <span v-else class="meta-item">{{
                     $t("calendar.all_day")
-                  }}</span>
-                  <span
-                    v-for="tag in event.tags"
-                    :key="tag"
-                    class="tag tag--sm"
-                    >{{ tag }}</span
-                  >
+                    }}</span>
+                  <span v-for="tag in event.tags" :key="tag" class="tag tag--sm">{{ tag }}</span>
                 </div>
               </div>
               <div class="day-detail-actions">
-                <button
-                  class="icon-btn icon-btn--danger"
-                  @click.stop="removeEvent(event.id)"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    width="13"
-                    height="13"
-                  >
-                    <path
-                      fill-rule="evenodd"
+                <button class="icon-btn icon-btn--danger" @click.stop="removeEvent(event.id)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="13"
+                    height="13">
+                    <path fill-rule="evenodd"
                       d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z"
-                      clip-rule="evenodd"
-                    />
+                      clip-rule="evenodd" />
                   </svg>
                 </button>
               </div>
@@ -305,11 +201,7 @@
     <!-- Modal -->
     <Teleport to="body">
       <Transition name="modal">
-        <div
-          v-if="modal.open"
-          class="modal-backdrop"
-          @mousedown.self="closeModal"
-        >
+        <div v-if="modal.open" class="modal-backdrop" @mousedown.self="closeModal">
           <div class="modal">
             <header class="modal-header">
               <h2 class="modal-title">
@@ -327,26 +219,18 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.name")
-                }}</label>
-                <input
-                  v-model="form.title"
-                  class="form-input"
-                  type="text"
-                  :placeholder="$t('calendar.modal.name_hint')"
-                />
+                  }}</label>
+                <input v-model="form.title" class="form-input" type="text"
+                  :placeholder="$t('calendar.modal.name_hint')" />
               </div>
 
               <!-- Description -->
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.desc")
-                }}</label>
-                <textarea
-                  v-model="form.description"
-                  class="form-input form-textarea"
-                  :placeholder="$t('calendar.modal.desc_hint')"
-                  rows="2"
-                ></textarea>
+                  }}</label>
+                <textarea v-model="form.description" class="form-input form-textarea"
+                  :placeholder="$t('calendar.modal.desc_hint')" rows="2"></textarea>
               </div>
 
               <!-- Date -->
@@ -354,18 +238,14 @@
                 <div class="field">
                   <label class="field-label">{{
                     $t("calendar.modal.date")
-                  }}</label>
+                    }}</label>
                   <input v-model="form.date" class="form-input" type="date" />
                 </div>
                 <div class="field field--checkbox">
                   <label class="field-label">{{
                     $t("calendar.modal.allday")
-                  }}</label>
-                  <button
-                    class="urgent-toggle"
-                    :class="{ active: form.allDay }"
-                    @click="form.allDay = !form.allDay"
-                  >
+                    }}</label>
+                  <button class="urgent-toggle" :class="{ active: form.allDay }" @click="form.allDay = !form.allDay">
                     {{ form.allDay ? $t("common.yes") : $t("common.no") }}
                   </button>
                 </div>
@@ -376,22 +256,14 @@
                 <div class="field">
                   <label class="field-label">{{
                     $t("calendar.modal.time_from")
-                  }}</label>
-                  <input
-                    v-model="form.startTime"
-                    class="form-input"
-                    type="time"
-                  />
+                    }}</label>
+                  <input v-model="form.startTime" class="form-input" type="time" />
                 </div>
                 <div class="field">
                   <label class="field-label">{{
                     $t("calendar.modal.time_to")
-                  }}</label>
-                  <input
-                    v-model="form.endTime"
-                    class="form-input"
-                    type="time"
-                  />
+                    }}</label>
+                  <input v-model="form.endTime" class="form-input" type="time" />
                 </div>
               </div>
 
@@ -399,44 +271,26 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.location")
-                }}</label>
-                <input
-                  v-model="form.location"
-                  class="form-input"
-                  type="text"
-                  :placeholder="$t('calendar.modal.location_hint')"
-                />
+                  }}</label>
+                <input v-model="form.location" class="form-input" type="text"
+                  :placeholder="$t('calendar.modal.location_hint')" />
               </div>
 
               <!-- Color -->
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.color")
-                }}</label>
+                  }}</label>
                 <div class="color-selector">
-                  <button
-                    v-for="colour in colorOptions"
-                    :key="colour"
-                    class="color-btn"
-                    :style="{
-                      background: colour,
-                      borderColor: form.color === colour ? '#fff' : colour,
-                    }"
-                    @click="form.color = colour"
-                  >
-                    <svg
-                      v-if="form.color === colour"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="white"
-                      width="12"
-                      height="12"
-                    >
-                      <path
-                        fill-rule="evenodd"
+                  <button v-for="colour in colorOptions" :key="colour" class="color-btn" :style="{
+                    background: colour,
+                    borderColor: form.color === colour ? '#fff' : colour,
+                  }" @click="form.color = colour">
+                    <svg v-if="form.color === colour" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                      fill="white" width="12" height="12">
+                      <path fill-rule="evenodd"
                         d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                        clip-rule="evenodd"
-                      />
+                        clip-rule="evenodd" />
                     </svg>
                   </button>
                 </div>
@@ -446,26 +300,16 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.tags")
-                }}</label>
+                  }}</label>
                 <div class="tag-input-wrapper">
-                  <span
-                    v-for="tag in form.tags"
-                    :key="tag"
-                    class="tag tag--removable"
-                  >
+                  <span v-for="tag in form.tags" :key="tag" class="tag tag--removable">
                     {{ tag }}
                     <button class="tag-remove" @click="removeTag(tag)">
                       ×
                     </button>
                   </span>
-                  <input
-                    v-model="tagInput"
-                    class="tag-input"
-                    type="text"
-                    :placeholder="$t('calendar.modal.tags_hint')"
-                    @keydown.enter.prevent="addTag"
-                    @keydown.188.prevent="addTag"
-                  />
+                  <input v-model="tagInput" class="tag-input" type="text" :placeholder="$t('calendar.modal.tags_hint')"
+                    @keydown.enter.prevent="addTag" @keydown.188.prevent="addTag" />
                 </div>
               </div>
 
@@ -473,7 +317,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.reminder")
-                }}</label>
+                  }}</label>
                 <select v-model="form.reminder" class="form-input form-select">
                   <option value="">
                     {{ $t("calendar.modal.reminder_none") }}
@@ -501,25 +345,17 @@
             </div>
 
             <footer class="modal-footer">
-              <button
-                v-if="modal.editId"
-                class="btn btn-danger"
-                @click="
-                  removeEvent(modal.editId);
-                  closeModal();
-                "
-              >
+              <button v-if="modal.editId" class="btn btn-danger" @click="
+                removeEvent(modal.editId);
+              closeModal();
+              ">
                 {{ $t("common.delete") }}
               </button>
               <div class="modal-footer-right">
                 <button class="btn btn-ghost" @click="closeModal">
                   {{ $t("common.cancel") }}
                 </button>
-                <button
-                  class="btn btn-primary"
-                  :disabled="!form.title.trim() || !form.date"
-                  @click="saveModal"
-                >
+                <button class="btn btn-primary" :disabled="!form.title.trim() || !form.date" @click="saveModal">
                   {{ modal.editId ? $t("common.save") : $t("common.create") }}
                 </button>
               </div>
@@ -536,6 +372,7 @@ import { ref, reactive, computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useCalendarStore } from "@/composables/useCalendarStore";
 import { storeToRefs } from "pinia";
+import { useToast } from "@/composables/useToast";
 
 const today = new Date();
 const currentYear = ref(today.getFullYear());
@@ -545,6 +382,7 @@ const activeView = ref("month");
 const selectedDate = ref(null);
 const calendarStore = useCalendarStore();
 const { events } = storeToRefs(calendarStore);
+const { showToast } = useToast();
 
 const { t, locale } = useI18n();
 
@@ -839,6 +677,7 @@ function saveModal() {
         ...form,
         tags: [...form.tags],
       };
+      showToast(t("calendar.edited_text"), "ok");
   } else {
     events.value.push({
       id: calendarStore.getNextId(),
@@ -853,11 +692,16 @@ function saveModal() {
       tags: [...form.tags],
       reminder: form.reminder,
     });
+    showToast(t("calendar.created_text"), "ok");
   }
   closeModal();
 }
 
 function removeEvent(id) {
+  if (!confirm(t("calendar.delete_confirmation")))
+    return;
+
+  showToast(t("calendar.deleted_text"), "ok");
   events.value = events.value.filter((e) => e.id !== id);
 }
 
@@ -1029,11 +873,9 @@ function removeTag(tag) {
 
 .cal-cell--today {
   border-color: var(--color-gold, #6366f1);
-  background: color-mix(
-    in srgb,
-    var(--color-gold, #6366f1) 8%,
-    var(--color-surface, #1e2130)
-  );
+  background: color-mix(in srgb,
+      var(--color-gold, #6366f1) 8%,
+      var(--color-surface, #1e2130));
 }
 
 .cal-cell--selected {
@@ -1131,11 +973,9 @@ function removeTag(tag) {
 
 .week-col--today {
   border-color: var(--color-primary, #6366f1);
-  background: color-mix(
-    in srgb,
-    var(--color-primary, #6366f1) 6%,
-    var(--color-surface, #1e2130)
-  );
+  background: color-mix(in srgb,
+      var(--color-primary, #6366f1) 6%,
+      var(--color-surface, #1e2130));
 }
 
 .week-col-header {
@@ -1672,11 +1512,9 @@ function removeTag(tag) {
 }
 
 .urgent-toggle.active {
-  background: color-mix(
-    in srgb,
-    var(--color-primary, #6366f1) 15%,
-    transparent
-  );
+  background: color-mix(in srgb,
+      var(--color-primary, #6366f1) 15%,
+      transparent);
   border-color: var(--color-primary, #6366f1);
   color: var(--color-primary, #6366f1);
 }
@@ -1723,8 +1561,7 @@ function removeTag(tag) {
   }
 
   .main {
-    padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem)
-      calc(var(--space-3, 0.75rem) + env(safe-area-inset-bottom));
+    padding: var(--space-3, 0.75rem) var(--space-3, 0.75rem) calc(var(--space-3, 0.75rem) + env(safe-area-inset-bottom));
   }
 
   .cal-wrapper {
@@ -1795,8 +1632,7 @@ function removeTag(tag) {
   .modal {
     width: 100%;
     max-width: 100%;
-    border-radius: calc(var(--radius, 0.5rem) * 1.5)
-      calc(var(--radius, 0.5rem) * 1.5) 0 0;
+    border-radius: calc(var(--radius, 0.5rem) * 1.5) calc(var(--radius, 0.5rem) * 1.5) 0 0;
     max-height: 92dvh;
     height: auto;
     position: fixed;
@@ -1832,8 +1668,7 @@ function removeTag(tag) {
 /* Mobile */
 @media (max-width: 420px) {
   .main {
-    padding: var(--space-2, 0.5rem) var(--space-2, 0.5rem)
-      calc(var(--space-2, 0.5rem) + env(safe-area-inset-bottom));
+    padding: var(--space-2, 0.5rem) var(--space-2, 0.5rem) calc(var(--space-2, 0.5rem) + env(safe-area-inset-bottom));
   }
 
   .cal-cell {

@@ -2,42 +2,42 @@
 
 export const ABSENCE_TYPES = {
     'on-site': {
-        label: 'On Site',
+        // label: 'On Site',
         color: 'var(--color-primary)',
         highlight: 'var(--color-primary-highlight)',
         counter: true, // counts as actual time
         icon: '💼'
     },
     homeoffice: {
-        label: 'Homeoffice',
+        // label: 'Homeoffice',
         color: 'var(--color-success)',
         highlight: 'var(--color-success-highlight)',
         counter: true,
         icon: '🏠'
     },
     vacation: {
-        label: 'Vacation',
+        // label: 'Vacation',
         color: 'var(--color-gold, #d19900)',
         highlight: 'var(--color-gold-highlight, #e9e0c6)',
         counter: false, // actual = planned (auto-filled)
         icon: '🏖️'
     },
     sick: {
-        label: 'Sick',
+        // label: 'Sick',
         color: 'var(--color-error)',
         highlight: 'var(--color-error-highlight)',
         counter: false,
         icon: '🤒'
     },
     publicholiday: {
-        label: 'Public Holiday',
+        // label: 'Public Holiday',
         color: 'var(--color-blue)',
         highlight: 'var(--color-blue-highlight)',
         counter: false,
         icon: '🎉'
     },
     other: {
-        label: 'Other',
+        // label: 'Other',
         color: 'var(--color-text-muted)',
         highlight: 'var(--color-surface-offset)',
         counter: false,

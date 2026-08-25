@@ -9,26 +9,16 @@
         {{ $t("monthTable.title", { month: store.currMonthLabel }) }}
       </div>
       <div class="table-badges">
-        <span class="badge badge-ok"
-          >{{ formatHours(store.monthActual) }}
-          {{ $t("monthTable.actual") }}</span
-        >
-        <span class="badge badge-neu"
-          >{{ formatHours(store.monthPlanned) }}
-          {{ $t("monthTable.planned") }}</span
-        >
+        <span class="badge badge-ok">{{ formatHours(store.monthActual) }}
+          {{ $t("monthTable.actual") }}</span>
+        <span class="badge badge-neu">{{ formatHours(store.monthPlanned) }}
+          {{ $t("monthTable.planned") }}</span>
       </div>
     </div>
 
     <!-- Empty State -->
     <div v-if="store.entriesForMonth.length === 0" class="empty-state">
-      <svg
-        class="empty-icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-      >
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <rect x="3" y="4" width="18" height="18" rx="2" />
         <line x1="16" y1="2" x2="16" y2="6" />
         <line x1="8" y1="2" x2="8" y2="6" />
@@ -56,31 +46,20 @@
           </tr>
         </thead>
         <tbody>
-          <template
-            v-for="(group, groupIndex) in store.weekGroups"
-            :key="group.kw"
-          >
+          <template v-for="(group, groupIndex) in store.weekGroups" :key="group.kw">
             <!-- Entry rows -->
-            <tr
-              v-for="(entry, entryIndex) in group.entries"
-              :key="entry.id"
-              :class="{ 'week-separator': entryIndex === 0 && groupIndex > 0 }"
-            >
+            <tr v-for="(entry, entryIndex) in group.entries" :key="entry.id"
+              :class="{ 'week-separator': entryIndex === 0 && groupIndex > 0 }">
               <td>
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: var(--space-2);
-                  "
-                >
-                  <span
-                    v-if="entry.typ && entry.typ !== 'on-site'"
-                    class="typ-chip"
-                    :style="`background:${getAbsenceType(entry.typ).highlight};color:${getAbsenceType(entry.typ).color}`"
-                  >
-                    {{ getAbsenceType(entry.typ).icon }}
-                    {{ getAbsenceType(entry.typ).label }}
+                <div style="
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+        ">
+                  <span v-if="entry.typ && entry.typ !== 'on-site'" class="typ-chip"
+                    :style="`background:${absenceMeta(entry.typ).highlight};color:${absenceMeta(entry.typ).color}`">
+                    {{ absenceMeta(entry.typ).icon }}
+                    {{ absenceMeta(entry.typ).label }}
                   </span>
                   <span>{{ formatDate(entry.date) }}</span>
                 </div>
@@ -89,11 +68,7 @@
               <!-- Inline editable cells -->
               <td>
                 <div class="time-stack">
-                  <span
-                    v-for="(timeEntry, index) in entry.timeEntries ?? []"
-                    :key="index"
-                    class="time-line"
-                  >
+                  <span v-for="(timeEntry, index) in entry.timeEntries ?? []" :key="index" class="time-line">
                     {{ timeEntry.start || "—" }}–{{ timeEntry.end || "—" }}
                   </span>
                   <span v-if="!entry.timeEntries?.length">—</span>
@@ -105,11 +80,11 @@
                 {{
                   entry.timeEntries?.length
                     ? $t("monthTable.pauses_value", {
-                        minutes: entry.timeEntries.reduce(
-                          (sum, timeEntry) => sum + (timeEntry.pause ?? 0),
-                          0,
-                        ),
-                      })
+                      minutes: entry.timeEntries.reduce(
+                        (sum, timeEntry) => sum + (timeEntry.pause ?? 0),
+                        0,
+                      ),
+                    })
                     : "—"
                 }}
               </td>
@@ -140,24 +115,11 @@
               </td>
 
               <!-- Notes -->
-              <td
-                class="editable"
-                @click="startEdit(entry, 'notes')"
-                style="max-width: 180px"
-              >
-                <input
-                  v-if="
-                    editCell?.id === entry.id && editCell?.field === 'notes'
-                  "
-                  type="text"
-                  class="inline-input"
-                  v-model="editCell.value"
-                  @blur="saveEdit(entry)"
-                  @keyup.enter="saveEdit(entry)"
-                  @keyup.escape="cancelEdit"
-                  autofocus
-                  style="min-width: 120px"
-                />
+              <td class="editable" @click="startEdit(entry, 'notes')" style="max-width: 180px">
+                <input v-if="
+                  editCell?.id === entry.id && editCell?.field === 'notes'
+                " type="text" class="inline-input" v-model="editCell.value" @blur="saveEdit(entry)"
+                  @keyup.enter="saveEdit(entry)" @keyup.escape="cancelEdit" autofocus style="min-width: 120px" />
                 <span v-else class="cell-truncate">
                   {{
                     entry.notes || '—'
@@ -168,60 +130,25 @@
               <!-- Row actions -->
               <td class="actions-cell">
                 <div class="row-actions">
-                  <button
-                    class="btn btn-ghost btn-sm"
-                    @click="emit('edit', entry)"
-                    :title="$t('common.edit')"
-                  >
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                      />
-                      <path
-                        d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
-                      />
+                  <button class="btn btn-ghost btn-sm" @click="emit('edit', entry)" :title="$t('common.edit')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   </button>
 
                   <!-- Delete: normal button or confirmation -->
                   <template v-if="pendingDelete === entry.id">
-                    <button
-                      class="btn btn-danger btn-sm"
-                      @click="confirmDelete"
-                      :title="$t('common.confirm')"
-                    >
+                    <button class="btn btn-danger btn-sm" @click="confirmDelete" :title="$t('common.confirm')">
                       ✓
                     </button>
-                    <button
-                      class="btn btn-ghost btn-sm"
-                      @click="cancelDelete"
-                      :title="$t('common.cancel')"
-                    >
+                    <button class="btn btn-ghost btn-sm" @click="cancelDelete" :title="$t('common.cancel')">
                       ✕
                     </button>
                   </template>
-                  <button
-                    v-else
-                    class="btn btn-ghost btn-sm"
-                    @click="askDelete(entry.id)"
-                    :title="$t('common.delete')"
-                    style="color: var(--color-text-faint)"
-                  >
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
+                  <button v-else class="btn btn-ghost btn-sm" @click="askDelete(entry.id)" :title="$t('common.delete')"
+                    style="color: var(--color-text-faint)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="3 6 5 6 21 6" />
                       <path d="M19 6l-1 14H6L5 6" />
                       <path d="M10 11v6M14 11v6M9 6V4h6v2" />
@@ -237,16 +164,10 @@
                 <span class="week-label">{{ $t('monthTable.week_total', { week: group.kw }) }}</span>
               </td>
               <td class="num">{{ formatHours(group.planned) }}</td>
-              <td
-                class="num"
-                :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'"
-              >
+              <td class="num" :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">
                 {{ formatHours(group.actual) }}
               </td>
-              <td
-                class="num"
-                :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'"
-              >
+              <td class="num" :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">
                 {{ group.ActualDiff >= 0 ? "+" : ""
                 }}{{ formatHours(group.ActualDiff) }}
               </td>
@@ -259,16 +180,10 @@
           <tr class="month-total-row">
             <td colspan="4">{{ $t('monthTable.month_total') }}</td>
             <td class="num">{{ formatHours(store.monthPlanned) }}</td>
-            <td
-              class="num"
-              :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'"
-            >
+            <td class="num" :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">
               {{ formatHours(store.monthActual) }}
             </td>
-            <td
-              class="num"
-              :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'"
-            >
+            <td class="num" :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">
               {{ store.monthDiff >= 0 ? "+" : ""
               }}{{ formatHours(store.monthDiff) }}
             </td>
@@ -301,6 +216,13 @@ const emit = defineEmits(["edit"]);
 const store = useZeitwerkStore();
 const { showToast } = useToast();
 const editCell = ref(null);
+
+function absenceMeta(typ) {
+  return {
+    ...getAbsenceType(typ),
+    label: t(`absence.${typ}`),
+  };
+}
 
 function startEdit(entry, field) {
   editCell.value = {
@@ -349,9 +271,9 @@ function askDelete(id) {
 }
 
 function confirmDelete() {
-    store.deleteEntry(pendingDelete.value)
-    showToast(t('monthTable.toast_deleted'), 'ok')
-    pendingDelete.value = null
+  store.deleteEntry(pendingDelete.value)
+  showToast(t('monthTable.toast_deleted'), 'ok')
+  pendingDelete.value = null
 }
 
 function cancelDelete() {
@@ -585,11 +507,9 @@ td.editable:hover {
 
 /* Absence Row (wird über JS nicht genutzt, aber gelassen) */
 tr[data-absence="true"] td {
-  background: color-mix(
-    in oklch,
-    var(--color-primary-highlight) 30%,
-    var(--color-surface)
-  );
+  background: color-mix(in oklch,
+      var(--color-primary-highlight) 30%,
+      var(--color-surface));
 }
 
 tr[data-absence="true"]:hover td {
@@ -630,11 +550,9 @@ tr[data-absence="true"]:hover td {
 }
 
 .month-total-row td {
-  background: color-mix(
-    in oklch,
-    var(--color-primary) 6%,
-    var(--color-surface-offset)
-  );
+  background: color-mix(in oklch,
+      var(--color-primary) 6%,
+      var(--color-surface-offset));
   border-top: 2px solid var(--color-primary-highlight);
   font-weight: 700;
   font-size: var(--text-sm);
@@ -670,7 +588,7 @@ tr[data-absence="true"]:hover td {
   white-space: nowrap;
 }
 
-.time-stack span + span {
+.time-stack span+span {
   color: var(--color-text-muted);
 }
 

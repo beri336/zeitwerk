@@ -547,8 +547,10 @@ import { ref, reactive, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import { useHabitStore } from "@/composables/useHabitStore";
+import { useToast } from "@/composables/useToast";
 
 const { t, locale } = useI18n();
+const { showToast } = useToast();
 const currentLocale = computed(() => locale.value);
 
 // Helpers
@@ -848,6 +850,7 @@ function saveModal() {
   if (modal.editId) {
     const habit = habits.value.find((h) => h.id === modal.editId);
     if (habit) Object.assign(habit, { ...form });
+    showToast(t("habits.edit_new"), "ok");
   } else {
     habits.value.push({
       id: habitStore.getNextId(),
@@ -858,13 +861,18 @@ function saveModal() {
       frequency: form.frequency,
       createdAt: Date.now(),
     });
+    showToast(t("habits.add_new"), "ok");
   }
   closeModal();
 }
 
 function removeHabit(id) {
+  if (!confirm(t("habits.remove_confirmation")))
+    return;
+
   habits.value = habits.value.filter((h) => h.id !== id);
   delete completions.value[id];
+  showToast(t("habits.remove"), "ok");
   persistCompletions();
 }
 
@@ -892,6 +900,7 @@ function prevMonth() {
     viewMonth.value--;
   }
 }
+
 function nextMonth() {
   if (viewMonth.value === 11) {
     viewMonth.value = 0;

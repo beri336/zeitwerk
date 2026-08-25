@@ -10,21 +10,21 @@
         <span class="todo-badge">
           {{ badgeText }}
         </span>
+
         <button class="btn btn-primary btn-sm ml-auto" @click="openModal()">
           + {{ $t("todos.add_btn") }}
+        </button>
+
+        <button class="btn btn-primary btn-sm ml-auto" @click="deleteAllEntries()">
+          {{ $t("todos.delete_all") }}
         </button>
       </header>
 
       <!-- Filter & Sort Bar -->
       <div class="toolbar">
         <div class="todo-filters">
-          <button
-            v-for="filter in filters"
-            :key="filter.key"
-            class="filter-btn"
-            :class="{ active: activeFilter === filter.key }"
-            @click="activeFilter = filter.key"
-          >
+          <button v-for="filter in filters" :key="filter.key" class="filter-btn"
+            :class="{ active: activeFilter === filter.key }" @click="activeFilter = filter.key">
             {{ filter.label }}
           </button>
         </div>
@@ -39,51 +39,29 @@
 
       <!-- Tag Filter -->
       <div v-if="allTags.length" class="tag-filter-row">
-        <button
-          class="tag tag--filter"
-          :class="{ active: !activeTag }"
-          @click="activeTag = null"
-        >
+        <button class="tag tag--filter" :class="{ active: !activeTag }" @click="activeTag = null">
           {{ $t("todos.filter.all") }}
         </button>
-        <button
-          v-for="tag in allTags"
-          :key="tag"
-          class="tag tag--filter"
-          :class="{ active: activeTag === tag }"
-          @click="activeTag = activeTag === tag ? null : tag"
-        >
+        <button v-for="tag in allTags" :key="tag" class="tag tag--filter" :class="{ active: activeTag === tag }"
+          @click="activeTag = activeTag === tag ? null : tag">
           {{ tag }}
         </button>
       </div>
 
       <!-- Todo List -->
       <TransitionGroup name="todo-list" tag="ul" class="todo-list">
-        <li
-          v-for="todo in filteredTodos"
-          :key="todo.id"
-          class="todo-item"
-          :class="{
-            done: todo.done,
-            urgent: todo.urgent,
-            [`priority-${todo.priority}`]: true,
-          }"
-        >
+        <li v-for="todo in filteredTodos" :key="todo.id" class="todo-item" :class="{
+          done: todo.done,
+          urgent: todo.urgent,
+          [`priority-${todo.priority}`]: true,
+        }">
           <!-- Left: Checkbox -->
           <button class="todo-check" @click="toggleTodo(todo.id)">
-            <svg
-              v-if="todo.done"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              width="14"
-              height="14"
-            >
-              <path
-                fill-rule="evenodd"
+            <svg v-if="todo.done" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14"
+              height="14">
+              <path fill-rule="evenodd"
                 d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                clip-rule="evenodd"
-              />
+                clip-rule="evenodd" />
             </svg>
           </button>
 
@@ -91,60 +69,29 @@
           <div class="todo-content">
             <div class="todo-main-row">
               <span class="todo-text">{{ todo.text }}</span>
-              <span v-if="todo.urgent" class="urgent-badge" title="Urgent"
-                >⚡</span
-              >
-              <span
-                class="priority-dot"
-                :class="`priority-dot--${todo.priority}`"
-                :title="priorityLabel(todo.priority)"
-              ></span>
+              <span v-if="todo.urgent" class="urgent-badge" title="Urgent">⚡</span>
+              <span class="priority-dot" :class="`priority-dot--${todo.priority}`"
+                :title="priorityLabel(todo.priority)"></span>
             </div>
 
             <!-- Meta Row -->
             <div class="todo-meta">
-              <span
-                v-if="todo.dueDate || todo.dueTime"
-                class="meta-item"
-                :class="{ overdue: isOverdue(todo) }"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  width="11"
-                  height="11"
-                >
+              <span v-if="todo.dueDate || todo.dueTime" class="meta-item" :class="{ overdue: isOverdue(todo) }">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="11" height="11">
                   <path
-                    d="M5.75 7.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM5 10.25a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75z"
-                  />
-                  <path
-                    fill-rule="evenodd"
+                    d="M5.75 7.5a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5zM5 10.25a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75z" />
+                  <path fill-rule="evenodd"
                     d="M4.75 1a.75.75 0 01.75.75V3h5V1.75a.75.75 0 011.5 0V3h.25A2.75 2.75 0 0115 5.75v7.5A2.75 2.75 0 0112.25 16H3.75A2.75 2.75 0 011 13.25v-7.5A2.75 2.75 0 013.75 3H4V1.75A.75.75 0 014.75 1zm-1 3.5c-.69 0-1.25.56-1.25 1.25V6h11v-.25c0-.69-.56-1.25-1.25-1.25H3.75zM2.5 7.5v5.75c0 .69.56 1.25 1.25 1.25h8.5c.69 0 1.25-.56 1.25-1.25V7.5h-11z"
-                    clip-rule="evenodd"
-                  />
+                    clip-rule="evenodd" />
                 </svg>
                 {{ formatDue(todo) }}
               </span>
-              <a
-                v-if="todo.link"
-                :href="todo.link"
-                target="_blank"
-                class="meta-item meta-link"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  width="11"
-                  height="11"
-                >
+              <a v-if="todo.link" :href="todo.link" target="_blank" class="meta-item meta-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="11" height="11">
                   <path
-                    d="M6.22 8.72a.75.75 0 001.06 1.06l5.22-5.22v1.69a.75.75 0 001.5 0v-3.5a.75.75 0 00-.75-.75h-3.5a.75.75 0 000 1.5h1.69L6.22 8.72z"
-                  />
+                    d="M6.22 8.72a.75.75 0 001.06 1.06l5.22-5.22v1.69a.75.75 0 001.5 0v-3.5a.75.75 0 00-.75-.75h-3.5a.75.75 0 000 1.5h1.69L6.22 8.72z" />
                   <path
-                    d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 007 4H4.75A2.75 2.75 0 002 6.75v4.5A2.75 2.75 0 004.75 14h4.5A2.75 2.75 0 0012 11.25V9a.75.75 0 00-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5z"
-                  />
+                    d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 007 4H4.75A2.75 2.75 0 002 6.75v4.5A2.75 2.75 0 004.75 14h4.5A2.75 2.75 0 0012 11.25V9a.75.75 0 00-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5z" />
                 </svg>
                 Link
               </a>
@@ -156,10 +103,7 @@
             <!-- Subtasks -->
             <div v-if="todo.subtasks.length" class="subtasks">
               <div class="subtask-progress">
-                <div
-                  class="subtask-progress-bar"
-                  :style="{ width: subtaskProgress(todo) + '%' }"
-                ></div>
+                <div class="subtask-progress-bar" :style="{ width: subtaskProgress(todo) + '%' }"></div>
               </div>
               <span class="subtask-count">
                 {{
@@ -170,129 +114,62 @@
                 }}
               </span>
               <ul class="subtask-list" v-show="todo.expanded">
-                <li
-                  v-for="sub in todo.subtasks"
-                  :key="sub.id"
-                  class="subtask-item"
-                  :class="{ done: sub.done }"
-                >
-                  <button
-                    class="todo-check todo-check--sm"
-                    @click="toggleSubtask(todo.id, sub.id)"
-                  >
-                    <svg
-                      v-if="sub.done"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      width="10"
-                      height="10"
-                    >
-                      <path
-                        fill-rule="evenodd"
+                <li v-for="sub in todo.subtasks" :key="sub.id" class="subtask-item" :class="{ done: sub.done }">
+                  <button class="todo-check todo-check--sm" @click="toggleSubtask(todo.id, sub.id)">
+                    <svg v-if="sub.done" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                      width="10" height="10">
+                      <path fill-rule="evenodd"
                         d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                        clip-rule="evenodd"
-                      />
+                        clip-rule="evenodd" />
                     </svg>
                   </button>
                   <span class="subtask-text">{{ sub.text }}</span>
 
                   <!-- Subtask Meta -->
                   <div class="subtask-meta">
-                    <span
-                      v-if="sub.dueDate || sub.dueTime"
-                      class="meta-item"
-                      :class="{ overdue: isOverdue(sub) }"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        width="10"
-                        height="10"
-                      >
-                        <path
-                          fill-rule="evenodd"
+                    <span v-if="sub.dueDate || sub.dueTime" class="meta-item" :class="{ overdue: isOverdue(sub) }">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="10"
+                        height="10">
+                        <path fill-rule="evenodd"
                           d="M4.75 1a.75.75 0 01.75.75V3h5V1.75a.75.75 0 011.5 0V3h.25A2.75 2.75 0 0115 5.75v7.5A2.75 2.75 0 0112.25 16H3.75A2.75 2.75 0 011 13.25v-7.5A2.75 2.75 0 013.75 3H4V1.75A.75.75 0 014.75 1zm-1 3.5c-.69 0-1.25.56-1.25 1.25V6h11v-.25c0-.69-.56-1.25-1.25-1.25H3.75zM2.5 7.5v5.75c0 .69.56 1.25 1.25 1.25h8.5c.69 0 1.25-.56 1.25-1.25V7.5h-11z"
-                          clip-rule="evenodd"
-                        />
+                          clip-rule="evenodd" />
                       </svg>
                       {{ formatDue(sub) }}
                     </span>
-                    <a
-                      v-if="sub.link"
-                      :href="sub.link"
-                      target="_blank"
-                      class="meta-item meta-link"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        width="10"
-                        height="10"
-                      >
+                    <a v-if="sub.link" :href="sub.link" target="_blank" class="meta-item meta-link">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="10"
+                        height="10">
                         <path
-                          d="M6.22 8.72a.75.75 0 001.06 1.06l5.22-5.22v1.69a.75.75 0 001.5 0v-3.5a.75.75 0 00-.75-.75h-3.5a.75.75 0 000 1.5h1.69L6.22 8.72z"
-                        />
+                          d="M6.22 8.72a.75.75 0 001.06 1.06l5.22-5.22v1.69a.75.75 0 001.5 0v-3.5a.75.75 0 00-.75-.75h-3.5a.75.75 0 000 1.5h1.69L6.22 8.72z" />
                         <path
-                          d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 007 4H4.75A2.75 2.75 0 002 6.75v4.5A2.75 2.75 0 004.75 14h4.5A2.75 2.75 0 0012 11.25V9a.75.75 0 00-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5z"
-                        />
+                          d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 007 4H4.75A2.75 2.75 0 002 6.75v4.5A2.75 2.75 0 004.75 14h4.5A2.75 2.75 0 0012 11.25V9a.75.75 0 00-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5z" />
                       </svg>
                       Link
                     </a>
-                    <span
-                      v-for="tag in sub.tags"
-                      :key="tag"
-                      class="tag tag--sm"
-                      >{{ tag }}</span
-                    >
+                    <span v-for="tag in sub.tags" :key="tag" class="tag tag--sm">{{ tag }}</span>
                   </div>
 
                   <div class="todo-actions subtask-actions">
-                    <button
-                      class="icon-btn"
-                      @click="openModal(todo.id, sub.id)"
-                      :title="$t('common.edit')"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        width="12"
-                        height="12"
-                      >
+                    <button class="icon-btn" @click="openModal(todo.id, sub.id)" :title="$t('common.edit')">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="12"
+                        height="12">
                         <path
-                          d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z"
-                        />
+                          d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
                       </svg>
                     </button>
-                    <button
-                      class="icon-btn icon-btn--danger"
-                      @click="removeSubtask(todo.id, sub.id)"
-                      :title="$t('common.delete')"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        width="12"
-                        height="12"
-                      >
-                        <path
-                          fill-rule="evenodd"
+                    <button class="icon-btn icon-btn--danger" @click="removeSubtask(todo.id, sub.id)"
+                      :title="$t('common.delete')">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="12"
+                        height="12">
+                        <path fill-rule="evenodd"
                           d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z"
-                          clip-rule="evenodd"
-                        />
+                          clip-rule="evenodd" />
                       </svg>
                     </button>
                   </div>
                 </li>
               </ul>
-              <button
-                class="subtask-toggle"
-                @click="todo.expanded = !todo.expanded"
-              >
+              <button class="subtask-toggle" @click="todo.expanded = !todo.expanded">
                 {{
                   todo.expanded
                     ? "▲ " + $t("common.collapse")
@@ -304,57 +181,23 @@
 
           <!-- Right: Actions -->
           <div class="todo-actions">
-            <button
-              class="icon-btn"
-              :title="$t('todos.add_subtask')"
-              @click="openModal(todo.id, null, true)"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                width="14"
-                height="14"
-              >
+            <button class="icon-btn" :title="$t('todos.add_subtask')" @click="openModal(todo.id, null, true)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
                 <path
-                  d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-                />
+                  d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
               </svg>
             </button>
-            <button
-              class="icon-btn"
-              @click="openModal(todo.id)"
-              :title="$t('common.edit')"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                width="14"
-                height="14"
-              >
+            <button class="icon-btn" @click="openModal(todo.id)" :title="$t('common.edit')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
                 <path
-                  d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z"
-                />
+                  d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
               </svg>
             </button>
-            <button
-              class="icon-btn icon-btn--danger"
-              @click="removeTodo(todo.id)"
-              :title="$t('common.delete')"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                width="14"
-                height="14"
-              >
-                <path
-                  fill-rule="evenodd"
+            <button class="icon-btn icon-btn--danger" @click="removeTodo(todo.id)" :title="$t('common.delete')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                <path fill-rule="evenodd"
                   d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z"
-                  clip-rule="evenodd"
-                />
+                  clip-rule="evenodd" />
               </svg>
             </button>
           </div>
@@ -371,11 +214,7 @@
         <span>{{
           $t("todos.footer_pending", { remaining, total: todos.length })
         }}</span>
-        <button
-          v-if="completedCount > 0"
-          class="btn btn-ghost btn-sm"
-          @click="clearCompleted"
-        >
+        <button v-if="completedCount > 0" class="btn btn-ghost btn-sm" @click="clearCompleted">
           {{ $t("todos.clear_completed", { count: completedCount }) }}
         </button>
       </footer>
@@ -384,11 +223,7 @@
     <!-- Modal -->
     <Teleport to="body">
       <Transition name="modal">
-        <div
-          v-if="modal.open"
-          class="modal-backdrop"
-          @mousedown.self="closeModal"
-        >
+        <div v-if="modal.open" class="modal-backdrop" @mousedown.self="closeModal">
           <div class="modal">
             <header class="modal-header">
               <h2 class="modal-title">
@@ -408,68 +243,40 @@
                 <label class="field-label">{{
                   $t("todos.modal.title_label")
                 }}</label>
-                <input
-                  v-model="form.text"
-                  class="todo-input"
-                  type="text"
-                  :placeholder="$t('todos.modal.title_hint')"
-                />
+                <input v-model="form.text" class="todo-input" type="text" :placeholder="$t('todos.modal.title_hint')" />
               </div>
 
               <!-- Row: Date + Time -->
               <div class="field-row">
                 <div class="field">
                   <label class="field-label">{{ $t("common.date") }}</label>
-                  <input
-                    v-model="form.dueDate"
-                    class="todo-input"
-                    type="date"
-                  />
+                  <input v-model="form.dueDate" class="todo-input" type="date" />
                 </div>
 
                 <div class="field">
                   <label class="field-label">{{ $t("common.time") }}</label>
-                  <input
-                    v-model="form.dueTime"
-                    class="todo-input"
-                    type="time"
-                  />
+                  <input v-model="form.dueTime" class="todo-input" type="time" />
                 </div>
               </div>
 
               <!-- Link -->
               <div class="field">
                 <label class="field-label">{{ $t("todos.modal.link") }}</label>
-                <input
-                  v-model="form.link"
-                  class="todo-input"
-                  type="url"
-                  placeholder="https://..."
-                />
+                <input v-model="form.link" class="todo-input" type="url" placeholder="https://..." />
               </div>
 
               <!-- Tags -->
               <div class="field">
                 <label class="field-label">{{ $t("common.tags") }}</label>
                 <div class="tag-input-wrapper">
-                  <span
-                    v-for="tag in form.tags"
-                    :key="tag"
-                    class="tag tag--removable"
-                  >
+                  <span v-for="tag in form.tags" :key="tag" class="tag tag--removable">
                     {{ tag }}
                     <button class="tag-remove" @click="removeTag(tag)">
                       ×
                     </button>
                   </span>
-                  <input
-                    v-model="tagInput"
-                    class="tag-input"
-                    type="text"
-                    :placeholder="$t('todos.modal.tags_hint')"
-                    @keydown.enter.prevent="addTag"
-                    @keydown.comma.prevent="addTag"
-                  />
+                  <input v-model="tagInput" class="tag-input" type="text" :placeholder="$t('todos.modal.tags_hint')"
+                    @keydown.enter.prevent="addTag" @keydown.comma.prevent="addTag" />
                 </div>
               </div>
 
@@ -481,16 +288,10 @@
                       $t("todos.modal.priority")
                     }}</label>
                     <div class="priority-selector">
-                      <button
-                        v-for="priority in priorities"
-                        :key="priority.key"
-                        class="priority-btn"
-                        :class="[
-                          `priority-btn--${priority.key}`,
-                          { active: form.priority === priority.key },
-                        ]"
-                        @click="form.priority = priority.key"
-                      >
+                      <button v-for="priority in priorities" :key="priority.key" class="priority-btn" :class="[
+                        `priority-btn--${priority.key}`,
+                        { active: form.priority === priority.key },
+                      ]" @click="form.priority = priority.key">
                         {{ priority.label }}
                       </button>
                     </div>
@@ -500,11 +301,7 @@
                     <label class="field-label">{{
                       $t("todos.modal.urgent")
                     }}</label>
-                    <button
-                      class="urgent-toggle"
-                      :class="{ active: form.urgent }"
-                      @click="form.urgent = !form.urgent"
-                    >
+                    <button class="urgent-toggle" :class="{ active: form.urgent }" @click="form.urgent = !form.urgent">
                       {{ form.urgent ? $t("common.yes") : $t("common.no") }}
                     </button>
                   </div>
@@ -516,11 +313,7 @@
               <button class="btn btn-ghost" @click="closeModal">
                 {{ $t("common.cancel") }}
               </button>
-              <button
-                class="btn btn-primary"
-                :disabled="!form.text.trim()"
-                @click="saveModal"
-              >
+              <button class="btn btn-primary" :disabled="!form.text.trim()" @click="saveModal">
                 {{ modal.editId ? $t("common.save") : $t("common.create") }}
               </button>
             </footer>
@@ -536,8 +329,10 @@ import { ref, computed, reactive, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useTodoStore } from "@/composables/useTodoStore";
 import { useI18n } from "vue-i18n";
+import { useToast } from "@/composables/useToast";
 
 const { t, locale } = useI18n();
+const { showToast } = useToast();
 const currentLocale = computed(() => locale.value);
 
 // Data
@@ -547,8 +342,8 @@ const { todos } = storeToRefs(todoStore);
 // derive nextId from store data
 let nextId = todos.value.length
   ? Math.max(
-      ...todos.value.flatMap((t) => [t.id, ...t.subtasks.map((s) => s.id)]),
-    ) + 1
+    ...todos.value.flatMap((t) => [t.id, ...t.subtasks.map((s) => s.id)]),
+  ) + 1
   : 1;
 
 const activeFilter = ref("all");
@@ -570,6 +365,10 @@ const priorities = computed(() => [
 ]);
 
 function deleteAllEntries() {
+  if (!confirm(t("todos.delete_all_confirmation")))
+    return;
+
+  showToast(t("todos.delete_all_text"), "ok");
   todoStore.deleteAllEntries();
 }
 
@@ -659,6 +458,7 @@ function saveModal() {
       sub.dueTime = form.dueTime;
       sub.link = form.link;
       sub.tags = [...form.tags];
+      showToast(t("todos.toast_updated_subtask"), "ok");
     }
   } else if (modal.editId !== null) {
     // update main task
@@ -672,6 +472,7 @@ function saveModal() {
       todo.tags = [...form.tags];
       todo.priority = form.priority;
       todo.urgent = form.urgent;
+      showToast(t("todos.toast_updated"), "ok");
     }
   } else if (modal.parentId !== null) {
     // new subtask
@@ -688,6 +489,7 @@ function saveModal() {
         tags: [...form.tags],
       });
       parent.expanded = true;
+      showToast(t("todos.toast_added_subtask"), "ok");
     }
   } else {
     // new Main Task
@@ -705,6 +507,7 @@ function saveModal() {
       expanded: true,
       createdAt: Date.now(),
     });
+    showToast(t("todos.toast_added"), "ok");
   }
 
   closeModal();
@@ -731,6 +534,10 @@ function toggleTodo(id) {
 }
 
 function removeTodo(id) {
+  if (!confirm(t("todos.delete_confirmation")))
+    return;
+
+  showToast(t("todos.toast_deleted"), "ok");
   todos.value = todos.value.filter((t) => t.id !== id);
 }
 
@@ -742,6 +549,10 @@ function toggleSubtask(parentId, subId) {
 }
 
 function removeSubtask(parentId, subId) {
+  if (!confirm(t("todos.delete_confirmation_subtask")))
+    return;
+
+  showToast(t("todos.toast_deleted_subtask"), "ok");
   const parent = todos.value.find((t) => t.id === parentId);
 
   if (parent) parent.subtasks = parent.subtasks.filter((s) => s.id !== subId);
@@ -1299,7 +1110,7 @@ const badgeText = computed(() =>
   padding-top: 2px;
 }
 
-.todo-item:hover > .todo-actions {
+.todo-item:hover>.todo-actions {
   opacity: 1;
 }
 
@@ -1648,8 +1459,7 @@ const badgeText = computed(() =>
   }
 
   .modal {
-    border-radius: calc(var(--radius, 0.5rem) * 1.5)
-      calc(var(--radius, 0.5rem) * 1.5) 0 0;
+    border-radius: calc(var(--radius, 0.5rem) * 1.5) calc(var(--radius, 0.5rem) * 1.5) 0 0;
     max-height: 92dvh;
   }
 

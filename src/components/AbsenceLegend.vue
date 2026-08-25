@@ -18,10 +18,13 @@
 
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { ABSENCE_TYPES } from "@/composables/useAbsence";
 
 const store = useZeitwerkStore();
+const { t } = useI18n();
 
 const stats = computed(() => {
   const counts = {};
@@ -33,7 +36,12 @@ const stats = computed(() => {
 
   return Object.entries(ABSENCE_TYPES)
     .filter(([key]) => counts[key])
-    .map(([key, type]) => ({ key, ...type, count: counts[key] }));
+    .map(([key, type]) => ({
+      key,
+      ...type,
+      label: t(`absence.${key}`),
+      count: counts[key],
+    }));
 });
 </script>
 
