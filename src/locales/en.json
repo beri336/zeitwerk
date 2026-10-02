@@ -550,6 +550,24 @@
     "dashboard": {
         "title": "Dashboard",
         "btn-add-entry": "Add new Entry",
+        "today": {
+            "eyebrow": "Today",
+            "title": "Today's summary",
+            "worked": "Worked",
+            "expected": "Expected",
+            "difference": "Overtime / deficit",
+            "remaining": "Remaining",
+            "break": "Break",
+            "no_break": "No active break",
+            "break_duration": "{minutes} min",
+            "suggested_stop": "Suggested finish: {time}"
+        },
+        "week": {
+            "title": "Week Overview",
+            "actual": "Week Actual",
+            "diff": "Week Difference",
+            "days": "Active Days"
+        },
         "quick_actions": {
             "title": "Quick actions",
             "subtitle": "Common actions for today",

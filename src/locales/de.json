@@ -513,6 +513,24 @@
     "dashboard": {
         "title": "Dashboard",
         "btn-add-entry": "Neuen Eintrag hinzufügen",
+        "today": {
+            "eyebrow": "Heute",
+            "title": "Tagesübersicht",
+            "worked": "Gearbeitet",
+            "expected": "Sollzeit",
+            "difference": "Überzeit / Fehlzeit",
+            "remaining": "Verbleibend",
+            "break": "Pause",
+            "no_break": "Keine aktive Pause",
+            "break_duration": "{minutes} Min.",
+            "suggested_stop": "Voraussichtliches Ende: {time}"
+        },
+        "week": {
+            "title": "Wochenübersicht",
+            "actual": "Istzeit Woche",
+            "diff": "Differenz Woche",
+            "days": "Aktive Tage"
+        },
         "quick_actions": {
             "title": "Schnellaktionen",
             "subtitle": "Häufige Aktionen für heute",

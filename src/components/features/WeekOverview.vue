@@ -71,8 +71,9 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { formatHours } from "@/composables/useTime";
 import CalendarDay from "@/components/CalendarDay.vue";
@@ -80,6 +81,7 @@ import EntryModal from "@/components/EntryModal.vue";
 
 const store = useZeitwerkStore();
 const { locale } = useI18n();
+const route = useRoute();
 
 const showModal = ref(false);
 const editEntry = ref(null);
@@ -174,6 +176,12 @@ function onDayClick(date) {
   editEntry.value = store.entries.find((entry) => entry.date === date) ?? null;
   showModal.value = true;
 }
+
+onMounted(() => {
+  if (route.query.today) {
+    goToToday();
+  }
+});
 </script>
 
 <style scoped>

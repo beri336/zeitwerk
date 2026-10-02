@@ -196,6 +196,28 @@ const isWeekend = computed(() => {
   border-color: var(--day-accent, var(--color-border));
 }
 
+.cal-day--entry:not(.cal-day--absence) {
+  background: color-mix(
+    in oklch,
+    var(--color-primary-highlight) 24%,
+    var(--color-surface)
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--color-primary) 45%,
+    var(--color-border)
+  );
+}
+
+.cal-day--entry:not(.cal-day--absence) .cal-day__num {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.cal-day--today.cal-day--entry:not(.cal-day--absence) .cal-day__num {
+  color: var(--color-text-inverse);
+}
+
 .cal-day--weekend {
   background: color-mix(
     in oklch,
