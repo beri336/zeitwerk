@@ -5,31 +5,15 @@
   <!--- Bottom Nav (mobile only) --->
   <nav class="bottom-nav">
     <!-- Primary Tabs -->
-    <RouterLink
-      v-for="item in primaryRoutes"
-      :key="item.path"
-      :to="item.path"
-      class="bottom-nav__item"
-      :class="{ active: route.path === item.path }"
-    >
+    <RouterLink v-for="item in primaryRoutes" :key="item.path" :to="item.path" class="bottom-nav__item"
+      :class="{ active: route.path === item.path }">
       <span v-html="item.icon"></span>
       <span>{{ item.label }}</span>
     </RouterLink>
 
     <!-- Hamburger Button -->
-    <button
-      class="bottom-nav__item bottom-nav__menu-btn"
-      :class="{ active: drawerOpen }"
-      @click="drawerOpen = true"
-    >
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
+    <button class="bottom-nav__item bottom-nav__menu-btn" :class="{ active: drawerOpen }" @click="drawerOpen = true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="6" x2="21" y2="6" />
         <line x1="3" y1="12" x2="21" y2="12" />
         <line x1="3" y1="18" x2="21" y2="18" />
@@ -49,14 +33,7 @@
       <div class="drawer-header">
         <span class="drawer-title">{{ $t('nav.drawer_title') }}</span>
         <button class="drawer-close" @click="closeDrawer">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -64,29 +41,15 @@
       </div>
 
       <div class="drawer-body">
-        <RouterLink
-          v-for="item in allRoutes"
-          :key="item.path"
-          :to="item.path"
-          class="drawer-item"
-          :class="{ active: route.path === item.path }"
-          @click="closeDrawer"
-        >
+        <RouterLink v-for="item in allRoutes" :key="item.path" :to="item.path" class="drawer-item"
+          :class="{ active: route.path === item.path }" @click="closeDrawer">
           <span class="drawer-item-icon" v-html="item.icon"></span>
           <span class="drawer-item-label">{{ item.label }}</span>
-          <svg
-            v-if="route.path === item.path"
-            class="drawer-item-check"
-            width="14"
-            height="14"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
+          <svg v-if="route.path === item.path" class="drawer-item-check" width="14" height="14" viewBox="0 0 20 20"
+            fill="currentColor">
+            <path fill-rule="evenodd"
               d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-              clip-rule="evenodd"
-            />
+              clip-rule="evenodd" />
           </svg>
         </RouterLink>
       </div>
@@ -113,6 +76,15 @@ const ROUTE_ICONS = {
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0"/>
             <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
+              </svg>`,
+  "/week-overview": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <line x1="8" y1="14" x2="16" y2="14"/>
+            <path d="M7 17h10"/>
+            <rect x="7" y="7" width="10" height="4" rx="1" fill="currentColor" stroke="none" opacity="0.15"/>
+            <path d="M7 12h10"/>
               </svg>`,
   "/month-overview": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -173,6 +145,11 @@ const allRoutes = computed(() => [
     icon: ROUTE_ICONS["/livetracking"],
   },
   {
+    path: "/week-overview",
+    label: t("nav.week"),
+    icon: ROUTE_ICONS["/week-overview"],
+  },
+  {
     path: "/month-overview",
     label: t("nav.month"),
     icon: ROUTE_ICONS["/month-overview"],
@@ -230,6 +207,7 @@ function closeDrawer() {
 
 /* Mobile */
 @media (max-width: 767px) {
+
   /* Bottom Nav */
   .bottom-nav {
     display: grid;
@@ -241,8 +219,7 @@ function closeDrawer() {
     z-index: 40;
     background: var(--color-surface);
     border-top: 1px solid var(--color-border);
-    padding: var(--space-2) var(--space-2)
-      calc(var(--space-2) + env(safe-area-inset-bottom));
+    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
     /* Prevent content from shifting under the nav */
     padding-left: max(var(--space-2), env(safe-area-inset-left));
     padding-right: max(var(--space-2), env(safe-area-inset-right));
@@ -385,10 +362,8 @@ function closeDrawer() {
 
   .drawer-item.active {
     color: var(--color-primary);
-    background: var(
-      --color-primary-highlight,
-      color-mix(in srgb, var(--color-primary) 12%, transparent)
-    );
+    background: var(--color-primary-highlight,
+        color-mix(in srgb, var(--color-primary) 12%, transparent));
   }
 
   .drawer-item-icon {

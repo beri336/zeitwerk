@@ -4,37 +4,10 @@
   <aside class="sidebar">
 
     <div class="sidebar-logo">
-      <svg
-        width="28"
-        height="28"
-        viewBox="0 0 28 28"
-        fill="none"
-        class="sidebar-logo-icon"
-      >
-        <rect
-          x="2"
-          y="2"
-          width="24"
-          height="24"
-          rx="6"
-          fill="currentColor"
-          opacity="0.15"
-        />
-        <circle
-          cx="14"
-          cy="14"
-          r="8"
-          stroke="currentColor"
-          stroke-width="2"
-          fill="none"
-        />
-        <path
-          d="M14 9v5l3 2"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="sidebar-logo-icon">
+        <rect x="2" y="2" width="24" height="24" rx="6" fill="currentColor" opacity="0.15" />
+        <circle cx="14" cy="14" r="8" stroke="currentColor" stroke-width="2" fill="none" />
+        <path d="M14 9v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         <circle cx="14" cy="14" r="1.5" fill="currentColor" />
       </svg>
       <span class="sidebar-logo-text">{{ $t("title") }}</span>
@@ -44,19 +17,8 @@
       <div class="sidebar-section-label">{{ $t("nav.drawer_title") }}</div>
 
       <!-- Dashboard -->
-      <RouterLink
-        to="/dashboard"
-        class="sidebar-item"
-        :class="{ active: route.path === '/dashboard' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/dashboard" class="sidebar-item" :class="{ active: route.path === '/dashboard' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7" rx="1" />
           <rect x="14" y="3" width="7" height="7" rx="1" />
           <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -66,19 +28,8 @@
       </RouterLink>
 
       <!-- Live Tracking -->
-      <RouterLink
-        to="/livetracking"
-        class="sidebar-item"
-        :class="{ active: route.path === '/livetracking' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/livetracking" class="sidebar-item" :class="{ active: route.path === '/livetracking' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
           <circle cx="12" cy="12" r="7" stroke-dasharray="3 2" />
           <line x1="12" y1="2" x2="12" y2="5" />
@@ -89,20 +40,25 @@
         <span>{{ $t("nav.live") }}</span>
       </RouterLink>
 
+      <!-- Week Overview -->
+      <RouterLink to="/week-overview" class="sidebar-item" :class="{ active: route.path === '/week-overview' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+          <circle cx="8" cy="15" r="1" fill="currentColor" stroke="none" />
+          <circle cx="12" cy="15" r="1" fill="currentColor" stroke="none" />
+          <circle cx="16" cy="15" r="1" fill="currentColor" stroke="none" />
+          <circle cx="8" cy="19" r="1" fill="currentColor" stroke="none" />
+          <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
+        </svg>
+        <span>{{ $t("nav.week_overview") }}</span>
+      </RouterLink>
+
       <!-- Month Overview -->
-      <RouterLink
-        to="/month-overview"
-        class="sidebar-item"
-        :class="{ active: route.path === '/month-overview' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/month-overview" class="sidebar-item" :class="{ active: route.path === '/month-overview' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
@@ -117,19 +73,8 @@
       </RouterLink>
 
       <!-- Year Overview -->
-      <RouterLink
-        to="/year-overview"
-        class="sidebar-item"
-        :class="{ active: route.path === '/year-overview' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/year-overview" class="sidebar-item" :class="{ active: route.path === '/year-overview' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
@@ -141,46 +86,20 @@
       </RouterLink>
 
       <!-- Calendar -->
-      <RouterLink
-        to="/calendar"
-        class="sidebar-item"
-        :class="{ active: route.path === '/calendar' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/calendar" class="sidebar-item" :class="{ active: route.path === '/calendar' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
           <line x1="3" y1="10" x2="21" y2="10" />
-          <path
-            d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"
-            stroke-linecap="round"
-            stroke-width="2.5"
-          />
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke-linecap="round" stroke-width="2.5" />
         </svg>
         <span>{{ $t("nav.calendar") }}</span>
       </RouterLink>
 
       <!-- ToDo -->
-      <RouterLink
-        to="/todo"
-        class="sidebar-item"
-        :class="{ active: route.path === '/todo' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/todo" class="sidebar-item" :class="{ active: route.path === '/todo' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 11l3 3 8-8" />
           <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9" />
         </svg>
@@ -188,19 +107,8 @@
       </RouterLink>
 
       <!-- Diagrams -->
-      <RouterLink
-        to="/diagrams"
-        class="sidebar-item"
-        :class="{ active: route.path === '/diagrams' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/diagrams" class="sidebar-item" :class="{ active: route.path === '/diagrams' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="20" x2="18" y2="10" />
           <line x1="12" y1="20" x2="12" y2="4" />
           <line x1="6" y1="20" x2="6" y2="14" />
@@ -210,19 +118,8 @@
       </RouterLink>
 
       <!-- Profile -->
-      <RouterLink
-        to="/profile"
-        class="sidebar-item"
-        :class="{ active: route.path === '/profile' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/profile" class="sidebar-item" :class="{ active: route.path === '/profile' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="8" r="4" />
           <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
         </svg>
@@ -230,44 +127,19 @@
       </RouterLink>
 
       <!-- Settings -->
-      <RouterLink
-        to="/settings"
-        class="sidebar-item"
-        :class="{ active: route.path === '/settings' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/settings" class="sidebar-item" :class="{ active: route.path === '/settings' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
-          <path
-            d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0"
-          />
+          <path d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0" />
           <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
         </svg>
         <span>{{ $t("nav.settings") }}</span>
       </RouterLink>
 
       <!-- Export -->
-      <RouterLink
-        to="/export"
-        class="sidebar-item"
-        :class="{ active: route.path === '/export' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+      <RouterLink to="/export" class="sidebar-item" :class="{ active: route.path === '/export' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="17 11 12 16 7 11" />
           <polyline points="17 6 12 11 7 6" />
         </svg>
@@ -275,19 +147,8 @@
       </RouterLink>
 
       <!-- Habit Tracker -->
-      <RouterLink
-        to="/habit-tracker"
-        class="sidebar-item"
-        :class="{ active: route.path === '/habit-tracker' }"
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <RouterLink to="/habit-tracker" class="sidebar-item" :class="{ active: route.path === '/habit-tracker' }">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" />
           <path d="M12 6v6l4 2" />
         </svg>
@@ -300,27 +161,13 @@
 
       <div class="month-nav">
         <button class="month-nav-btn" @click="store.prevMonth()">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
         <div class="month-nav-text">{{ store.currMonthLabel }}</div>
         <button class="month-nav-btn" @click="store.nextMonth()">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>

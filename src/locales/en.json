@@ -197,6 +197,7 @@
         "export": "Export",
         "more": "More",
         "drawer_title": "Navigation",
+        "week_overview": "Week Overview",
         "month_overview": "Month Overview",
         "year_overview": "Year Overview",
         "diagrams": "Diagrams"
@@ -205,6 +206,9 @@
         "title": "Year Overview",
         "this_year": "This year",
         "hint": "Tap a day to open or create an entry. Colored days indicate tracked work, absences, or public holidays."
+    },
+    "week": {
+        "hint": "Tap a day to add or edit an entry."
     },
     "todos": {
         "title": "To-Do's Overview",

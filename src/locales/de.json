@@ -197,6 +197,7 @@
         "export": "Export",
         "more": "Mehr",
         "drawer_title": "Navigation",
+        "week_overview": "Wochenübersicht",
         "month_overview": "Monatsübersicht",
         "year_overview": "Jahresübersicht",
         "diagrams": "Diagramme"
@@ -205,6 +206,9 @@
         "title": "Jahresübersicht",
         "this_year": "Dieses Jahr",
         "hint": "Tippe auf einen Tag, um einen Eintrag zu öffnen oder zu erstellen. Farbige Tage zeigen erfasste Arbeit, Abwesenheiten oder Feiertage."
+    },
+    "week": {
+        "hint": "Tippe auf einen Tag, um einen Eintrag hinzuzufügen oder zu bearbeiten."
     },
     "todos": {
         "title": "To-Do-Übersicht",
