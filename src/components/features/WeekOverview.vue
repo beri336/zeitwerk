@@ -62,7 +62,7 @@
         </div>
 
         <CalendarDay v-for="day in weekDays" :key="day.date" :date="day.date" :is-today="day.date === todayStr"
-          :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
+          compact :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
       </div>
     </section>
 
@@ -259,6 +259,12 @@ function onDayClick(date) {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 108px;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .cal-stat-label {
@@ -287,6 +293,11 @@ function onDayClick(date) {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .cal-weekday {
@@ -365,10 +376,14 @@ function onDayClick(date) {
   }
 
   .cal-stat {
+    min-width: 0;
     padding: var(--space-2) var(--space-3);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
+  }
+
+  .cal-grid {
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -392,6 +407,10 @@ function onDayClick(date) {
 
   .cal-stat {
     padding: var(--space-1-5, 0.375rem) var(--space-2);
+  }
+
+  .cal-grid {
+    padding: var(--space-1-5, 0.375rem);
   }
 }
 </style>

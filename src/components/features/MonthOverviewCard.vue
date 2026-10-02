@@ -4,20 +4,8 @@
 
   <main class="main">
     <section class="cal-toolbar" aria-label="Calendar navigation">
-      <button
-        class="cal-nav-btn"
-        type="button"
-        @click="store.prevMonth()"
-        aria-label="Previous month"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <button class="cal-nav-btn" type="button" @click="store.prevMonth()" aria-label="Previous month">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
@@ -26,31 +14,14 @@
         {{ store.currMonthLabel }}
       </div>
 
-      <button
-        class="cal-nav-btn"
-        type="button"
-        @click="store.nextMonth()"
-        aria-label="Next month"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <button class="cal-nav-btn" type="button" @click="store.nextMonth()" aria-label="Next month">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 18l6-6-6-6" />
         </svg>
       </button>
 
-      <button
-        class="cal-today-chip"
-        type="button"
-        @click="goToToday"
-        :disabled="isCurrentMonth"
-        aria-label="Jump to current month"
-      >
+      <button class="cal-today-chip" type="button" @click="goToToday" :disabled="isCurrentMonth"
+        aria-label="Jump to current month">
         {{ $t("common.today") }}
       </button>
     </section>
@@ -71,10 +42,7 @@
 
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.actual") }}</span>
-          <span
-            class="cal-stat-value"
-            :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'"
-          >
+          <span class="cal-stat-value" :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'">
             {{ formatHours(store.monthActual) }}
           </span>
         </div>
@@ -83,15 +51,12 @@
           <span class="cal-stat-label">{{ $t("month.planned") }}</span>
           <span class="cal-stat-value">{{
             formatHours(store.monthPlanned)
-          }}</span>
+            }}</span>
         </div>
 
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.diff") }}</span>
-          <span
-            class="cal-stat-value"
-            :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'"
-          >
+          <span class="cal-stat-value" :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'">
             {{ store.monthDiff >= 0 ? "+" : ""
             }}{{ formatHours(store.monthDiff) }}
           </span>
@@ -101,32 +66,18 @@
 
     <section class="cal-grid-wrap" aria-label="Month calendar">
       <div class="cal-grid">
-        <div
-          v-for="(header, index) in DAY_HEADERS"
-          :key="header"
-          class="cal-weekday"
-          :class="{ 'cal-weekday--weekend': isWeekendHeader(index) }"
-        >
+        <div v-for="(header, index) in DAY_HEADERS" :key="header" class="cal-weekday"
+          :class="{ 'cal-weekday--weekend': isWeekendHeader(index) }">
           {{ header }}
         </div>
 
-        <CalendarDay
-          v-for="day in calendarDays"
-          :key="day.date"
-          :date="day.date"
-          :is-today="day.date === todayStr"
-          :is-outside="day.outside"
-          :flash-today="flashToday && day.date === todayStr"
-          @click="onDayClick"
-        />
+        <CalendarDay v-for="day in calendarDays" :key="day.date" :date="day.date" :is-today="day.date === todayStr"
+          :is-outside="day.outside"           compact
+          :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
       </div>
     </section>
 
-    <EntryModal
-      v-model="showModal"
-      :edit-entry="editEntry"
-      :prefill-date="clickedDate"
-    />
+    <EntryModal v-model="showModal" :edit-entry="editEntry" :prefill-date="clickedDate" />
   </main>
 </template>
 
@@ -364,6 +315,12 @@ const workdays = computed(
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 108px;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .cal-stat-label {
@@ -390,7 +347,11 @@ const workdays = computed(
 
 /* Grid */
 .cal-grid-wrap {
-  background: transparent;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .cal-grid {
@@ -460,11 +421,11 @@ const workdays = computed(
       "today today today";
   }
 
-  .cal-toolbar > .cal-nav-btn:first-child {
+  .cal-toolbar>.cal-nav-btn:first-child {
     grid-area: prev;
   }
 
-  .cal-toolbar > .cal-nav-btn:nth-of-type(2) {
+  .cal-toolbar>.cal-nav-btn:nth-of-type(2) {
     grid-area: next;
     justify-self: end;
   }
@@ -487,10 +448,14 @@ const workdays = computed(
   }
 
   .cal-stat {
+    min-width: 0;
     padding: var(--space-2) var(--space-3);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
+  }
+
+  .cal-grid-wrap {
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -516,6 +481,10 @@ const workdays = computed(
 
   .cal-stat {
     padding: var(--space-1-5, 0.375rem) var(--space-2);
+  }
+
+  .cal-grid-wrap {
+    padding: var(--space-1-5, 0.375rem);
   }
 
   .cal-stat-value {

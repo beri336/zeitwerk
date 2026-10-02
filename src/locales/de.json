@@ -156,6 +156,7 @@
     "topbar": {
         "dashboard": "Dashboard",
         "livetracking": "Live-Tracking",
+        "overview": "Übersicht",
         "month": "Monatsübersicht",
         "calendar": "Kalender",
         "todo": "To-Do-Liste",
@@ -185,8 +186,10 @@
     "nav": {
         "dashboard": "Dashboard",
         "live": "Live-Tracker",
+        "week": "Woche",
         "month": "Monat",
         "year": "Jahr",
+        "overview": "Übersicht",
         "calendar": "Kalender",
         "todo": "To-Do",
         "stats": "Statistiken",

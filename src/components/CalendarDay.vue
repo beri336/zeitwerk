@@ -11,6 +11,7 @@
       'cal-day--absence': entry && entry.typ && entry.typ !== 'on-site',
       'cal-day--flash': flashToday,
       'cal-day--weekend': isWeekend,
+      'cal-day--compact': compact,
     }"
     :style="
       entry && entry.typ && entry.typ !== 'on-site'
@@ -67,6 +68,7 @@ const props = defineProps({
   isToday: { type: Boolean, default: false },
   isOutside: { type: Boolean, default: false }, // other month
   flashToday: { type: Boolean, default: false },
+  compact: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["click"]);
@@ -207,6 +209,30 @@ const isWeekend = computed(() => {
   font-weight: 700;
 }
 
+/* Compact calendar cells match the year overview's dense month cards. */
+.cal-day--compact {
+  min-height: 72px;
+  padding: var(--space-1-5, 0.375rem);
+  border-radius: var(--radius-sm);
+  gap: 2px;
+}
+
+.cal-day--compact .cal-day__time,
+.cal-day--compact .cal-day__note,
+.cal-day--compact .cal-day__gross,
+.cal-day--compact .cal-day__bar-track {
+  display: none;
+}
+
+.cal-day--compact .cal-day__num {
+  width: 22px;
+  height: 22px;
+}
+
+.cal-day--compact .cal-day__ist {
+  font-size: 11px;
+}
+
 /* Header */
 .cal-day__header {
   display: flex;
@@ -285,16 +311,17 @@ const isWeekend = computed(() => {
 /* Progress Bar */
 .cal-day__bar-track {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 1px;
+  left: 1px;
+  right: 1px;
   height: 3px;
   background: var(--color-divider);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .cal-day__bar-fill {
   height: 100%;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   transition: width 0.4s ease;
 }
 
@@ -350,6 +377,21 @@ const isWeekend = computed(() => {
   .cal-day:hover {
     transform: none;
   }
+
+  .cal-day--compact {
+    min-height: 56px;
+    padding: var(--space-1);
+  }
+
+  .cal-day--compact .cal-day__num {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .cal-day--compact .cal-day__ist {
+    font-size: 10px;
+  }
 }
 
 /* Small Mobile */
@@ -368,6 +410,11 @@ const isWeekend = computed(() => {
 
   .cal-day__ist {
     font-size: 10px;
+  }
+
+  .cal-day--compact {
+    min-height: 44px;
+    padding: 2px;
   }
 }
 </style>

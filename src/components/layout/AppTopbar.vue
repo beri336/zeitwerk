@@ -173,10 +173,9 @@ const exportDropRef = ref(null);
 const titleKeys = {
   "/dashboard": "topbar.dashboard",
   "/livetracking": "topbar.livetracking",
-  "/month-overview": "topbar.month",
+  "/overview": "topbar.overview",
   "/calendar": "topbar.calendar",
   "/todo": "topbar.todo",
-  "/year-overview": "topbar.year",
   "/diagrams": "topbar.diagrams",
   "/profile": "topbar.profile",
   "/settings": "topbar.settings",
@@ -185,7 +184,9 @@ const titleKeys = {
 };
 
 const topbarTitle = computed(() => {
-  const key = titleKeys[route.path];
+  const key = route.path.startsWith("/overview")
+    ? "topbar.overview"
+    : titleKeys[route.path];
   return key ? t(key) : "Zeitwerk";
 });
 
