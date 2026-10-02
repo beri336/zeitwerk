@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
-      registerType: 'autoUpdate',   // The software updates automatically
+      registerType: 'prompt', // Let the user choose when to reload
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
 
       // Workbox Strategy: Cache Everything the App Needs

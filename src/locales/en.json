@@ -79,6 +79,7 @@
     "pwa": {
         "new_version": "New version available",
         "update_now": "Update now",
+        "updating": "Updating…",
         "later": "Later"
     },
     "notifications": {

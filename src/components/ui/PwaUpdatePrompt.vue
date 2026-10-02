@@ -3,7 +3,7 @@
 <template>
 
     <Teleport to="body">
-        <div v-if="needRefresh" class="pwa-banner">
+        <div v-if="needRefresh" class="pwa-banner" role="status" aria-live="polite">
             <div class="pwa-banner__text">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="23 4 23 10 17 10" />
@@ -11,9 +11,10 @@
                 </svg>
                 {{ $t('pwa.new_version') }}
             </div>
+
             <div class="pwa-banner__actions">
-                <button class="btn btn-primary btn-sm" @click="update">
-                    {{ $t('pwa.update_now') }}
+                <button class="btn btn-primary btn-sm" :disabled="updating" @click="update">
+                    {{ updating ? $t('pwa.updating') : $t('pwa.update_now') }}
                 </button>
                 <button class="btn btn-ghost btn-sm" @click="needRefresh = false">
                     {{ $t('pwa.later') }}
@@ -26,8 +27,10 @@
 <script setup>
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { useI18n } from 'vue-i18n'
+import { ref } from 'vue'
 
 const { t } = useI18n()
+const updating = ref(false)
 
 const { needRefresh, updateServiceWorker } = useRegisterSW({
     onRegistered(r) {
@@ -39,7 +42,10 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
     }
 })
 
-function update() { updateServiceWorker(true) }
+async function update() {
+    updating.value = true
+    await updateServiceWorker(true)
+}
 </script>
 
 <style scoped>
