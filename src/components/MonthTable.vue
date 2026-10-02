@@ -3,7 +3,7 @@
 <template>
 
   <!-- Month Table -->
-  <div class="table-wrap">
+  <div class="table-wrap month-table">
     <div class="table-header">
       <div class="table-title">
         {{ $t("monthTable.title", { month: store.currMonthLabel }) }}

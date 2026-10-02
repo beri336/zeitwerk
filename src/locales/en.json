@@ -550,6 +550,17 @@
     "dashboard": {
         "title": "Dashboard",
         "btn-add-entry": "Add new Entry",
+        "quick_actions": {
+            "title": "Quick actions",
+            "subtitle": "Common actions for today",
+            "start": "Start tracking",
+            "stop": "Stop tracking",
+            "resume": "Resume tracking",
+            "add_entry": "Manual entry",
+            "add_break": "Add break",
+            "today": "Open today",
+            "add_time": "Add time"
+        },
         "pwa_mode": "PWA mode",
         "month": {
             "title": "Month Overview",

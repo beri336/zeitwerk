@@ -513,6 +513,17 @@
     "dashboard": {
         "title": "Dashboard",
         "btn-add-entry": "Neuen Eintrag hinzufügen",
+        "quick_actions": {
+            "title": "Schnellaktionen",
+            "subtitle": "Häufige Aktionen für heute",
+            "start": "Zeiterfassung starten",
+            "stop": "Zeiterfassung stoppen",
+            "resume": "Zeiterfassung fortsetzen",
+            "add_entry": "Manueller Eintrag",
+            "add_break": "Pause hinzufügen",
+            "today": "Heute öffnen",
+            "add_time": "Zeit hinzufügen"
+        },
         "pwa_mode": "PWA-Modus",
         "month": {
             "title": "Monatsübersicht",
