@@ -2,7 +2,6 @@
 
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useCalendarStore } from '@/composables/useCalendarStore'
-import { useHabitStore } from '@/composables/useHabitStore'
 import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
 
@@ -11,7 +10,6 @@ export function useExport() {
     function collectAll() {
         const zeitwerk = useZeitwerkStore()
         const calendar = useCalendarStore()
-        const habits = useHabitStore()
         const todos = useTodoStore()
         const profile = useProfileStore()
 
@@ -26,12 +24,6 @@ export function useExport() {
             },
             calendar: {
                 events: calendar.events,
-            },
-            habits: {
-                habits: habits.habits,
-                completions: Object.fromEntries(
-                    Object.entries(habits.completions).map(([k, v]) => [k, [...v]])
-                ),
             },
             todos: {
                 todos: todos.todos,
@@ -94,7 +86,6 @@ export function useExport() {
     function applyImport(data) {
         const zeitwerk = useZeitwerkStore()
         const calendar = useCalendarStore()
-        const habits = useHabitStore()
         const todos = useTodoStore()
         const profile = useProfileStore()
 
@@ -105,16 +96,6 @@ export function useExport() {
             Object.assign(zeitwerk.settings, data.zeitwerk.settings)
 
         if (data.calendar?.events) calendar.events = data.calendar.events
-
-        if (data.habits?.habits)
-            habits.habits = data.habits.habits
-
-        if (data.habits?.completions) {
-            habits.completions = Object.fromEntries(
-                Object.entries(data.habits.completions).map(([k, v]) => [k, new Set(v)])
-            )
-            habits.persistCompletions()
-        }
 
         if (data.todos?.todos)
             todos.todos = data.todos.todos

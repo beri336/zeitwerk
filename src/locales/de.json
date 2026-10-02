@@ -95,7 +95,7 @@
         },
         "default": {
             "title": "Benachrichtigungen erlauben",
-            "sub": "Zeitwerk benötigt die Berechtigung, um dich bei Überstunden, Inaktivität und Gewohnheits-Erinnerungen zu benachrichtigen.",
+            "sub": "Zeitwerk benötigt die Berechtigung, um dich bei Überstunden und Inaktivität zu benachrichtigen.",
             "btn": "Benachrichtigungen erlauben"
         },
         "granted": {
@@ -112,11 +112,6 @@
         "inactivity": {
             "label": "Inaktivitäts-Auto­pause",
             "hint": "Benachrichtigen, wenn der Timer wegen Inaktivität pausiert"
-        },
-        "habit": {
-            "label": "Tägliche Gewohnheits-Erinnerung",
-            "hint": "Erinnert dich täglich daran, deine Gewohnheiten zu prüfen",
-            "time": "Erinnerungszeit"
         },
         "howto": {
             "chrome": {
@@ -164,7 +159,6 @@
         "year": "Jahresübersicht",
         "diagrams": "Diagramme & Statistiken",
         "settings": "Einstellungen",
-        "habits": "Gewohnheiten",
         "export": "Export",
         "export_charts": "Diagramme exportieren",
         "export_png": "Als PNG exportieren",
@@ -195,7 +189,6 @@
         "todo": "To-Do",
         "stats": "Statistiken",
         "settings": "Einstellungen",
-        "habits": "Gewohnheiten",
         "export": "Export",
         "more": "Mehr",
         "drawer_title": "Navigation",
@@ -376,44 +369,6 @@
     "of": "von",
     "title": "Zeitwerk",
     "goal": "Ziel",
-    "habits": {
-        "title": "Gewohnheitsübersicht",
-        "today_count": "{done}/{total} heute",
-        "add_btn": "Gewohnheit hinzufügen",
-        "empty": "Noch keine Gewohnheiten. Starte deine Routine! 💪",
-        "streak_one": "{count} Tag in Folge",
-        "streak_other": "{count} Tage in Folge",
-        "add_new": "Gewohnheit hinzugefügt",
-        "edit_new": "Gewohnheit bearbeitet",
-        "remove": "Gewohnheit entfernt",
-        "remove_confirmation": "Gewohnheit wirklich entfernen?",
-        "stats": {
-            "this_week": "Diese Woche",
-            "best_streak": "Beste Serie",
-            "week_rate": "Quote dieser Woche"
-        },
-        "freq": {
-            "daily": "Täglich",
-            "weekdays": "Wochentage",
-            "weekend": "Wochenende"
-        },
-        "year": {
-            "days_completed": "Abgeschlossene Tage",
-            "completion_rate": "Erfüllungsquote",
-            "best_streak": "Beste Serie"
-        },
-        "modal": {
-            "title_new": "Neue Gewohnheit",
-            "title_edit": "Gewohnheit bearbeiten",
-            "icon": "Icon",
-            "name": "Name der Gewohnheit *",
-            "name_hint": "z. B. Morgenlauf",
-            "goal": "Ziel / Beschreibung",
-            "goal_hint": "z. B. 30 Min, 2 km, 8 Gläser",
-            "color": "Farbe",
-            "frequency": "Frequenz"
-        }
-    },
     "export": {
         "title": "Export",
         "sub": "Exportiere deine Daten in verschiedenen Formaten",

@@ -208,7 +208,6 @@ import { useI18n } from 'vue-i18n'
 
 import { useExport } from '@/composables/useExport'
 import { useCalendarStore } from '@/composables/useCalendarStore'
-import { useHabitStore } from '@/composables/useHabitStore'
 import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
 
@@ -233,7 +232,6 @@ const PRESETS = computed(() => [
 
 const { exportJSON: exportFullJSON } = useExport()
 const calendar = useCalendarStore()
-const habits = useHabitStore()
 const todos = useTodoStore()
 const profile = useProfileStore()
 
@@ -426,12 +424,6 @@ function exportCSV() {
 function collectOtherStores() {
     return {
         calendar: { events: calendar.events },
-        habits: {
-            habits: habits.habits,
-            completions: Object.fromEntries(
-                Object.entries(habits.completions).map(([k, v]) => [k, [...v]])
-            ),
-        },
         todos: { todos: todos.todos },
         profile: { ...profile.profile },
     }

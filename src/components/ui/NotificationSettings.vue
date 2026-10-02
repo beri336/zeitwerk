@@ -232,37 +232,6 @@
           />
         </div>
 
-        <div class="notif-row">
-          <div>
-            <div class="privacy-label">
-              {{ $t("notifications.habit.label") }}
-            </div>
-            <div class="privacy-hint">
-              {{ $t("notifications.habit.hint") }}
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            v-model="store.settings.habitReminder"
-            class="notif-check"
-          />
-        </div>
-
-        <Transition name="fade">
-          <div
-            v-if="store.settings.habitReminder"
-            class="form-group reminder-time"
-          >
-            <label class="form-label">{{
-              $t("notifications.habit.time")
-            }}</label>
-            <input
-              type="time"
-              class="form-input time-input"
-              v-model="store.settings.habitReminderTime"
-            />
-          </div>
-        </Transition>
       </template>
     </template>
   </div>
@@ -283,13 +252,6 @@ const { t } = useI18n();
 async function handleAllow() {
   await notifications.requestPermission();
 }
-
-watch(
-  () => [store.settings.habitReminder, store.settings.habitReminderTime],
-  () => {
-    notifications.scheduleHabitReminder();
-  },
-);
 
 const browsers = computed(() => [
   {

@@ -11,7 +11,7 @@
 
 **A modern, privacy-first time tracking web app - built entirely in your browser.**
 
-Track your workdays. Visualize your time. Build better habits. Export everything. No backend, no account, no cloud.
+Track your workdays. Visualize your time. Export everything. No backend, no account, no cloud.
 
 <br>
 
@@ -33,7 +33,7 @@ Track your workdays. Visualize your time. Build better habits. Export everything
 
 Zeitwerk is a **fully client-side time tracking web app** with zero dependencies on external servers or accounts. Everything lives in your browser - your data stays yours.
 
-It combines a dashboard with powerful features that usually come as separate tools: time tracking, calendar, habits, charts, todos, and multi-format exports - all in one place, installable as a (offline) PWA.
+It combines a dashboard with powerful features that usually come as separate tools: time tracking, calendar, charts, todos, and multi-format exports - all in one place, installable as a (offline) PWA.
 
 <br>
 
@@ -83,7 +83,6 @@ npm run dev -- --host    # Access from other devices on your network (e.g. iPhon
 
 - Full appointment calendar with reminders & tags
 - To-Do list with subtasks, priorities, and due dates
-- Habit tracker with streaks and weekly/monthly heatmaps
 
 </td>
 <td width="50%" valign="top">
@@ -121,7 +120,7 @@ npm run dev -- --host    # Access from other devices on your network (e.g. iPhon
 src/
 ├── assets/             # Global CSS, fonts
 │   ├── charts/         # 9 ECharts-based chart components
-│   ├── features/       # One card component per view (DashboardCard, HabitTrackerCard, …)
+│   ├── features/       # One card component per view (DashboardCard, …)
 ├── components/
 │   ├── layout/         # AppSidebar, AppTopbar, AppBottomNav
 │   └── ui/             # Reusable UI primitives (KpiCard, ToastList, DeviceChip, …)
@@ -194,7 +193,6 @@ All data is stored in `localStorage`. No server communication ever occurs. All d
 | `CalendarView`      | Appointment calendar with agenda mode        |
 | `ToDoView`          | Tasks with subtasks, filters, priorities     |
 | `DiagramsView`      | All 9 analytics charts                       |
-| `HabitTrackerView`  | Habit streaks and heatmaps                   |
 | `ExportView`        | CSV / JSON / PDF / clipboard export          |
 | `SettingsView`      | Defaults, salary, notifications, danger zone |
 
@@ -230,7 +228,6 @@ All data is stored in `localStorage`. No server communication ever occurs. All d
 | `composables/useAbsence.js`       | Absence types and helpers                   |
 | `composables/useHolidays.js`      | Public holiday lookup by state              |
 | `composables/useExport.js`        | JSON/CSV export and import logic            |
-| `composables/useHabitStore.js`    | Habit tracking state and persistence        |
 | `composables/useTodoStore.js`     | To-do list state and filters                |
 | `composables/useNotifications.js` | Browser Notification API                    |
 | `composables/useToast.js`         | Toast creation and lifecycle                |

@@ -101,10 +101,6 @@ const ROUTE_ICONS = {
             <path d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0"/>
             <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
               </svg>`,
-  "/habit-tracker": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
-            <path d="M12 6v6l4 2"/>
-              </svg>`,
   "/export": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
             <polyline points="7 9 12 4 17 9"/>
@@ -139,11 +135,6 @@ const allRoutes = computed(() => [
     path: "/settings",
     label: t("nav.settings"),
     icon: ROUTE_ICONS["/settings"],
-  },
-  {
-    path: "/habit-tracker",
-    label: t("nav.habits"),
-    icon: ROUTE_ICONS["/habit-tracker"],
   },
   { path: "/export", label: t("nav.export"), icon: ROUTE_ICONS["/export"] },
 ]);

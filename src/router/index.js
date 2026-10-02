@@ -12,7 +12,6 @@ import CalendarView from '@/views/CalendarView.vue'
 import ToDoView from '@/views/ToDoView.vue'
 import DiagramsView from '@/views/DiagramsView.vue'
 import SettingsView from '@/views/SettingsView.vue'
-import HabitTrackerView from '@/views/HabitTrackerView.vue'
 import ExportView from '@/views/ExportView.vue'
 
 const routes = [
@@ -36,7 +35,6 @@ const routes = [
     { path: '/todo', name: 'todo', component: ToDoView },
     { path: '/diagrams', name: 'diagrams', component: DiagramsView },
     { path: '/settings', name: 'settings', component: SettingsView },
-    { path: '/habit-tracker', name: 'habit-tracker', component: HabitTrackerView },
     { path: '/export', name: 'export', component: ExportView },
 ]
 

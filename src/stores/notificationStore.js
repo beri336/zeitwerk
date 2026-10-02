@@ -12,8 +12,6 @@ export const useNotificationStore = defineStore('notifications', () => {
         permission: parsed.permission ?? 'default',
         overtime: parsed.overtime ?? true,
         inactivity: parsed.inactivity ?? true,
-        habitReminder: parsed.habitReminder ?? false,
-        habitReminderTime: parsed.habitReminderTime ?? '20:00',
         workStart: parsed.workStart ?? false,
         workStartTime: parsed.workStartTime ?? '09:30',
     })

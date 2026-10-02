@@ -95,7 +95,7 @@
         },
         "default": {
             "title": "Allow notifications",
-            "sub": "Zeitwerk needs permission to send you alerts for overtime, inactivity, and habit reminders.",
+            "sub": "Zeitwerk needs permission to send you alerts for overtime and inactivity.",
             "btn": "Allow Notifications"
         },
         "granted": {
@@ -112,11 +112,6 @@
         "inactivity": {
             "label": "Inactivity Auto-Pause",
             "hint": "Notify when timer is paused due to inactivity"
-        },
-        "habit": {
-            "label": "Daily Habit Reminder",
-            "hint": "Remind you to check your habits each day",
-            "time": "Reminder Time"
         },
         "howto": {
             "chrome": {
@@ -165,7 +160,6 @@
         "diagrams": "Diagrams & Stats",
         "profile": "Profile",
         "settings": "Settings",
-        "habits": "Habit Tracker",
         "export": "Export",
         "export_charts": "Export charts",
         "export_png": "Export as PNG",
@@ -197,7 +191,6 @@
         "stats": "Stats",
         "profile": "Profile",
         "settings": "Settings",
-        "habits": "Habits",
         "export": "Export",
         "more": "More",
         "drawer_title": "Navigation",
@@ -413,44 +406,6 @@
     "of": "of",
     "title": "Zeitwerk",
     "goal": "Goal",
-    "habits": {
-        "title": "Habit Tracker Overview",
-        "today_count": "{done}/{total} today",
-        "add_btn": "Add Habit",
-        "empty": "No habits yet. Start building a routine! 💪",
-        "streak_one": "{count} day streak",
-        "streak_other": "{count} days streak",
-        "add_new": "Habit added",
-        "edit_new": "Habit edited",
-        "remove": "Habit removed",
-        "remove_confirmation": "Are you sure you want to remove this habit?",
-        "stats": {
-            "this_week": "This Week",
-            "best_streak": "Best Streak",
-            "week_rate": "This week rate"
-        },
-        "freq": {
-            "daily": "Daily",
-            "weekdays": "Weekdays",
-            "weekend": "Weekend"
-        },
-        "year": {
-            "days_completed": "Days completed",
-            "completion_rate": "Completion rate",
-            "best_streak": "Best streak"
-        },
-        "modal": {
-            "title_new": "New Habit",
-            "title_edit": "Edit Habit",
-            "icon": "Icon",
-            "name": "Habit Name *",
-            "name_hint": "e.g., Morning Run",
-            "goal": "Goal / Description",
-            "goal_hint": "e.g. 30 min, 2km, 8 glasses",
-            "color": "Color",
-            "frequency": "Frequency"
-        }
-    },
     "export": {
         "title": "Export",
         "sub": "Export your data in different formats",

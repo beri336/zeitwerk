@@ -393,7 +393,6 @@ import { useStorageSize } from "@/composables/useStorageSize";
 import { useTodoStore } from "@/composables/useTodoStore";
 import { useCalendarStore } from "@/composables/useCalendarStore";
 import { useProfileStore } from "@/composables/useProfileStore";
-import { useHabitStore } from "@/composables/useHabitStore";
 import DeviceChipExt from "@/components/ui/DeviceChipExt.vue";
 import SettingsNotification from "@/components/ui/NotificationSettings.vue";
 
@@ -410,7 +409,6 @@ const { showToast } = useToast();
 const todoStore = useTodoStore();
 const calendarStore = useCalendarStore();
 const profileStore = useProfileStore();
-const habitStore = useHabitStore();
 
 const form = reactive({ ...store.settings });
 const { bytes, formatted, calculate } = useStorageSize();
@@ -476,7 +474,6 @@ function confirmDeleteAll() {
   todoStore.deleteAllEntries(); // Todos
   calendarStore.deleteAllEntries(); // Calendar Events
   profileStore.resetProfile(); // Profile
-  habitStore.deleteAllEntries(); // Habits
 
   reset(); // call to also reset settings to default values
   calculate(); // update size

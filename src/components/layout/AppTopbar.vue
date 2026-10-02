@@ -179,7 +179,6 @@ const titleKeys = {
   "/diagrams": "topbar.diagrams",
   "/profile": "topbar.profile",
   "/settings": "topbar.settings",
-  "/habit-tracker": "topbar.habits",
   "/exports": "topbar.export",
 };
 
