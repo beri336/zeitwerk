@@ -113,10 +113,6 @@ const ROUTE_ICONS = {
             <line x1="12" y1="20" x2="12" y2="4"/>
             <line x1="6" y1="20" x2="6" y2="14"/>
               </svg>`,
-  "/profile": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-              </svg>`,
   "/settings": `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0"/>
@@ -146,7 +142,7 @@ const allRoutes = computed(() => [
   },
   {
     path: "/week-overview",
-    label: t("nav.week"),
+    label: t("nav.week_overview"),
     icon: ROUTE_ICONS["/week-overview"],
   },
   {
@@ -166,7 +162,6 @@ const allRoutes = computed(() => [
   },
   { path: "/todo", label: t("nav.todo"), icon: ROUTE_ICONS["/todo"] },
   { path: "/diagrams", label: t("nav.stats"), icon: ROUTE_ICONS["/diagrams"] },
-  { path: "/profile", label: t("nav.profile"), icon: ROUTE_ICONS["/profile"] },
   {
     path: "/settings",
     label: t("nav.settings"),

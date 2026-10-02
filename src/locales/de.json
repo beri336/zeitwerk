@@ -161,7 +161,6 @@
         "todo": "To-Do-Liste",
         "year": "Jahresübersicht",
         "diagrams": "Diagramme & Statistiken",
-        "profile": "Profil",
         "settings": "Einstellungen",
         "habits": "Gewohnheiten",
         "export": "Export",
@@ -191,7 +190,6 @@
         "calendar": "Kalender",
         "todo": "To-Do",
         "stats": "Statistiken",
-        "profile": "Profil",
         "settings": "Einstellungen",
         "habits": "Gewohnheiten",
         "export": "Export",
@@ -317,41 +315,6 @@
             "warning": "Du bist dabei, alle erfassten Einträge dauerhaft zu entfernen – inklusive Arbeitstagen, Abwesenheiten und importierten Feiertagen.",
             "confirm_label": "Tippe",
             "confirm_btn": "Ja, alles löschen"
-        }
-    },
-    "profile": {
-        "edit_btn": "Profil bearbeiten",
-        "avatar_change": "Bild ändern",
-        "placeholder_name": "Dein Name",
-        "placeholder_role": "Rolle / Titel",
-        "about": "Über dich",
-        "contact": "Kontakt",
-        "contact_empty": "Noch keine Kontaktinfos. Klicke auf „Profil bearbeiten“, um welche hinzuzufügen.",
-        "skills": "Fähigkeiten",
-        "status": {
-            "none": "Keiner",
-            "available": "Verfügbar",
-            "busy": "Beschäftigt",
-            "away": "Abwesend"
-        },
-        "fields": {
-            "display_name": "Anzeigename",
-            "role": "Rolle / Titel",
-            "location": "Ort",
-            "status": "Status",
-            "bio": "Kurzbeschreibung",
-            "email": "E‑Mail",
-            "phone": "Telefon",
-            "website": "Website",
-            "github": "GitHub-Benutzername"
-        },
-        "placeholders": {
-            "role": "Softwareentwickler",
-            "location": "Stuttgart, DE",
-            "bio": "Ein paar Worte über dich ...",
-            "email": "mail@example.com",
-            "phone": "+49 123 456789",
-            "skills": "Fähigkeit eingeben + Enter"
         }
     },
     "month": {
@@ -526,7 +489,9 @@
         "export": "Export",
         "delete_confirm_yes": "Ja, löschen",
         "add": "Hinzufügen",
-        "update": "Aktualisieren"
+        "update": "Aktualisieren",
+        "expand": "Erweitern",
+        "collapse": "Verkleinern"
     },
     "weekdays": {
         "mon": "Mo",

@@ -526,7 +526,9 @@
         "export": "Export",
         "delete_confirm_yes": "Yes, delete",
         "add": "Add",
-        "update": "Update"
+        "update": "Update",
+        "expand": "Expand",
+        "collapse": "Collapse"
     },
     "weekdays": {
         "mon": "Mon",
