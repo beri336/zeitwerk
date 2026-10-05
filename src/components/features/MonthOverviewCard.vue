@@ -26,9 +26,15 @@
       </button>
     </section>
 
+    <button class="overview-add-btn" type="button" @click="openNewEntry">
+      <span aria-hidden="true">+</span>
+      <span class="sr-only">{{ $t("dashboard.btn-add-entry") }}</span>
+    </button>
+
     <p class="cal-hint">{{ $t("month.hint") }}</p>
 
-    <section class="cal-header" aria-label="Month statistics">
+    <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
+      <summary>{{ $t("overview.statistics") }}</summary>
       <div class="cal-stats">
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.working_days") }}</span>
@@ -61,8 +67,12 @@
             }}{{ formatHours(store.monthDiff) }}
           </span>
         </div>
+        <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
+          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
+          <span class="cal-stat-value">{{ monthTypeCounts[type] }}</span>
+        </div>
       </div>
-    </section>
+    </details>
 
     <section class="cal-grid-wrap" aria-label="Month calendar">
       <div class="cal-grid">
@@ -89,6 +99,8 @@ import CalendarDay from "@/components/CalendarDay.vue";
 import EntryModal from "@/components/EntryModal.vue";
 import HolidayImportModal from "@/components/HolidayImportModal.vue";
 import { useI18n } from "vue-i18n";
+import { countAbsenceTypes } from "@/composables/useAbsence";
+import { useOverviewStatsPreference } from "@/composables/useOverviewPreferences";
 
 const store = useZeitwerkStore();
 const { t, locale } = useI18n();
@@ -99,6 +111,9 @@ const editEntry = ref(null);
 const clickedDate = ref(null);
 const flashToday = ref(false);
 const showHolidayModal = ref(false);
+const { statsOpen, updateStatsOpen } = useOverviewStatsPreference("month");
+const absenceStatTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
+const monthTypeCounts = computed(() => countAbsenceTypes(store.entriesForMonth));
 
 const DAY_HEADERS = computed(() => {
   const base = new Date(2023, 0, 2); // Montag
@@ -201,6 +216,15 @@ async function goToToday() {
   }, 1800);
 }
 
+function openNewEntry() {
+  const date = isCurrentMonth.value
+    ? todayStr.value
+    : `${store.currYear}-${String(store.currMonth + 1).padStart(2, "0")}-01`;
+  clickedDate.value = date;
+  editEntry.value = null;
+  showModal.value = true;
+}
+
 const workdays = computed(
   () =>
     calendarDays.value.filter((date) => {
@@ -250,6 +274,74 @@ const workdays = computed(
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+}
+
+.overview-add-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  box-shadow: var(--shadow-sm);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.overview-add-btn span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.overview-add-btn .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.overview-stats {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+}
+
+.overview-stats summary {
+  cursor: pointer;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  list-style: none;
+}
+
+.overview-stats summary::-webkit-details-marker {
+  display: none;
+}
+
+.overview-stats summary::after {
+  content: "+";
+  float: right;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.overview-stats[open] summary::after {
+  content: "−";
+}
+
+.overview-stats .cal-stats {
+  padding: 0 var(--space-3) var(--space-3);
 }
 
 .cal-month-label {
@@ -419,6 +511,20 @@ const workdays = computed(
     grid-template-areas:
       "prev month next"
       "today today today";
+  }
+
+  .overview-add-btn {
+    position: fixed;
+    right: var(--space-4);
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    z-index: 20;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .main {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 
   .cal-toolbar>.cal-nav-btn:first-child {

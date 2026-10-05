@@ -99,6 +99,13 @@
         <KpiCard :label="$t('dashboard.month.active_days')" :value="String(activeDays)"
           :sub="$t('dashboard.month.active_sub')" />
 
+        <KpiCard :label="$t('dashboard.month.vacation')" :value="String(monthTypeCounts.vacation)" />
+        <KpiCard :label="$t('dashboard.month.sick')" :value="String(monthTypeCounts.sick)" />
+        <KpiCard :label="$t('dashboard.month.homeoffice')" :value="String(monthTypeCounts.homeoffice)" />
+        <KpiCard :label="$t('dashboard.month.office')" :value="String(monthTypeCounts['on-site'])" />
+        <KpiCard :label="$t('dashboard.month.publicholiday')" :value="String(monthTypeCounts.publicholiday)" />
+        <KpiCard :label="$t('dashboard.month.other')" :value="String(monthTypeCounts.other)" />
+
         <KpiCard v-if="longestDay" :label="$t('dashboard.month.longest')"
           :value="formatHours(calcActualHours(longestDay))" :sub="longestDay.date" />
 
@@ -120,6 +127,13 @@
         <KpiCard :label="$t('dashboard.year.diff')" :value="`${yearDiff >= 0 ? '+' : ''}${formatHours(yearDiff)}`"
           :sub="yearDiff >= 0 ? $t('dashboard.year.overtime') : $t('dashboard.year.missed-hours')"
           :variant="yearDiff >= 0 ? 'ok' : 'err'" />
+
+        <KpiCard :label="$t('dashboard.year.vacation')" :value="String(yearTypeCounts.vacation)" />
+        <KpiCard :label="$t('dashboard.year.sick')" :value="String(yearTypeCounts.sick)" />
+        <KpiCard :label="$t('dashboard.year.homeoffice')" :value="String(yearTypeCounts.homeoffice)" />
+        <KpiCard :label="$t('dashboard.year.office')" :value="String(yearTypeCounts['on-site'])" />
+        <KpiCard :label="$t('dashboard.year.publicholiday')" :value="String(yearTypeCounts.publicholiday)" />
+        <KpiCard :label="$t('dashboard.year.other')" :value="String(yearTypeCounts.other)" />
 
         <KpiCard v-if="store.grossHourlyRate > 0" :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
           :sub="$t('dashboard.year.gross_sub')" variant="ok" :private="true" />
@@ -373,6 +387,19 @@ const activeDays = computed(
       .length,
 );
 
+function countByType(entries, type) {
+  return entries.filter((entry) => (entry.typ ?? "on-site") === type).length;
+}
+
+const monthTypeCounts = computed(() => ({
+  vacation: countByType(store.entriesForMonth, "vacation"),
+  sick: countByType(store.entriesForMonth, "sick"),
+  homeoffice: countByType(store.entriesForMonth, "homeoffice"),
+  "on-site": countByType(store.entriesForMonth, "on-site"),
+  publicholiday: countByType(store.entriesForMonth, "publicholiday"),
+  other: countByType(store.entriesForMonth, "other"),
+}));
+
 const longestDay = computed(() =>
   store.entriesForMonth.reduce(
     (max, e) => (!max || calcActualHours(e) > calcActualHours(max) ? e : max),
@@ -420,6 +447,15 @@ const yearGrossLabel = computed(() => {
 const yearMonthsWithEntries = computed(
   () => new Set(yearEntries.value.map((e) => new Date(e.date).getMonth())).size,
 );
+
+const yearTypeCounts = computed(() => ({
+  vacation: countByType(yearEntries.value, "vacation"),
+  sick: countByType(yearEntries.value, "sick"),
+  homeoffice: countByType(yearEntries.value, "homeoffice"),
+  "on-site": countByType(yearEntries.value, "on-site"),
+  publicholiday: countByType(yearEntries.value, "publicholiday"),
+  other: countByType(yearEntries.value, "other"),
+}));
 
 // Modals
 const showModal = ref(false);

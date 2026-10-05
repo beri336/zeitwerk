@@ -54,7 +54,22 @@
       </button>
     </section>
 
+    <button class="overview-add-btn" type="button" @click="openNewEntry">
+      <span aria-hidden="true">+</span>
+      <span class="sr-only">{{ $t("dashboard.btn-add-entry") }}</span>
+    </button>
+
     <p class="year-hint">{{ $t("year.hint") }}</p>
+
+    <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
+      <summary>{{ $t("overview.statistics") }}</summary>
+      <div class="year-stats cal-stats" aria-label="Year statistics">
+        <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
+          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
+          <span class="cal-stat-value">{{ yearTypeCounts[type] }}</span>
+        </div>
+      </div>
+    </details>
 
     <section class="year-grid" aria-label="Year calendar overview">
       <article
@@ -113,7 +128,8 @@
 import { computed, ref } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { formatHours } from "@/composables/useTime";
-import { getAbsenceType } from "@/composables/useAbsence";
+import { getAbsenceType, countAbsenceTypes } from "@/composables/useAbsence";
+import { useOverviewStatsPreference } from "@/composables/useOverviewPreferences";
 
 import EntryModal from "@/components/EntryModal.vue";
 import KpiCard from "@/components/ui/KpiCard.vue";
@@ -127,6 +143,8 @@ const store = useZeitwerkStore();
 const showModal = ref(false);
 const editEntry = ref(null);
 const clickedDate = ref(null);
+const { statsOpen, updateStatsOpen } = useOverviewStatsPreference("year");
+const absenceStatTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
 
 const DAY_HEADERS = computed(() => {
   const base = new Date(2023, 0, 2); // Montag
@@ -207,6 +225,7 @@ const yearEntries = computed(() =>
     return date.getFullYear() === store.currYear;
   }),
 );
+const yearTypeCounts = computed(() => countAbsenceTypes(yearEntries.value));
 
 function getEntryForDate(date) {
   return store.entries.find((entry) => entry.date === date) ?? null;
@@ -280,6 +299,15 @@ function nextYear() {
   store.currYear++;
 }
 
+function openNewEntry() {
+  const date = isCurrentYear.value
+    ? todayStr.value
+    : `${store.currYear}-01-01`;
+  clickedDate.value = date;
+  editEntry.value = null;
+  showModal.value = true;
+}
+
 function goToCurrentYear() {
   store.currYear = new Date().getFullYear();
 }
@@ -331,6 +359,102 @@ const yearGrossLabel = computed(() => {
 </script>
 
 <style scoped>
+.year-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.overview-add-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  box-shadow: var(--shadow-sm);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.overview-add-btn span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.overview-add-btn .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.overview-stats {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+}
+
+.overview-stats summary {
+  cursor: pointer;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  list-style: none;
+}
+
+.overview-stats summary::-webkit-details-marker {
+  display: none;
+}
+
+.overview-stats summary::after {
+  content: "+";
+  float: right;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.overview-stats[open] summary::after {
+  content: "−";
+}
+
+.overview-stats .cal-stats {
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.year-stats .cal-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.year-stats .cal-stat-label {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.year-stats .cal-stat-value {
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
 /* Main Layout */
 .main {
   overflow-y: auto;
@@ -591,6 +715,10 @@ const yearGrossLabel = computed(() => {
 
 /* Tablet */
 @media (max-width: 1100px) {
+  .year-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .year-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -609,6 +737,25 @@ const yearGrossLabel = computed(() => {
 
   .year-hint {
     margin-top: 0;
+  }
+
+  .overview-add-btn {
+    position: fixed;
+    right: var(--space-4);
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    z-index: 20;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .main {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .year-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
   }
 
   .year-grid {

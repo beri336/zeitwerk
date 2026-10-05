@@ -57,3 +57,19 @@ export function effectiveActualFallback(entry, defaultPlanned) {
         return entry.plannedHours ?? defaultPlanned
     return null
 }
+
+export function countAbsenceTypes(entries) {
+    return entries.reduce((counts, entry) => {
+        const type = entry.typ ?? 'on-site'
+        if (Object.prototype.hasOwnProperty.call(counts, type))
+            counts[type] += 1
+        return counts
+    }, {
+        'on-site': 0,
+        homeoffice: 0,
+        vacation: 0,
+        sick: 0,
+        publicholiday: 0,
+        other: 0
+    })
+}

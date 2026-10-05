@@ -7,6 +7,9 @@
         "publicholiday": "Feiertag",
         "other": "Sonstiges"
     },
+    "overview": {
+        "statistics": "Statistiken"
+    },
     "monthTable": {
         "title": "Arbeitszeit {month}",
         "actual": "Ist",
@@ -554,6 +557,12 @@
             "avg_sub": "Tagesdurchschnitt",
             "active_days": "Aktive Tage",
             "active_sub": "Gearbeitete Tage",
+            "vacation": "Urlaub genommen",
+            "sick": "Krankheitstage",
+            "homeoffice": "Homeoffice-Tage",
+            "office": "Büro-Tage",
+            "publicholiday": "Feiertage",
+            "other": "Sonstiges",
             "longest": "Längster Tag",
             "gross": "Monat Brutto",
             "gross_sub": "Bruttoeinnahmen",
@@ -569,6 +578,12 @@
             "missed-hours": "Fehlstunden",
             "diff": "Jahresdifferenz",
             "overtime": "Überstunden",
+            "vacation": "Urlaub genommen",
+            "sick": "Krankheitstage",
+            "homeoffice": "Homeoffice-Tage",
+            "office": "Büro-Tage",
+            "publicholiday": "Feiertage",
+            "other": "Sonstiges",
             "gross": "Jahr Brutto",
             "gross_sub": "Bruttoeinnahmen",
             "vac_used": "Genutzter Urlaub",

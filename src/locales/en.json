@@ -7,6 +7,9 @@
         "publicholiday": "Public holiday",
         "other": "Other"
     },
+    "overview": {
+        "statistics": "Statistics"
+    },
     "monthTable": {
         "title": "Working time {month}",
         "actual": "Actual",
@@ -591,6 +594,12 @@
             "avg_sub": "Daily average",
             "active_days": "Active Days",
             "active_sub": "Days worked",
+            "vacation": "Vacation Taken",
+            "sick": "Sick Days",
+            "homeoffice": "Home Office Days",
+            "office": "Office Days",
+            "publicholiday": "Public Holidays",
+            "other": "Other",
             "longest": "Longest Day",
             "gross": "Month Gross",
             "gross_sub": "Gross earnings",
@@ -606,6 +615,12 @@
             "missed-hours": "Missed Hours",
             "diff": "Year Difference",
             "overtime": "Overtime",
+            "vacation": "Vacation Taken",
+            "sick": "Sick Days",
+            "homeoffice": "Home Office Days",
+            "office": "Office Days",
+            "publicholiday": "Public Holidays",
+            "other": "Other",
             "gross": "Year Gross",
             "gross_sub": "Gross earnings",
             "vac_used": "Used Vacation",
