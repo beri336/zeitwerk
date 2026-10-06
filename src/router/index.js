@@ -14,6 +14,8 @@ import DiagramsView from '@/views/DiagramsView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import ExportView from '@/views/ExportView.vue'
 
+const LAST_OVERVIEW_KEY = 'zeitwerk_last_overview'
+
 const routes = [
     { path: '/', redirect: '/dashboard' },
     { path: '/dashboard', name: 'dashboard', component: DashboardView },
@@ -22,7 +24,20 @@ const routes = [
         path: '/overview',
         component: OverviewView,
         children: [
-            { path: '', redirect: '/overview/month' },
+            {
+                path: '',
+                redirect: () => {
+                    let lastView = 'month'
+                    try {
+                        const stored = localStorage.getItem(LAST_OVERVIEW_KEY)
+                        if (['week', 'month', 'year'].includes(stored))
+                            lastView = stored
+                    } catch {
+                        // use the default view when storage is unavailable
+                    }
+                    return `/overview/${lastView}`
+                }
+            },
             { path: 'week', name: 'overview-week', component: WeekOverview },
             { path: 'month', name: 'overview-month', component: MonthOverviewCard },
             { path: 'year', name: 'overview-year', component: YearOverviewCard },

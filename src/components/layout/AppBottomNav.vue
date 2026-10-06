@@ -41,7 +41,7 @@
       </div>
 
       <div class="drawer-body">
-        <RouterLink v-for="item in allRoutes" :key="item.path" :to="item.path" class="drawer-item"
+        <RouterLink v-for="item in secondaryRoutes" :key="item.path" :to="item.path" class="drawer-item"
           :class="{ active: isActive(item.path) }" @click="closeDrawer">
           <span class="drawer-item-icon" v-html="item.icon"></span>
           <span class="drawer-item-label">{{ item.label }}</span>
@@ -149,6 +149,10 @@ const primaryTabs = [
 
 const primaryRoutes = computed(() =>
   allRoutes.value.filter((r) => primaryTabs.includes(r.path)),
+);
+
+const secondaryRoutes = computed(() =>
+  allRoutes.value.filter((r) => !primaryTabs.includes(r.path)),
 );
 
 function isActive(path) {

@@ -29,10 +29,27 @@
 
 <script setup>
 import { useRoute } from "vue-router";
+import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 useI18n();
+
+watch(
+  () => route.path,
+  (path) => {
+    const view = path.split("/").pop()
+    if (!["week", "month", "year"].includes(view))
+      return
+
+    try {
+      localStorage.setItem("zeitwerk_last_overview", view)
+    } catch {
+      // keep navigation functional when storage is unavailable
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>
