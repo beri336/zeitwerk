@@ -83,7 +83,11 @@
         "new_version": "New version available",
         "update_now": "Update now",
         "updating": "Updating…",
-        "later": "Later"
+        "later": "Later",
+        "check_updates": "Check for updates",
+        "checking": "Checking for updates…",
+        "no_updates": "No updates available – you are up to date.",
+        "check_failed": "The update check failed."
     },
     "notifications": {
         "title": "Notifications",

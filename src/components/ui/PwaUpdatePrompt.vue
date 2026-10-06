@@ -25,27 +25,11 @@
 </template>
 
 <script setup>
-import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue'
+import { usePwaUpdate } from '@/composables/usePwaUpdate'
 
 const { t } = useI18n()
-const updating = ref(false)
-
-const { needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegistered(r) {
-        console.log('[Zeitwerk] SW registered:', r)
-    },
-
-    onRegisterError(error) {
-        console.error('[Zeitwerk] SW error:', error)
-    }
-})
-
-async function update() {
-    updating.value = true
-    await updateServiceWorker(true)
-}
+const { needRefresh, updating, update } = usePwaUpdate()
 </script>
 
 <style scoped>

@@ -14,15 +14,8 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_day")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="0.5"
-              min="1"
-              max="12"
-              v-model.number="form.hoursPerDay"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="0.5" min="1" max="12" v-model.number="form.hoursPerDay" />
             <span class="form-hint">{{ $t("settings.hints.hours_day") }}</span>
           </div>
 
@@ -30,15 +23,8 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_week")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="0.5"
-              min="1"
-              max="60"
-              v-model.number="form.hoursPerWeek"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="0.5" min="1" max="60" v-model.number="form.hoursPerWeek" />
             <span class="form-hint">{{ $t("settings.hints.hours_week") }}</span>
           </div>
 
@@ -46,33 +32,19 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.default_break")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="5"
-              min="0"
-              max="120"
-              v-model.number="form.defaultBreak"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="5" min="0" max="120" v-model.number="form.defaultBreak" />
             <span class="form-hint">{{
               $t("settings.hints.default_break")
-            }}</span>
+              }}</span>
           </div>
 
           <!-- Working days per week -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.work_days")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="1"
-              min="1"
-              max="7"
-              v-model.number="form.workDays"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="1" min="1" max="7" v-model.number="form.workDays" />
             <span class="form-hint">{{ $t("settings.hints.work_days") }}</span>
           </div>
 
@@ -91,92 +63,53 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.vacation_days")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="1"
-              min="0"
-              max="365"
-              v-model.number="form.vacationDaysPerYear"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="1" min="0" max="365"
+              v-model.number="form.vacationDaysPerYear" />
             <span class="form-hint">{{
               $t("settings.hints.vacation_days")
-            }}</span>
+              }}</span>
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.gross_salary")
-            }}</label>
+              }}</label>
 
             <!-- Normal input — only if privacy is OFF -->
-            <input
-              v-if="!privacyMode"
-              class="form-input"
-              type="number"
-              step="1"
-              min="1"
-              max="10000"
-              v-model.number="form.grossMonthlySalary"
-            />
+            <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
+              v-model.number="form.grossMonthlySalary" />
 
             <!-- Masked — if Privacy ON -->
-            <input
-              v-else
-              class="form-input"
-              type="text"
-              value="••••"
-              disabled
-            />
+            <input v-else class="form-input" type="text" value="••••" disabled />
 
             <span class="form-hint">{{
               $t("settings.hints.gross_salary")
-            }}</span>
+              }}</span>
             <span class="form-hint">{{
               $t("settings.hints.gross_salary_sub")
-            }}</span>
+              }}</span>
           </div>
 
           <!-- SettingsCard Template -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.autostop")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="0.5"
-              min="1"
-              max="16"
-              v-model.number="form.maxWorkHours"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.maxWorkHours" />
             <span class="form-hint">{{ $t("settings.hints.autostop") }}</span>
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.overtime_warn")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="0.5"
-              min="1"
-              max="16"
-              v-model.number="form.warnWorkHours"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.warnWorkHours" />
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.inactivity")
-            }}</label>
-            <input
-              class="form-input"
-              type="number"
-              step="5"
-              min="5"
-              max="120"
-              v-model.number="form.inactivityMinutes"
-            />
+              }}</label>
+            <input class="form-input" type="number" step="5" min="5" max="120"
+              v-model.number="form.inactivityMinutes" />
             <span class="form-hint">{{ $t("settings.hints.inactivity") }}</span>
           </div>
 
@@ -184,7 +117,7 @@
           <div class="form-group full" v-if="previewGrossHourlyRate > 0">
             <label class="form-label">{{
               $t("settings.fields.preview")
-            }}</label>
+              }}</label>
             <div class="salary-preview">
               <span>{{
                 $t("settings.preview_hourly", {
@@ -217,38 +150,16 @@
           <div class="privacy-info">
             <!-- Privacy is on -->
             <span class="privacy-icon">
-              <svg
-                v-if="privacyMode"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
-                />
-                <path
-                  d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
-                />
+              <svg v-if="privacyMode" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                 <line x1="1" y1="1" x2="23" y2="23" />
               </svg>
 
               <!-- Privacy is off -->
-              <svg
-                v-else
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
@@ -270,18 +181,10 @@
           </div>
 
           <!-- Toggle for privacy mode -->
-          <button
-            class="toggle-switch"
-            :class="{ active: privacyMode }"
-            @click="toggle"
-            :aria-label="
-              privacyMode
-                ? $t('settings.privacy.disable')
-                : $t('settings.privacy.enable')
-            "
-            role="switch"
-            :aria-checked="privacyMode"
-          >
+          <button class="toggle-switch" :class="{ active: privacyMode }" @click="toggle" :aria-label="privacyMode
+              ? $t('settings.privacy.disable')
+              : $t('settings.privacy.enable')
+            " role="switch" :aria-checked="privacyMode">
             <span class="toggle-thumb" />
           </button>
         </div>
@@ -292,6 +195,9 @@
         </button>
         <button class="btn btn-secondary" @click="reset">
           {{ $t("common.reset") }}
+        </button>
+        <button class="btn btn-secondary" :disabled="checkingForUpdates" @click="checkForUpdates">
+          {{ checkingForUpdates ? $t("pwa.checking") : $t("pwa.check_updates") }}
         </button>
       </div>
 
@@ -308,31 +214,18 @@
 
         <!-- Storage Usage -->
         <div class="storage-usage">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <ellipse cx="12" cy="5" rx="9" ry="3" />
             <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
           </svg>
-          <span
-            >{{ $t("settings.storage_usage") }}:
-            <strong>{{ formatted() }}</strong></span
-          >
+          <span>{{ $t("settings.storage_usage") }}:
+            <strong>{{ formatted() }}</strong></span>
           <span class="storage-bar-wrap">
-            <span
-              class="storage-bar-fill"
-              :style="{
-                width: Math.min((bytes / (5 * 1024 * 1024)) * 100, 100) + '%',
-              }"
-            />
+            <span class="storage-bar-fill" :style="{
+              width: Math.min((bytes / (5 * 1024 * 1024)) * 100, 100) + '%',
+            }" />
           </span>
           <span class="storage-limit">/ ~5 MB</span>
         </div>
@@ -351,24 +244,14 @@
           <label class="form-label" for="delete-confirm-input">
             {{ $t("settings.danger.confirm_label") }} <strong>DELETE</strong>
           </label>
-          <input
-            id="delete-confirm-input"
-            v-model="deleteConfirmText"
-            class="form-input danger-input"
-            type="text"
-            placeholder="DELETE"
-            autocomplete="off"
-          />
+          <input id="delete-confirm-input" v-model="deleteConfirmText" class="form-input danger-input" type="text"
+            placeholder="DELETE" autocomplete="off" />
 
           <div class="danger-confirm__actions">
             <button class="btn btn-secondary" @click="cancelDeleteAll">
               {{ $t("common.cancel") }}
             </button>
-            <button
-              class="btn btn-danger"
-              :disabled="!canDeleteAll"
-              @click="confirmDeleteAll"
-            >
+            <button class="btn btn-danger" :disabled="!canDeleteAll" @click="confirmDeleteAll">
               {{ $t("settings.danger.confirm_btn") }}
             </button>
           </div>
@@ -389,6 +272,7 @@ import { useToast } from "@/composables/useToast";
 import { STATES } from "@/composables/useHolidays";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useStorageSize } from "@/composables/useStorageSize";
+import { usePwaUpdate } from "@/composables/usePwaUpdate";
 
 import { useTodoStore } from "@/composables/useTodoStore";
 import { useCalendarStore } from "@/composables/useCalendarStore";
@@ -406,6 +290,8 @@ const currentLocaleLabel = computed(() =>
 const { privacyMode, toggle, mask, toggleOffIfOn } = usePrivacy();
 const store = useZeitwerkStore();
 const { showToast } = useToast();
+const { needRefresh, checkForUpdates: requestUpdateCheck } = usePwaUpdate();
+const checkingForUpdates = ref(false);
 const todoStore = useTodoStore();
 const calendarStore = useCalendarStore();
 const profileStore = useProfileStore();
@@ -433,6 +319,20 @@ watch(
 function save() {
   store.saveSettings({ ...form });
   showToast(t("settings.toast_saved"), "ok");
+}
+
+async function checkForUpdates() {
+  checkingForUpdates.value = true
+  try {
+    const updateAvailable = await requestUpdateCheck()
+    if (!updateAvailable && !needRefresh.value)
+      showToast(t("pwa.no_updates"), "ok")
+  } catch (error) {
+    console.error("[Zeitwerk] Update check failed:", error)
+    showToast(t("pwa.check_failed"), "error")
+  } finally {
+    checkingForUpdates.value = false
+  }
 }
 
 function reset() {
@@ -779,13 +679,10 @@ select.form-input {
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  border: 1px solid
-    color-mix(in oklch, var(--color-error) 25%, var(--color-border));
-  background: color-mix(
-    in oklch,
-    var(--color-error-highlight) 45%,
-    var(--color-surface)
-  );
+  border: 1px solid color-mix(in oklch, var(--color-error) 25%, var(--color-border));
+  background: color-mix(in oklch,
+      var(--color-error-highlight) 45%,
+      var(--color-surface));
   border-radius: var(--radius-md);
 }
 
@@ -802,17 +699,14 @@ select.form-input {
 }
 
 .danger-input {
-  border-color: color-mix(
-    in oklch,
-    var(--color-error) 35%,
-    var(--color-border)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-error) 35%,
+      var(--color-border));
 }
 
 .danger-input:focus {
   border-color: var(--color-error);
-  box-shadow: 0 0 0 2px
-    color-mix(in oklch, var(--color-error-highlight) 80%, white);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-error-highlight) 80%, white);
 }
 
 .btn-danger:disabled {

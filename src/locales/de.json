@@ -83,7 +83,11 @@
         "new_version": "Neue Version verfügbar",
         "update_now": "Jetzt aktualisieren",
         "updating": "Wird aktualisiert…",
-        "later": "Später"
+        "later": "Später",
+        "check_updates": "Nach Updates suchen",
+        "checking": "Suche nach Updates…",
+        "no_updates": "Keine Updates vorhanden – du bist auf dem neuesten Stand.",
+        "check_failed": "Die Update-Prüfung ist fehlgeschlagen."
     },
     "notifications": {
         "title": "Benachrichtigungen",
