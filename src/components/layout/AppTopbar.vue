@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useZeitwerkStore, chartExportTrigger } from "@/stores/zeitwerk";
 import { useI18n } from "vue-i18n";
@@ -201,6 +201,25 @@ function handleExport() {
 function handleCSV() {
   showCsvModal.value = true;
 }
+
+// handle keyboard shortcuts: ctrl/cmd + e for export, ctrl/cmd + shift + e for export charts
+function handleShortcut(event) {
+  const modifier = event.ctrlKey || event.metaKey;
+  if (!modifier || event.altKey || document.querySelector('[role="dialog"]')) {
+    return;
+  }
+
+  if (event.key.toLowerCase() === "e" && event.shiftKey) {
+    event.preventDefault();
+    handleExport();
+  } else if (event.key.toLowerCase() === "e") {
+    event.preventDefault();
+    handleCSV();
+  }
+}
+
+onMounted(() => window.addEventListener("keydown", handleShortcut));
+onUnmounted(() => window.removeEventListener("keydown", handleShortcut));
 
 function handleCsvConfirm({ from, to }) {
   try {

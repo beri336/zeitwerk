@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { useToast } from "@/composables/useToast";
 import { STATES, getHolidaysForMonth } from "@/composables/useHolidays";
@@ -149,6 +149,25 @@ function isAlreadyImported(date) {
 function close() {
   emit("update:modelValue", false);
 }
+
+// handle keyboard shortcuts: esc to close, ctrl/cmd + enter to submit
+function handleKeydown(event) {
+  if (!props.modelValue) return;
+
+  if (event.key === "Escape") {
+    close();
+    return;
+  }
+
+  const modifier = event.ctrlKey || event.metaKey;
+  if (modifier && !event.altKey && event.key === "Enter") {
+    event.preventDefault();
+    doImport();
+  }
+}
+
+onMounted(() => window.addEventListener("keydown", handleKeydown));
+onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 
 function doImport() {
   store.saveSettings({ state: selectedState.value });

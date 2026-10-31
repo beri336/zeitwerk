@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { useI18n } from "vue-i18n";
 
@@ -99,6 +99,25 @@ function pad(num) {
 function close() {
   isOpen.value = false;
 }
+
+// handle keyboard shortcuts: esc to close, ctrl/cmd + enter to submit
+function handleKeydown(event) {
+  if (!props.modelValue) return;
+
+  if (event.key === "Escape") {
+    close();
+    return;
+  }
+
+  const modifier = event.ctrlKey || event.metaKey;
+  if (modifier && !event.altKey && event.key === "Enter") {
+    event.preventDefault();
+    submit();
+  }
+}
+
+onMounted(() => window.addEventListener("keydown", handleKeydown));
+onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 
 function resetToCurrentMonth() {
   const current = `${store.currYear}-${pad(store.currMonth + 1)}`;

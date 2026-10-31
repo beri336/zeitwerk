@@ -205,7 +205,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onMounted, onUnmounted } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { useToast } from "@/composables/useToast";
 import { calcActualHours, formatHours, today } from "@/composables/useTime";
@@ -313,6 +313,29 @@ function close() {
   pendingDelete.value = false;
   emit("update:modelValue", false);
 }
+
+// handle keyboard shortcuts: esc to close, ctrl/cmd + s or enter to save
+function handleKeydown(event) {
+  if (!props.modelValue) return;
+
+  if (event.key === "Escape") {
+    if (pendingDelete.value) {
+      cancelDelete();
+    } else {
+      close();
+    }
+    return;
+  }
+
+  const modifier = event.ctrlKey || event.metaKey;
+  if (modifier && !event.altKey && (event.key === "s" || event.key === "Enter")) {
+    event.preventDefault();
+    if (!pendingDelete.value) save();
+  }
+}
+
+onMounted(() => window.addEventListener("keydown", handleKeydown));
+onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 
 // save new or updated entry
 function save() {
