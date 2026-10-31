@@ -34,6 +34,15 @@ function hasData(data) {
         || Object.values(data.profile).some(Boolean)
 }
 
+function getSnapshotStats(data) {
+    const entries = data.zeitwerk.entries.length
+    const events = data.calendar.events.length
+    const todos = data.todos.todos.length
+    const bytes = new Blob([JSON.stringify(data)]).size
+
+    return { entries, events, todos, bytes }
+}
+
 function isDue(lastCreatedAt, frequency) {
     if (!lastCreatedAt)
         return true
@@ -73,10 +82,12 @@ export function useRecovery() {
             zeitwerk.settings.recoveryFrequency))
             return false
 
+        const stats = getSnapshotStats(data)
         stored.unshift({
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             createdAt: new Date().toISOString(),
             data,
+            stats,
         })
 
         writeSnapshots(stored)
@@ -108,13 +119,27 @@ export function useRecovery() {
 
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
-        const date = snapshot.createdAt.slice(0, 10)
+        const date = snapshot.createdAt.replace(/[:.]/g, '-').replace('T', '-').slice(0, 19)
 
         link.href = url
-        link.download = `zeitwerk-recovery-${date}.json`
+        const entries = snapshot.stats?.entries ?? snapshot.data?.zeitwerk?.entries?.length ?? 0
+        link.download = `zeitwerk-recovery-${date}-${entries}-entries-${deviceLabel()}.json`
         link.click()
 
         URL.revokeObjectURL(url)
+    }
+
+    function deviceLabel() {
+        const ua = navigator.userAgent
+
+        if (/iPhone/i.test(ua)) return 'iphone'
+        if (/iPad/i.test(ua)) return 'ipad'
+        if (/Android/i.test(ua)) return 'android'
+        if (/Macintosh|MacIntel/i.test(ua)) return 'mac'
+        if (/Windows/i.test(ua)) return 'windows'
+        if (/Linux/i.test(ua)) return 'linux'
+
+        return 'device'
     }
 
     function ignoreWarning() {

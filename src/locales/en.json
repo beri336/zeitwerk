@@ -302,6 +302,8 @@
             "restore": "Restore",
             "export": "Export",
             "delete": "Delete",
+            "confirm_restore": "Restore this recovery backup? Your current data will be backed up first.",
+            "summary": "{entries} entries · {events} events · {todos} to-dos · {size}",
             "empty": "No recovery backup available yet.",
             "restored": "Recovery backup restored.",
             "deleted": "Recovery backup deleted.",

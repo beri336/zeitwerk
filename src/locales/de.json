@@ -300,6 +300,8 @@
             "restore": "Wiederherstellen",
             "export": "Exportieren",
             "delete": "Löschen",
+            "confirm_restore": "Möchtest du diese Recovery-Sicherung wirklich wiederherstellen? Der aktuelle Stand wird vorher automatisch gesichert.",
+            "summary": "{entries} Einträge · {events} Termine · {todos} To-dos · {size}",
             "empty": "Noch keine Recovery-Sicherung vorhanden.",
             "restored": "Recovery-Sicherung wiederhergestellt.",
             "deleted": "Recovery-Sicherung gelöscht.",

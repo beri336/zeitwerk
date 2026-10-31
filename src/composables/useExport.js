@@ -41,7 +41,7 @@ export function useExport() {
             [JSON.stringify(data, null, 2)],
             { type: 'application/json' }
         )
-        download(blob, `zeitwerk-backup-${dateStamp()}.json`)
+        download(blob, `zeitwerk-backup-${dateTimeStamp()}-${deviceLabel()}.json`)
     }
 
     // CSV (Zeiteinträge)
@@ -115,6 +115,21 @@ export function useExport() {
     // Helpers
     function dateStamp() {
         return new Date().toISOString().slice(0, 10)
+    }
+
+    function dateTimeStamp() {
+        return new Date().toISOString().replace(/[:.]/g, '-').replace('T', '-').slice(0, 19)
+    }
+
+    function deviceLabel() {
+        const ua = navigator.userAgent
+        if (/iPhone/i.test(ua)) return 'iphone'
+        if (/iPad/i.test(ua)) return 'ipad'
+        if (/Android/i.test(ua)) return 'android'
+        if (/Macintosh|MacIntel/i.test(ua)) return 'mac'
+        if (/Windows/i.test(ua)) return 'windows'
+        if (/Linux/i.test(ua)) return 'linux'
+        return 'device'
     }
 
     function download(blob, filename) {

@@ -187,8 +187,12 @@
 
             <div v-if="snapshots.length" class="recovery-list">
               <div v-for="snapshot in snapshots" :key="snapshot.id" class="recovery-item">
-                <span>{{ formatRecoveryDate(snapshot.createdAt) }}</span><div class="recovery-item__actions">
-                  <button class="btn btn-secondary btn-sm" @click="restoreRecovery(snapshot)">
+                <div class="recovery-item__info">
+                  <strong>{{ formatRecoveryDate(snapshot.createdAt) }}</strong>
+                  <span>{{ recoverySummary(snapshot) }}</span>
+                </div>
+                <div class="recovery-item__actions">
+                  <button class="btn btn-secondary btn-sm" @click="confirmRestore(snapshot)">
                     {{ $t("settings.recovery.restore") }}
                   </button>
                   <button class="btn btn-secondary btn-sm" @click="exportRecovery(snapshot)">
@@ -426,11 +430,39 @@ function formatRecoveryDate(date) {
   });
 }
 
+// confirm restore recovery snapshot
+function confirmRestore(snapshot) {
+  if (!window.confirm(t("settings.recovery.confirm_restore"))) return;
+
+  restoreRecovery(snapshot);
+}
+
 // restore recovery snapshot
 function restoreRecovery(snapshot) {
   restoreSnapshot(snapshot);
   Object.assign(form, { ...store.settings });
   showToast(t("settings.recovery.restored"), "ok");
+}
+
+// generate recovery summary for display
+function recoverySummary(snapshot) {
+  const stats = snapshot.stats ?? {
+    entries: snapshot.data?.zeitwerk?.entries?.length ?? 0,
+    events: snapshot.data?.calendar?.events?.length ?? 0,
+    todos: snapshot.data?.todos?.todos?.length ?? 0,
+    bytes: new Blob([JSON.stringify(snapshot.data)]).size,
+  };
+
+  const size = stats.bytes < 1024
+    ? `${stats.bytes} B`
+    : `${(stats.bytes / 1024).toFixed(1)} KB`;
+
+  return t("settings.recovery.summary", {
+    entries: stats.entries,
+    events: stats.events,
+    todos: stats.todos,
+    size,
+  });
 }
 
 // delete recovery snapshot
