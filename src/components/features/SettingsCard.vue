@@ -187,10 +187,17 @@
 
             <div v-if="snapshots.length" class="recovery-list">
               <div v-for="snapshot in snapshots" :key="snapshot.id" class="recovery-item">
-                <span>{{ formatRecoveryDate(snapshot.createdAt) }}</span>
-                <button class="btn btn-secondary btn-sm" @click="restoreRecovery(snapshot)">
-                  {{ $t("settings.recovery.restore") }}
-                </button>
+                <span>{{ formatRecoveryDate(snapshot.createdAt) }}</span><div class="recovery-item__actions">
+                  <button class="btn btn-secondary btn-sm" @click="restoreRecovery(snapshot)">
+                    {{ $t("settings.recovery.restore") }}
+                  </button>
+                  <button class="btn btn-secondary btn-sm" @click="exportRecovery(snapshot)">
+                    {{ $t("settings.recovery.export") }}
+                  </button>
+                  <button class="btn btn-danger btn-sm" @click="deleteRecovery(snapshot)">
+                    {{ $t("settings.recovery.delete") }}
+                  </button>
+                </div>
               </div>
             </div>
             <span v-else class="form-hint">{{ $t("settings.recovery.empty") }}</span>
@@ -344,7 +351,7 @@ const checkingForUpdates = ref(false);
 const todoStore = useTodoStore();
 const calendarStore = useCalendarStore();
 const profileStore = useProfileStore();
-const { snapshots, restoreSnapshot } = useRecovery();
+const { snapshots, restoreSnapshot, deleteSnapshot, exportSnapshot } = useRecovery();
 
 const form = reactive({ ...store.settings });
 const { bytes, formatted, calculate } = useStorageSize();
@@ -424,6 +431,18 @@ function restoreRecovery(snapshot) {
   restoreSnapshot(snapshot);
   Object.assign(form, { ...store.settings });
   showToast(t("settings.recovery.restored"), "ok");
+}
+
+// delete recovery snapshot
+function deleteRecovery(snapshot) {
+  deleteSnapshot(snapshot.id);
+  showToast(t("settings.recovery.deleted"), "ok");
+}
+
+// export recovery snapshot
+function exportRecovery(snapshot) {
+  exportSnapshot(snapshot);
+  showToast(t("settings.recovery.exported"), "ok");
 }
 
 // Delete
@@ -526,6 +545,12 @@ const previewGrossDailyRate = computed(() => {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   margin-top: var(--space-1);
+}
+
+.recovery-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .settings-body {

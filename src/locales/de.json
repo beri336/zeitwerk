@@ -288,16 +288,13 @@
                 "biweekly": "Alle 2 Wochen",
                 "monthly": "Monatlich"
             },
-            "recovery": {
-                "warning": "Dein letztes Backup ist älter als 30 Tage.",
-                "create_backup": "Jetzt sichern",
-                "ignore": "Ignorieren",
-                "created": "Recovery-Backup erstellt."
-            },
-            
             "restore": "Wiederherstellen",
+            "export": "Exportieren",
+            "delete": "Löschen",
             "empty": "Noch keine Recovery-Sicherung vorhanden.",
-            "restored": "Recovery-Sicherung wiederhergestellt."
+            "restored": "Recovery-Sicherung wiederhergestellt.",
+            "deleted": "Recovery-Sicherung gelöscht.",
+            "exported": "Recovery-Sicherung exportiert."
         },
         "storage_usage": "LocalStorage-Nutzung",
         "preview_hourly": "{val} €/h brutto",
@@ -346,6 +343,12 @@
             "confirm_label": "Tippe",
             "confirm_btn": "Ja, alles löschen"
         }
+    },
+    "recovery": {
+        "warning": "Dein letztes Backup ist älter als 30 Tage.",
+        "create_backup": "Jetzt sichern",
+        "ignore": "Ignorieren",
+        "created": "Recovery-Backup erstellt."
     },
     "month": {
         "title": "Monatsübersicht",

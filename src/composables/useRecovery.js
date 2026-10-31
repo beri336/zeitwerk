@@ -100,6 +100,23 @@ export function useRecovery() {
         snapshots.value = remaining.slice(0, MAX_SNAPSHOTS)
     }
 
+    function exportSnapshot(snapshot) {
+        const blob = new Blob(
+            [JSON.stringify(snapshot.data, null, 2)],
+            { type: 'application/json' },
+        )
+
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const date = snapshot.createdAt.slice(0, 10)
+
+        link.href = url
+        link.download = `zeitwerk-recovery-${date}.json`
+        link.click()
+
+        URL.revokeObjectURL(url)
+    }
+
     function ignoreWarning() {
         ignoredSnapshotId.value = snapshots.value[0]?.id ?? 'none'
         localStorage.setItem(IGNORED_KEY, ignoredSnapshotId.value)
@@ -111,6 +128,7 @@ export function useRecovery() {
         createSnapshot,
         restoreSnapshot,
         deleteSnapshot,
+        exportSnapshot,
         ignoreWarning,
     }
 }

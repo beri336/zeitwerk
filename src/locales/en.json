@@ -290,15 +290,13 @@
                 "biweekly": "Every 2 weeks",
                 "monthly": "Monthly"
             },
-            "recovery": {
-                "warning": "Your last backup is more than 30 days old.",
-                "create_backup": "Back up now",
-                "ignore": "Ignore",
-                "created": "Recovery backup created."
-            },
             "restore": "Restore",
+            "export": "Export",
+            "delete": "Delete",
             "empty": "No recovery backup available yet.",
-            "restored": "Recovery backup restored."
+            "restored": "Recovery backup restored.",
+            "deleted": "Recovery backup deleted.",
+            "exported": "Recovery backup exported."
         },
         "storage_usage": "LocalStorage Usage",
         "preview_hourly": "{val} €/h gross",
@@ -347,6 +345,12 @@
             "confirm_label": "Type",
             "confirm_btn": "Yes, delete everything"
         }
+    },
+    "recovery": {
+        "warning": "Your last backup is more than 30 days old.",
+        "create_backup": "Back up now",
+        "ignore": "Ignore",
+        "created": "Recovery backup created."
     },
     "profile": {
         "edit_btn": "Edit Profile",
