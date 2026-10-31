@@ -67,20 +67,28 @@ export function useExport() {
     }
 
     // Import
-    function importJSON(file) {
+    function readImportFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader()
             reader.onload = e => {
                 try {
                     const data = JSON.parse(e.target.result)
-                    applyImport(data)
-                    resolve()
+
+                    if (!Array.isArray(data.zeitwerk?.entries))
+                        throw new Error('Invalid JSON file')
+
+                    resolve(data)
                 } catch {
                     reject(new Error('Invalid JSON file'))
                 }
             }
             reader.readAsText(file)
         })
+    }
+
+    async function importJSON(file) {
+        const data = await readImportFile(file)
+        applyImport(data)
     }
 
     function applyImport(data) {
@@ -122,6 +130,7 @@ export function useExport() {
         exportJSON,
         exportCSV,
         importJSON,
+        readImportFile,
         applyImport,
         collectAll
     }

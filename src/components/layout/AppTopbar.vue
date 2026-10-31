@@ -139,6 +139,13 @@
   </header>
 
   <ExportCsvModal v-model="showCsvModal" @confirm="handleCsvConfirm" />
+
+  <ImportConfirmModal
+    v-model="showImportModal"
+    :current-count="store.entries.length"
+    :import-count="pendingImport?.zeitwerk?.entries?.length ?? 0"
+    @confirm="confirmImport"
+  />
 </template>
 
 <script setup>
@@ -150,6 +157,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 import { useToast } from "@/composables/useToast";
 import ExportCsvModal from "@/components/ExportCsvModal.vue";
+import ImportConfirmModal from "@/components/ImportConfirmModal.vue";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useExport } from "@/composables/useExport";
 import { useRecovery } from "@/composables/useRecovery";
@@ -166,11 +174,13 @@ const store = useZeitwerkStore();
 const { showToast } = useToast();
 const showCsvModal = ref(false);
 
-const { importJSON, exportJSON: exportFullJSON } = useExport();
+const { readImportFile, applyImport, exportJSON: exportFullJSON } = useExport();
 const { createSnapshot } = useRecovery();
 
 const showExportMenu = ref(false);
 const exportDropRef = ref(null);
+const showImportModal = ref(false);
+const pendingImport = ref(null);
 
 const titleKeys = {
   "/dashboard": "topbar.dashboard",
@@ -253,12 +263,30 @@ function onFileChange(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  createSnapshot({ force: true });
-  importJSON(file)
-    .then(() => showToast(t("topbar.toast_import_ok"), "ok"))
+  readImportFile(file)
+    .then((data) => {
+      pendingImport.value = data;
+      showImportModal.value = true;
+    })
     .catch(() => showToast(t("topbar.toast_import_err"), "err"));
 
   event.target.value = "";
+}
+
+// confirm import and apply it to the store, optionally creating a backup first
+function confirmImport({ createBackup }) {
+  if (!pendingImport.value) return;
+
+  try {
+    if (createBackup) createSnapshot({ force: true });
+    applyImport(pendingImport.value);
+    pendingImport.value = null;
+    showImportModal.value = false;
+    showToast(t("topbar.toast_import_ok"), "ok");
+  } catch (error) {
+    console.error("[Zeitwerk] Import failed:", error);
+    showToast(t("topbar.toast_import_err"), "err");
+  }
 }
 
 // Close when clicked outside of export menu

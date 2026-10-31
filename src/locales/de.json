@@ -52,6 +52,15 @@
         "only_this_month": "Nur diesen Monat exportieren",
         "submit": "CSV exportieren"
     },
+    "import": {
+        "title": "Daten importieren",
+        "warning": "Bitte prüfe den Import, bevor deine aktuellen Daten ersetzt werden.",
+        "current_entries": "Aktuelle Einträge",
+        "file_entries": "Einträge im Import",
+        "replaces_data": "Achtung: Die aktuellen Daten werden durch den Import ersetzt.",
+        "backup_and_import": "Backup erstellen & importieren",
+        "import_now": "Jetzt importieren"
+    },
     "entry": {
         "title_new": "Neuer Eintrag",
         "title_edit": "Eintrag bearbeiten",

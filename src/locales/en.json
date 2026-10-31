@@ -52,6 +52,15 @@
         "only_this_month": "Export only this month",
         "submit": "Export CSV"
     },
+    "import": {
+        "title": "Import data",
+        "warning": "Review the import before replacing your current data.",
+        "current_entries": "Current entries",
+        "file_entries": "Entries in import",
+        "replaces_data": "Warning: Current data will be replaced by this import.",
+        "backup_and_import": "Create backup & import",
+        "import_now": "Import now"
+    },
     "entry": {
         "title_new": "New Entry",
         "title_edit": "Edit Entry",
