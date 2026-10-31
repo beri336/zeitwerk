@@ -270,7 +270,7 @@
     "settings": {
         "title": "Standardwerte",
         "source_code": "Quellcode:",
-        "sub": "Diese Werte werden automatisch auf neue Einträge angewendet.",
+        "sub": "Diese Werte werden automatisch gespeichert und auf neue Einträge angewendet.",
         "toast_saved": "Einstellungen gespeichert.",
         "toast_reset": "Einstellungen zurückgesetzt.",
         "toast_deleted": "Alle Einträge gelöscht.",

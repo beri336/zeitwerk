@@ -272,7 +272,7 @@
     "settings": {
         "title": "Defaults",
         "source_code": "Source code:",
-        "sub": "These values will be automatically applied to new entries.",
+        "sub": "These values are saved automatically and applied to new entries.",
         "toast_saved": "Settings saved.",
         "toast_reset": "Settings reset.",
         "toast_deleted": "All entries deleted.",

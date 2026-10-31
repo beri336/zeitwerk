@@ -200,9 +200,6 @@
         </div>
       </div>
       <div class="settings-actions">
-        <button class="btn btn-primary" @click="save">
-          {{ $t("common.save") }}
-        </button>
         <button class="btn btn-secondary" @click="reset">
           {{ $t("common.reset") }}
         </button>
@@ -315,21 +312,23 @@ const canDeleteAll = computed(
   () => deleteConfirmText.value.trim().toUpperCase() === "DELETE",
 );
 
-// Save state change immediately + Toast
+// Save every setting change immediately.
+watch(form,
+  () => {
+    store.saveSettings({ ...form });
+  },
+  { deep: true },
+);
+
+// State changes also resync public holidays and show a specific notification
 watch(
   () => form.state,
   (newVal, oldVal) => {
     if (!oldVal || newVal === oldVal) return;
 
-    store.saveSettings({ state: newVal });
     showToast(t("settings.toast_state", { state: STATES[newVal] }), "ok");
   },
 );
-
-function save() {
-  store.saveSettings({ ...form });
-  showToast(t("settings.toast_saved"), "ok");
-}
 
 async function checkForUpdates() {
   checkingForUpdates.value = true
