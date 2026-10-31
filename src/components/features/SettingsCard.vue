@@ -156,6 +156,47 @@
           </div>
         </div>
 
+        <div class="recovery-settings">
+          <div class="recovery-header">
+            <div>
+              <div class="privacy-label">{{ $t("settings.recovery.title") }}</div>
+              <div class="privacy-hint">{{ $t("settings.recovery.sub") }}</div>
+            </div>
+            <button
+              class="toggle-switch"
+              :class="{ active: form.recoveryEnabled }"
+              @click="form.recoveryEnabled = !form.recoveryEnabled"
+              role="switch"
+              :aria-checked="form.recoveryEnabled"
+              :aria-label="$t('settings.recovery.toggle')"
+            >
+              <span class="toggle-thumb" />
+            </button>
+          </div>
+
+          <div v-if="form.recoveryEnabled || snapshots.length" class="recovery-body">
+            <div v-if="form.recoveryEnabled" class="form-group">
+              <label class="form-label">{{ $t("settings.recovery.frequency_label") }}</label>
+              <select class="form-input" v-model="form.recoveryFrequency">
+                <option value="daily">{{ $t("settings.recovery.frequency.daily") }}</option>
+                <option value="weekly">{{ $t("settings.recovery.frequency.weekly") }}</option>
+                <option value="biweekly">{{ $t("settings.recovery.frequency.biweekly") }}</option>
+                <option value="monthly">{{ $t("settings.recovery.frequency.monthly") }}</option>
+              </select>
+            </div>
+
+            <div v-if="snapshots.length" class="recovery-list">
+              <div v-for="snapshot in snapshots" :key="snapshot.id" class="recovery-item">
+                <span>{{ formatRecoveryDate(snapshot.createdAt) }}</span>
+                <button class="btn btn-secondary btn-sm" @click="restoreRecovery(snapshot)">
+                  {{ $t("settings.recovery.restore") }}
+                </button>
+              </div>
+            </div>
+            <span v-else class="form-hint">{{ $t("settings.recovery.empty") }}</span>
+          </div>
+        </div>
+
         <div class="privacy-row">
           <div class="privacy-info">
             <!-- Privacy is on -->
@@ -280,6 +321,7 @@ import { STATES } from "@/composables/useHolidays";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useStorageSize } from "@/composables/useStorageSize";
 import { usePwaUpdate } from "@/composables/usePwaUpdate";
+import { useRecovery } from "@/composables/useRecovery";
 
 import { useTodoStore } from "@/composables/useTodoStore";
 import { useCalendarStore } from "@/composables/useCalendarStore";
@@ -302,6 +344,7 @@ const checkingForUpdates = ref(false);
 const todoStore = useTodoStore();
 const calendarStore = useCalendarStore();
 const profileStore = useProfileStore();
+const { snapshots, restoreSnapshot } = useRecovery();
 
 const form = reactive({ ...store.settings });
 const { bytes, formatted, calculate } = useStorageSize();
@@ -350,6 +393,9 @@ function reset() {
     hoursPerWeek: 40,
     defaultBreak: 30,
     workDays: 5,
+    defaultWorkplace: "on-site",
+    recoveryEnabled: true,
+    recoveryFrequency: "weekly",
     state: "BW",
     grossHourlyRate: 0,
     grossMonthlySalary: 0,
@@ -363,6 +409,21 @@ function reset() {
 
   // deactivate privacy mode when resetting settings
   toggleOffIfOn();
+}
+
+// format recovery date for display
+function formatRecoveryDate(date) {
+  return new Date(date).toLocaleString(locale.value === "de" ? "de-DE" : "en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+// restore recovery snapshot
+function restoreRecovery(snapshot) {
+  restoreSnapshot(snapshot);
+  Object.assign(form, { ...store.settings });
+  showToast(t("settings.recovery.restored"), "ok");
 }
 
 // Delete
@@ -469,6 +530,47 @@ const previewGrossDailyRate = computed(() => {
 
 .settings-body {
   padding: var(--space-6);
+}
+
+.recovery-settings {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+}
+
+.recovery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.recovery-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.recovery-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.recovery-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
 }
 
 .settings-actions {

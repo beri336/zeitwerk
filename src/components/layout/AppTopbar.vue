@@ -152,6 +152,7 @@ import { useToast } from "@/composables/useToast";
 import ExportCsvModal from "@/components/ExportCsvModal.vue";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useExport } from "@/composables/useExport";
+import { useRecovery } from "@/composables/useRecovery";
 
 const { t } = useI18n();
 
@@ -166,6 +167,7 @@ const { showToast } = useToast();
 const showCsvModal = ref(false);
 
 const { importJSON, exportJSON: exportFullJSON } = useExport();
+const { createSnapshot } = useRecovery();
 
 const showExportMenu = ref(false);
 const exportDropRef = ref(null);
@@ -251,6 +253,7 @@ function onFileChange(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  createSnapshot({ force: true });
   importJSON(file)
     .then(() => showToast(t("topbar.toast_import_ok"), "ok"))
     .catch(() => showToast(t("topbar.toast_import_err"), "err"));

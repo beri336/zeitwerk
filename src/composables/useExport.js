@@ -122,6 +122,7 @@ export function useExport() {
         exportJSON,
         exportCSV,
         importJSON,
+        applyImport,
         collectAll
     }
 }

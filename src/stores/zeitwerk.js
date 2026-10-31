@@ -17,6 +17,8 @@ const DEFAULT_SETTINGS = {
     defaultBreak: 30,
     workDays: 5,
     defaultWorkplace: 'on-site',
+    recoveryEnabled: true,
+    recoveryFrequency: 'weekly',
     state: 'BW',
     grossMonthlySalary: 0,
     vacationDaysPerYear: 30,

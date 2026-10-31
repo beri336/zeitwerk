@@ -23,8 +23,10 @@ import AppTopbar from '@/components/layout/AppTopbar.vue'
 import AppBottomNav from '@/components/layout/AppBottomNav.vue'
 import ToastList from '@/components/ui/ToastList.vue'
 import PwaUpdatePrompt from '@/components/ui/PwaUpdatePrompt.vue'
+import { useAutoRecovery } from '@/composables/useRecovery'
 
 const isDark = ref(false)
+useAutoRecovery()
 
 onMounted(() => {
   localStorage.removeItem('habits')

@@ -279,6 +279,21 @@
         "toast_reset": "Settings reset.",
         "toast_deleted": "All entries deleted.",
         "toast_state": "State changed to {state} - Holidays updated.",
+        "recovery": {
+            "title": "Automatic recovery",
+            "sub": "Keeps up to three local backups of your data.",
+            "toggle": "Enable automatic recovery",
+            "frequency_label": "Backup frequency",
+            "frequency": {
+                "daily": "Daily",
+                "weekly": "Weekly",
+                "biweekly": "Every 2 weeks",
+                "monthly": "Monthly"
+            },
+            "restore": "Restore",
+            "empty": "No recovery backup available yet.",
+            "restored": "Recovery backup restored."
+        },
         "storage_usage": "LocalStorage Usage",
         "preview_hourly": "{val} €/h gross",
         "preview_daily": "{val} €/day gross",

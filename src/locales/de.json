@@ -276,7 +276,22 @@
         "toast_saved": "Einstellungen gespeichert.",
         "toast_reset": "Einstellungen zurückgesetzt.",
         "toast_deleted": "Alle Einträge gelöscht.",
-        "toast_state": "Bundesland auf {state} geändert – Feiertage aktualisiert.",
+        "toast_state": "Bundesland auf {state} geändert - Feiertage aktualisiert.",
+        "recovery": {
+            "title": "Automatische Recovery",
+            "sub": "Behält bis zu drei lokale Sicherungen deiner Daten.",
+            "toggle": "Automatische Recovery aktivieren",
+            "frequency_label": "Sicherungsintervall",
+            "frequency": {
+                "daily": "Täglich",
+                "weekly": "Wöchentlich",
+                "biweekly": "Alle 2 Wochen",
+                "monthly": "Monatlich"
+            },
+            "restore": "Wiederherstellen",
+            "empty": "Noch keine Recovery-Sicherung vorhanden.",
+            "restored": "Recovery-Sicherung wiederhergestellt."
+        },
         "storage_usage": "LocalStorage-Nutzung",
         "preview_hourly": "{val} €/h brutto",
         "preview_daily": "{val} €/Tag brutto",
