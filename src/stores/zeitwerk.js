@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
     hoursPerWeek: 40,
     defaultBreak: 30,
     workDays: 5,
+    defaultWorkplace: 'on-site',
     state: 'BW',
     grossMonthlySalary: 0,
     vacationDaysPerYear: 30,

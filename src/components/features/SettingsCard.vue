@@ -59,6 +59,16 @@
             <span class="form-hint">{{ $t("settings.hints.state") }}</span>
           </div>
 
+          <!-- Default workplace -->
+          <div class="form-group">
+            <label class="form-label">{{ $t("settings.fields.default_workplace") }}</label>
+            <select class="form-input" v-model="form.defaultWorkplace">
+              <option value="on-site">{{ $t("absence.on-site") }}</option>
+              <option value="homeoffice">{{ $t("absence.homeoffice") }}</option>
+            </select>
+            <span class="form-hint">{{ $t("settings.hints.default_workplace") }}</span>
+          </div>
+
           <!-- Vacation days -->
           <div class="form-group">
             <label class="form-label">{{

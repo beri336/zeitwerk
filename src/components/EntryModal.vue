@@ -227,7 +227,7 @@ const { t } = useI18n();
 
 const defaultForm = () => ({
   date: today(),
-  typ: "on-site",
+  typ: store.settings.defaultWorkplace === "homeoffice" ? "homeoffice" : "on-site",
   timeEntries: [
     {
       start: "08:00",
