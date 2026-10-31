@@ -290,6 +290,12 @@
                 "biweekly": "Every 2 weeks",
                 "monthly": "Monthly"
             },
+            "recovery": {
+                "warning": "Your last backup is more than 30 days old.",
+                "create_backup": "Back up now",
+                "ignore": "Ignore",
+                "created": "Recovery backup created."
+            },
             "restore": "Restore",
             "empty": "No recovery backup available yet.",
             "restored": "Recovery backup restored."

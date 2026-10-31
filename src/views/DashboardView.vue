@@ -21,12 +21,14 @@
       {{ $t("dashboard.pwa_mode") }}
     </div>
 
+    <RecoveryWarning />
     <Dashboard />
   </main>
 </template>
 
 <script setup>
 import Dashboard from "@/components/features/DashboardCard.vue";
+import RecoveryWarning from "@/components/ui/RecoveryWarning.vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 

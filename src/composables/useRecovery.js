@@ -8,7 +8,11 @@ import { useProfileStore } from '@/composables/useProfileStore'
 import { useExport } from '@/composables/useExport'
 
 const STORAGE_KEY = 'zeitwerk_recovery'
+const IGNORED_KEY = 'zeitwerk_recovery_warning_ignored'
 const MAX_SNAPSHOTS = 3
+const MAX_BACKUP_AGE = 30 * 86400000
+const snapshots = ref(readSnapshots())
+const ignoredSnapshotId = ref(localStorage.getItem(IGNORED_KEY))
 
 function readSnapshots() {
     try {
@@ -51,22 +55,22 @@ function isDue(lastCreatedAt, frequency) {
 
 export function useRecovery() {
     const zeitwerk = useZeitwerkStore()
-    const calendar = useCalendarStore()
-    const todos = useTodoStore()
-    const profile = useProfileStore()
     const { collectAll, applyImport } = useExport()
-    const snapshots = ref(readSnapshots())
 
     function createSnapshot({ force = false } = {}) {
         const data = collectAll()
+
         if (!hasData(data))
             return false
 
         const stored = readSnapshots()
         const last = stored[0]
+
         if (!force && !zeitwerk.settings.recoveryEnabled)
             return false
-        if (!force && !isDue(last?.createdAt, zeitwerk.settings.recoveryFrequency))
+
+        if (!force && !isDue(last?.createdAt,
+            zeitwerk.settings.recoveryFrequency))
             return false
 
         stored.unshift({
@@ -74,8 +78,12 @@ export function useRecovery() {
             createdAt: new Date().toISOString(),
             data,
         })
+
         writeSnapshots(stored)
         snapshots.value = stored.slice(0, MAX_SNAPSHOTS)
+        ignoredSnapshotId.value = null
+        localStorage.removeItem(IGNORED_KEY)
+
         return true
     }
 
@@ -85,16 +93,25 @@ export function useRecovery() {
     }
 
     function deleteSnapshot(snapshotId) {
-        const remaining = readSnapshots().filter(snapshot => snapshot.id !== snapshotId)
+        const remaining = readSnapshots().
+            filter(snapshot => snapshot.id !== snapshotId)
+
         writeSnapshots(remaining)
         snapshots.value = remaining.slice(0, MAX_SNAPSHOTS)
     }
 
+    function ignoreWarning() {
+        ignoredSnapshotId.value = snapshots.value[0]?.id ?? 'none'
+        localStorage.setItem(IGNORED_KEY, ignoredSnapshotId.value)
+    }
+
     return {
         snapshots,
+        ignoredSnapshotId,
         createSnapshot,
         restoreSnapshot,
         deleteSnapshot,
+        ignoreWarning,
     }
 }
 
@@ -103,9 +120,13 @@ export function useAutoRecovery() {
     const calendar = useCalendarStore()
     const todos = useTodoStore()
     const profile = useProfileStore()
-    const { createSnapshot } = useRecovery()
+    const { snapshots, createSnapshot } = useRecovery()
 
     function check() {
+        const latest = snapshots.value[0]
+        if (latest && Date.now() - new Date(latest.createdAt).getTime() > MAX_BACKUP_AGE)
+            return
+
         createSnapshot()
     }
 
@@ -124,9 +145,6 @@ export function useAutoRecovery() {
 
     return {
         zeitwerk,
-        calendar,
-        todos,
-        profile,
         check,
     }
 }
