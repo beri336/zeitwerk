@@ -210,7 +210,9 @@
         "hint": "Tippe auf einen Tag, um einen Eintrag zu öffnen oder zu erstellen. Farbige Tage zeigen erfasste Arbeit, Abwesenheiten oder Feiertage."
     },
     "week": {
-        "hint": "Tippe auf einen Tag, um einen Eintrag hinzuzufügen oder zu bearbeiten."
+        "hint": "Tippe auf einen Tag, um einen Eintrag hinzuzufügen oder zu bearbeiten.",
+        "stats_period_label": "Statistikzeitraum",
+        "stats_period": "{count} Woche | {count} Wochen"
     },
     "todos": {
         "title": "To-Do-Übersicht",

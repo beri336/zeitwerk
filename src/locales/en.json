@@ -212,7 +212,9 @@
         "hint": "Tap a day to open or create an entry. Colored days indicate tracked work, absences, or public holidays."
     },
     "week": {
-        "hint": "Tap a day to add or edit an entry."
+        "hint": "Tap a day to add or edit an entry.",
+        "stats_period_label": "Statistics period",
+        "stats_period": "{count} week | {count} weeks"
     },
     "todos": {
         "title": "To-Do's Overview",

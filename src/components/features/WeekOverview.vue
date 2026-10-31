@@ -32,34 +32,47 @@
 
     <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
       <summary>{{ $t("overview.statistics") }}</summary>
+      <div class="stats-period" role="group" :aria-label="$t('week.stats_period_label')">
+        <button
+          v-for="period in statsPeriods"
+          :key="period"
+          type="button"
+          class="stats-period-btn"
+          :class="{ active: statsPeriod === period }"
+          :aria-pressed="statsPeriod === period"
+          @click="statsPeriod = period"
+        >
+          {{ $t("week.stats_period", { count: period }) }}
+        </button>
+      </div>
       <div class="cal-stats">
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.working_days") }}</span>
-          <span class="cal-stat-value">{{ workdays }}</span>
+          <span class="cal-stat-value">{{ statsWorkdays }}</span>
         </div>
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("common.entries") }}</span>
-          <span class="cal-stat-value">{{ weekEntries.length }}</span>
+          <span class="cal-stat-value">{{ statsEntries.length }}</span>
         </div>
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.actual") }}</span>
-          <span class="cal-stat-value" :class="weekDiff >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ formatHours(weekActual) }}
+          <span class="cal-stat-value" :class="statsDiff >= 0 ? 'stat-ok' : 'stat-err'">
+            {{ formatHours(statsActual) }}
           </span>
         </div>
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.planned") }}</span>
-          <span class="cal-stat-value">{{ formatHours(weekPlanned) }}</span>
+          <span class="cal-stat-value">{{ formatHours(statsPlanned) }}</span>
         </div>
         <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("month.diff") }}</span>
-          <span class="cal-stat-value" :class="weekDiff >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ weekDiff >= 0 ? "+" : "" }}{{ formatHours(weekDiff) }}
+          <span class="cal-stat-value" :class="statsDiff >= 0 ? 'stat-ok' : 'stat-err'">
+            {{ statsDiff >= 0 ? "+" : "" }}{{ formatHours(statsDiff) }}
           </span>
         </div>
         <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
           <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
-          <span class="cal-stat-value">{{ weekTypeCounts[type] }}</span>
+          <span class="cal-stat-value">{{ statsTypeCounts[type] }}</span>
         </div>
       </div>
     </details>
@@ -101,6 +114,8 @@ const editEntry = ref(null);
 const clickedDate = ref(null);
 const flashToday = ref(false);
 const weekStart = ref(getMonday(new Date()));
+const statsPeriods = [1, 2, 3, 4];
+const statsPeriod = ref(1);
 
 const dayHeaders = computed(() =>
   weekDays.value.map(({ date }) =>
@@ -118,32 +133,51 @@ const weekDays = computed(() =>
   }),
 );
 
-const weekEntries = computed(() => {
-  const dates = new Set(weekDays.value.map((day) => day.date));
+const absenceStatTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
+
+const statsStart = computed(() => {
+  const start = new Date(weekStart.value);
+  start.setDate(start.getDate() - (statsPeriod.value - 1) * 7);
+
+  return start;
+});
+
+const statsDays = computed(() =>
+  Array.from({ length: statsPeriod.value * 7 }, (_, index) => {
+    const date = new Date(statsStart.value);
+    date.setDate(date.getDate() + index);
+
+    return { date: formatDate(date) };
+  }),
+);
+
+const statsEntries = computed(() => {
+  const dates = new Set(statsDays.value.map((day) => day.date));
+
   return store.entries.filter((entry) => dates.has(entry.date));
 });
 
-const weekActual = computed(() =>
-  weekEntries.value.reduce(
-    (total, entry) => total + store.effectiveActualHours(entry),
+const statsActual = computed(() =>
+  statsEntries.value.reduce(
+    (total, entry) =>
+      total + store.effectiveActualHours(entry),
     0,
   ),
 );
 
-const weekPlanned = computed(() =>
-  weekEntries.value.reduce(
+const statsPlanned = computed(() =>
+  statsEntries.value.reduce(
     (total, entry) =>
       total + (entry.plannedHours ?? store.settings.hoursPerDay),
     0,
   ),
 );
 
-const weekDiff = computed(() => weekActual.value - weekPlanned.value);
-const absenceStatTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
-const weekTypeCounts = computed(() => countAbsenceTypes(weekEntries.value));
+const statsDiff = computed(() => statsActual.value - statsPlanned.value);
+const statsTypeCounts = computed(() => countAbsenceTypes(statsEntries.value));
 
-const workdays = computed(() =>
-  weekDays.value.filter(({ date }) => {
+const statsWorkdays = computed(() =>
+  statsDays.value.filter(({ date }) => {
     const day = new Date(`${date}T00:00:00`).getDay();
     return day !== 0 && day !== 6;
   }).length,
@@ -243,6 +277,32 @@ onMounted(() => {
   font: inherit;
   font-size: var(--text-sm);
   font-weight: 700;
+}
+
+.stats-period {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding: 0 var(--space-3);
+}
+
+.stats-period-btn {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.stats-period-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .overview-add-btn span {
