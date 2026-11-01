@@ -252,7 +252,13 @@
     "week": {
         "hint": "Tap a day to add or edit an entry.",
         "stats_period_label": "Statistics period",
-        "stats_period": "{count} week | {count} weeks"
+        "stats_period": "{count} week | {count} weeks",
+        "average_actual": "Average actual / week",
+        "average_planned": "Average planned / week",
+        "homeoffice_quote": "Home office share",
+        "overtime_trend": "Planned/actual trend",
+        "period_comparison": "Compared with previous period",
+        "comparison_hint": "Previous period: {value} overtime"
     },
     "todos": {
         "title": "To-Do's Overview",

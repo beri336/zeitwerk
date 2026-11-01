@@ -74,7 +74,34 @@
           <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
           <span class="cal-stat-value">{{ statsTypeCounts[type] }}</span>
         </div>
+        <div class="cal-stat">
+          <span class="cal-stat-label">{{ $t("week.average_actual") }}</span>
+          <span class="cal-stat-value">{{ formatHours(statsAverageActual) }}</span>
+        </div>
+        <div class="cal-stat">
+          <span class="cal-stat-label">{{ $t("week.average_planned") }}</span>
+          <span class="cal-stat-value">{{ formatHours(statsAveragePlanned) }}</span>
+        </div>
+        <div class="cal-stat">
+          <span class="cal-stat-label">{{ $t("week.homeoffice_quote") }}</span>
+          <span class="cal-stat-value">{{ statsHomeofficeQuote.toFixed(0) }}%</span>
+        </div>
+        <div class="cal-stat">
+          <span class="cal-stat-label">{{ $t("week.overtime_trend") }}</span>
+          <span class="cal-stat-value" :class="statsTrend >= 0 ? 'stat-ok' : 'stat-err'">
+            {{ statsTrend >= 0 ? "+" : "" }}{{ formatHours(statsTrend) }}
+          </span>
+        </div>
+        <div class="cal-stat">
+          <span class="cal-stat-label">{{ $t("week.period_comparison") }}</span>
+          <span class="cal-stat-value" :class="statsComparison >= 0 ? 'stat-ok' : 'stat-err'">
+            {{ statsComparison >= 0 ? "+" : "" }}{{ formatHours(statsComparison) }}
+          </span>
+        </div>
       </div>
+      <p class="stats-comparison-hint">
+        {{ $t("week.comparison_hint", { value: formatHours(previousDiff) }) }}
+      </p>
     </details>
 
     <section class="cal-grid-wrap" aria-label="Week calendar">
@@ -114,7 +141,7 @@ const editEntry = ref(null);
 const clickedDate = ref(null);
 const flashToday = ref(false);
 const weekStart = ref(getMonday(new Date()));
-const statsPeriods = [1, 2, 3, 4];
+const statsPeriods = [1, 2, 3, 4, 8, 12];
 const statsPeriod = ref(1);
 
 const dayHeaders = computed(() =>
@@ -182,6 +209,50 @@ const statsWorkdays = computed(() =>
     return day !== 0 && day !== 6;
   }).length,
 );
+
+// previous period stats for comparison
+const previousStatsEntries = computed(() => {
+  const dates = new Set(
+    Array.from({ length: statsPeriod.value * 7 }, (_, index) => {
+      const date = new Date(statsStart.value);
+      date.setDate(date.getDate() - statsPeriod.value * 7 + index);
+      return formatDate(date);
+    }),
+  );
+  return store.entries.filter((entry) => dates.has(entry.date));
+});
+
+function sumActual(entries) {
+  return entries.reduce((total, entry) => total + store.effectiveActualHours(entry), 0);
+}
+
+function sumPlanned(entries) {
+  return entries.reduce(
+    (total, entry) => total + (entry.plannedHours ?? store.settings.hoursPerDay),
+    0,
+  );
+}
+
+const statsAverageActual = computed(() =>
+  statsPeriod.value ? statsActual.value / statsPeriod.value : 0,
+);
+const statsAveragePlanned = computed(() =>
+  statsPeriod.value ? statsPlanned.value / statsPeriod.value : 0,
+);
+const statsHomeofficeQuote = computed(() => {
+  const workplaceEntries = statsEntries.value.filter((entry) =>
+    ["homeoffice", "on-site"].includes(entry.typ),
+  );
+  if (!workplaceEntries.length) return 0;
+  return (workplaceEntries.filter((entry) => entry.typ === "homeoffice").length
+    / workplaceEntries.length) * 100;
+});
+const previousActual = computed(() => sumActual(previousStatsEntries.value));
+const previousPlanned = computed(() => sumPlanned(previousStatsEntries.value));
+const previousDiff = computed(() => previousActual.value - previousPlanned.value);
+const statsComparison = computed(() => statsDiff.value - previousDiff.value);
+const statsTrend = computed(() => statsActual.value - statsPlanned.value);
+
 
 const todayStr = computed(() => formatDate(new Date()));
 const isCurrentWeek = computed(() => weekDays.value.some(({ date }) => date === todayStr.value));
@@ -437,6 +508,12 @@ onMounted(() => {
   font-size: var(--text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.stats-comparison-hint {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-faint);
+  font-size: var(--text-xs);
 }
 
 .stat-ok {

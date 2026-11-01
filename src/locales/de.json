@@ -250,7 +250,13 @@
     "week": {
         "hint": "Tippe auf einen Tag, um einen Eintrag hinzuzufügen oder zu bearbeiten.",
         "stats_period_label": "Statistikzeitraum",
-        "stats_period": "{count} Woche | {count} Wochen"
+        "stats_period": "{count} Woche | {count} Wochen",
+        "average_actual": "Ist-Durchschnitt / Woche",
+        "average_planned": "Soll-Durchschnitt / Woche",
+        "homeoffice_quote": "Homeoffice-Quote",
+        "overtime_trend": "Soll-/Ist-Trend",
+        "period_comparison": "Vergleich zum Vorzeitraum",
+        "comparison_hint": "Vorzeitraum: {value} Überstunden"
     },
     "todos": {
         "title": "To-Do-Übersicht",
