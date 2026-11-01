@@ -268,9 +268,31 @@ function onFileChange(event) {
       pendingImport.value = data;
       showImportModal.value = true;
     })
-    .catch(() => showToast(t("topbar.toast_import_err"), "err"));
+    .catch((error) => {
+      console.error("[Zeitwerk] Import validation failed:", error);
+      showToast(getImportErrorMessage(error), "err");
+    });
 
   event.target.value = "";
+}
+
+// map import error codes to translation keys
+function getImportErrorMessage(error) {
+  const messages = {
+    invalid_json: "topbar.toast_import_invalid_json",
+    read_failed: "topbar.toast_import_read_failed",
+    invalid_format: "topbar.toast_import_invalid_format",
+    missing_entries: "topbar.toast_import_missing_entries",
+    invalid_version: "topbar.toast_import_invalid_version",
+    unsupported_version: "topbar.toast_import_unsupported_version",
+    unsupported_format: "topbar.toast_import_unsupported_format",
+    invalid_settings: "topbar.toast_import_invalid_data",
+    invalid_calendar: "topbar.toast_import_invalid_data",
+    invalid_todos: "topbar.toast_import_invalid_data",
+    invalid_profile: "topbar.toast_import_invalid_data",
+  };
+
+  return t(messages[error?.code] ?? "topbar.toast_import_err");
 }
 
 // confirm import and apply it to the store, optionally creating a backup first

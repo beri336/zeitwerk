@@ -192,7 +192,15 @@
         "toast_csv_ok": "CSV-Export erfolgreich.",
         "toast_csv_err": "CSV-Export fehlgeschlagen.",
         "toast_import_ok": "Import erfolgreich.",
-        "toast_import_err": "Fehler beim Import."
+        "toast_import_err": "Fehler beim Import.",
+        "toast_import_invalid_json": "Die Datei enthält kein gültiges JSON.",
+        "toast_import_read_failed": "Die Importdatei konnte nicht gelesen werden.",
+        "toast_import_invalid_format": "Ungültiges Zeitwerk-Importformat.",
+        "toast_import_missing_entries": "Die Importdatei enthält keine gültigen Zeiteinträge.",
+        "toast_import_invalid_version": "Die Version der Importdatei ist ungültig.",
+        "toast_import_unsupported_version": "Diese Backup-Version wird nicht unterstützt.",
+        "toast_import_unsupported_format": "Dieses Importformat wird nicht unterstützt.",
+        "toast_import_invalid_data": "Die Importdatei enthält beschädigte Daten."
     },
     "nav": {
         "dashboard": "Dashboard",

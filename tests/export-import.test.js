@@ -16,12 +16,47 @@ describe('export and import', () => {
             JSON.stringify({ zeitwerk: { entries: [{ id: 1 }] } }),
         ], 'backup.json', { type: 'application/json' })
 
-        const invalid = new File(['{}'], 'invalid.json', { type: 'application/json' })
+        const invalid = new File(['{'],
+                                 'invalid.json',
+                                 { type: 'application/json' })
 
-        await expect(readImportFile(valid)).resolves.toEqual({
-            zeitwerk: { entries: [{ id: 1 }] },
+        await expect(readImportFile(valid)).resolves.toMatchObject({
+            meta: { format: 'zeitwerk-backup', version: 2 },
+            zeitwerk: { entries: [{ id: 1 }], settings: {} },
         })
-        await expect(readImportFile(invalid)).rejects.toThrow('Invalid JSON file')
+        await expect(readImportFile(invalid)).rejects.toThrow('invalid_json')
+    })
+
+    it('migrates legacy and version 1 backups', () => {
+        const { migrateImport } = useExport()
+
+        expect(migrateImport({
+            zeitwerk: { entries: [{ id: 1 }] },
+        })).toMatchObject({
+            meta: { version: 2, migratedFrom: 0 },
+            calendar: { events: [] },
+            todos: { todos: [] },
+            profile: {},
+        })
+
+        expect(migrateImport({
+            meta: { format: 'zeitwerk-backup', version: 1 },
+            zeitwerk: { entries: [] },
+        }).meta.migratedFrom).toBe(1)
+    })
+
+    it('rejects unsupported versions and malformed backup sections', () => {
+        const { migrateImport } = useExport()
+
+        expect(() => migrateImport({
+            meta: { format: 'zeitwerk-backup', version: 99 },
+            zeitwerk: { entries: [] },
+        })).toThrow('unsupported_version')
+        expect(() => migrateImport({
+            meta: { format: 'zeitwerk-backup', version: 2 },
+            zeitwerk: { entries: [] },
+            calendar: { events: 'invalid' },
+        })).toThrow('invalid_calendar')
     })
 
     it('collects and applies all local data stores', () => {
@@ -32,18 +67,10 @@ describe('export and import', () => {
         const { collectAll, applyImport } = useExport()
 
         zeitwerk.entries = []
-        zeitwerk.addEntry(
-            { id: 1,
-              date: '2026-10-30',
-              typ: 'homeoffice' }
-        )
-        calendar.events.push(
-            { id: 1,
-              title: 'Meeting' }
-        )
-
+        zeitwerk.addEntry({ id: 1, date: '2026-10-30', typ: 'homeoffice' })
+        calendar.events.push({ id: 1, title: 'Meeting' })
         todos.todos.push({ id: 1, title: 'Task' })
-        profile.profile.displayName = 'name'
+        profile.profile.displayName = 'Beri'
 
         const backup = collectAll()
         zeitwerk.entries = []
@@ -55,8 +82,8 @@ describe('export and import', () => {
 
         expect(zeitwerk.entries).toHaveLength(1)
         expect(zeitwerk.entries[0].typ).toBe('homeoffice')
-        expect(calendar.events).toEqual( [{ id: 1, title: 'Meeting' }] )
-        expect(todos.todos).toEqual( [{ id: 1, title: 'Task' }] )
-        expect(profile.profile.displayName).toBe('name')
+        expect(calendar.events).toEqual([{ id: 1, title: 'Meeting' }])
+        expect(todos.todos).toEqual([{ id: 1, title: 'Task' }])
+        expect(profile.profile.displayName).toBe('Beri')
     })
 })

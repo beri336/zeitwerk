@@ -193,7 +193,15 @@
         "toast_csv_ok": "CSV export successful.",
         "toast_csv_err": "CSV export failed.",
         "toast_import_ok": "Import successful.",
-        "toast_import_err": "Error during import."
+        "toast_import_err": "Error during import.",
+        "toast_import_invalid_json": "The file does not contain valid JSON.",
+        "toast_import_read_failed": "The import file could not be read.",
+        "toast_import_invalid_format": "Invalid Zeitwerk import format.",
+        "toast_import_missing_entries": "The import file contains no valid time entries.",
+        "toast_import_invalid_version": "The import file version is invalid.",
+        "toast_import_unsupported_version": "This backup version is not supported.",
+        "toast_import_unsupported_format": "This import format is not supported.",
+        "toast_import_invalid_data": "The import file contains corrupted data."
     },
     "nav": {
         "dashboard": "Dashboard",

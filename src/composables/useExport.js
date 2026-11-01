@@ -5,6 +5,17 @@ import { useCalendarStore } from '@/composables/useCalendarStore'
 import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
 
+export const BACKUP_FORMAT = 'zeitwerk-backup'
+export const CURRENT_BACKUP_VERSION = 2
+
+class ImportValidationError extends Error {
+    constructor(code) {
+        super(code)
+        this.name = 'ImportValidationError'
+        this.code = code
+    }
+}
+
 export function useExport() {
 
     function collectAll() {
@@ -16,7 +27,8 @@ export function useExport() {
         return {
             meta: {
                 exportedAt: new Date().toISOString(),
-                version: 1,
+                format: BACKUP_FORMAT,
+                version: CURRENT_BACKUP_VERSION,
             },
             zeitwerk: {
                 entries: zeitwerk.entries,
@@ -73,15 +85,15 @@ export function useExport() {
             reader.onload = e => {
                 try {
                     const data = JSON.parse(e.target.result)
-
-                    if (!Array.isArray(data.zeitwerk?.entries))
-                        throw new Error('Invalid JSON file')
-
-                    resolve(data)
-                } catch {
-                    reject(new Error('Invalid JSON file'))
+                    resolve(migrateImport(data))
+                } catch (error) {
+                    reject(error instanceof ImportValidationError
+                        ? error
+                        : new ImportValidationError('invalid_json'))
                 }
             }
+
+            reader.onerror = () => reject(new ImportValidationError('read_failed'))
             reader.readAsText(file)
         })
     }
@@ -92,24 +104,75 @@ export function useExport() {
     }
 
     function applyImport(data) {
+        const normalized = migrateImport(data)
         const zeitwerk = useZeitwerkStore()
         const calendar = useCalendarStore()
         const todos = useTodoStore()
         const profile = useProfileStore()
 
-        if (data.zeitwerk?.entries)
-            zeitwerk.entries = data.zeitwerk.entries
+        zeitwerk.entries = normalized.zeitwerk.entries
 
-        if (data.zeitwerk?.settings)
-            Object.assign(zeitwerk.settings, data.zeitwerk.settings)
+        Object.assign(zeitwerk.settings, normalized.zeitwerk.settings)
 
-        if (data.calendar?.events) calendar.events = data.calendar.events
+        calendar.events = normalized.calendar.events
 
-        if (data.todos?.todos)
-            todos.todos = data.todos.todos
 
-        if (data.profile)
-            Object.assign(profile.profile, data.profile)
+        todos.todos = normalized.todos.todos
+
+        Object.assign(profile.profile, normalized.profile)
+    }
+
+    function migrateImport(data) {
+        if (!data || typeof data !== 'object' || Array.isArray(data))
+            throw new ImportValidationError('invalid_format')
+
+        const version = data.meta?.version
+        if (version !== undefined && (!Number.isInteger(version) || version < 1))
+            throw new ImportValidationError('invalid_version')
+
+        if (version > CURRENT_BACKUP_VERSION)
+            throw new ImportValidationError('unsupported_version')
+
+        if (data.meta?.format && data.meta.format !== BACKUP_FORMAT)
+            throw new ImportValidationError('unsupported_format')
+
+        const zeitwerk = data.zeitwerk
+        if (!zeitwerk || typeof zeitwerk !== 'object' || !Array.isArray(zeitwerk.entries))
+            throw new ImportValidationError('missing_entries')
+
+        if (zeitwerk.settings !== undefined
+            && (!zeitwerk.settings || typeof zeitwerk.settings !== 'object' || Array.isArray(zeitwerk.settings)))
+            throw new ImportValidationError('invalid_settings')
+
+        if (data.calendar?.events !== undefined && !Array.isArray(data.calendar.events))
+            throw new ImportValidationError('invalid_calendar')
+
+        if (data.todos?.todos !== undefined && !Array.isArray(data.todos.todos))
+            throw new ImportValidationError('invalid_todos')
+
+        if (data.profile !== undefined
+            && (!data.profile || typeof data.profile !== 'object' || Array.isArray(data.profile)))
+            throw new ImportValidationError('invalid_profile')
+
+        return {
+            meta: {
+                ...data.meta,
+                format: BACKUP_FORMAT,
+                version: CURRENT_BACKUP_VERSION,
+                migratedFrom: version ?? 0,
+            },
+            zeitwerk: {
+                entries: data.zeitwerk.entries,
+                settings: data.zeitwerk.settings ?? {},
+            },
+            calendar: {
+                events: data.calendar?.events ?? [],
+            },
+            todos: {
+                todos: data.todos?.todos ?? [],
+            },
+            profile: data.profile ?? {},
+        }
     }
 
     // Helpers
@@ -147,6 +210,7 @@ export function useExport() {
         importJSON,
         readImportFile,
         applyImport,
-        collectAll
+        collectAll,
+        migrateImport,
     }
 }
