@@ -7,6 +7,23 @@
             <p class="export-sub">{{ $t('export.sub') }}</p>
         </div>
 
+        <section class="card data-management-card">
+            <div class="card-head">
+                <h2>{{ $t('export.data.title') }}</h2>
+                <p>{{ $t('export.data.sub') }}</p>
+            </div>
+            <div class="card-body data-management-actions">
+                <button class="btn btn-secondary" type="button" @click="openImport">
+                    {{ $t('export.data.import') }}
+                </button>
+                <button class="btn btn-secondary" type="button" @click="exportFullJSON">
+                    {{ $t('export.data.backup') }}
+                </button>
+                <input ref="importInput" type="file" accept=".json,application/json"
+                    class="hidden-file-input" @change="handleImportFile" />
+            </div>
+        </section>
+
         <!-- Filters -->
         <section class="card">
             <div class="card-head">
@@ -196,6 +213,13 @@
             <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
         </Transition>
 
+        <ImportConfirmModal
+            v-model="showImportModal"
+            :current-count="store.entries.length"
+            :import-count="pendingImport?.zeitwerk?.entries?.length ?? 0"
+            @confirm="confirmImport"
+        />
+
     </main>
 </template>
 
@@ -210,6 +234,8 @@ import { useExport } from '@/composables/useExport'
 import { useCalendarStore } from '@/composables/useCalendarStore'
 import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
+import ImportConfirmModal from '@/components/ImportConfirmModal.vue'
+import { useRecovery } from '@/composables/useRecovery'
 
 const store = useZeitwerkStore()
 const { showToast } = useToast()
@@ -231,9 +257,15 @@ const PRESETS = computed(() => [
 ])
 
 const { exportJSON: exportFullJSON } = useExport()
+const { readImportFile, applyImport } = useExport()
+const { createSnapshot } = useRecovery()
 const calendar = useCalendarStore()
 const todos = useTodoStore()
 const profile = useProfileStore()
+
+const importInput = ref(null)
+const showImportModal = ref(false)
+const pendingImport = ref(null)
 
 // derive all available months from the entries
 const availableMonths = computed(() => {
@@ -452,6 +484,41 @@ function exportJSON() {
     showToast(t('export.toast.json'))
 }
 
+function openImport() {
+    importInput.value?.click()
+}
+
+function handleImportFile(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    readImportFile(file)
+        .then(data => {
+            pendingImport.value = data
+            showImportModal.value = true
+        })
+        .catch(error => {
+            console.error('[Zeitwerk] Import validation failed:', error)
+            showToast(t('topbar.toast_import_err'), 'err')
+        })
+}
+
+function confirmImport({ createBackup }) {
+    if (!pendingImport.value) return
+
+    try {
+        if (createBackup) createSnapshot({ force: true })
+        applyImport(pendingImport.value)
+        pendingImport.value = null
+        showImportModal.value = false
+        showToast(t('topbar.toast_import_ok'), 'ok')
+    } catch (error) {
+        console.error('[Zeitwerk] Import failed:', error)
+        showToast(t('topbar.toast_import_err'), 'err')
+    }
+}
+
 // PDF
 // Exports a formatted HTML file - open in browser and print (Ctrl+P -> Save as PDF)
 function exportPDF() {
@@ -665,6 +732,20 @@ function toast(msg) {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+}
+
+.data-management-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.btn-secondary {
+  width: fit-content;
 }
 
 /* Filters */

@@ -2,7 +2,7 @@
 
 <template>
   <main class="main">
-    <h1>{{ $t("nav.export") }}</h1>
+    <h1>{{ $t("nav.data") }}</h1>
     <ExportCard />
   </main>
 </template>

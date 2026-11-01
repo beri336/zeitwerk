@@ -195,7 +195,8 @@
         "diagrams": "Diagrams & Stats",
         "profile": "Profile",
         "settings": "Settings",
-        "export": "Export",
+        "export": "Data management",
+        "data": "Data management",
         "export_charts": "Export charts",
         "export_png": "Export as PNG",
         "export_jpg": "Export as JPG",
@@ -234,7 +235,8 @@
         "stats": "Stats",
         "profile": "Profile",
         "settings": "Settings",
-        "export": "Export",
+        "export": "Data management",
+        "data": "Data management",
         "more": "More",
         "drawer_title": "Navigation",
         "week_overview": "Week Overview",
@@ -327,7 +329,8 @@
                 "monthly": "Monthly"
             },
             "restore": "Restore",
-            "export": "Export",
+            "export": "Data management",
+            "data": "Data management",
             "delete": "Delete",
             "confirm_restore": "Restore this recovery backup? Your current data will be backed up first.",
             "summary": "{entries} entries · {events} events · {todos} to-dos · {size}",
@@ -481,6 +484,12 @@
     "title": "Zeitwerk",
     "goal": "Goal",
     "export": {
+        "data": {
+            "title": "Manage data",
+            "sub": "Import and export your Zeitwerk data from one central place.",
+            "import": "Import backup",
+            "backup": "Export full backup"
+        },
         "title": "Export",
         "sub": "Export your data in different formats",
         "scope": {

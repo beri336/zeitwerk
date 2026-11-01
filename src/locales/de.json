@@ -194,7 +194,8 @@
         "year": "Jahresübersicht",
         "diagrams": "Diagramme & Statistiken",
         "settings": "Einstellungen",
-        "export": "Export",
+        "export": "Datenverwaltung",
+        "data": "Datenverwaltung",
         "export_charts": "Diagramme exportieren",
         "export_png": "Als PNG exportieren",
         "export_jpg": "Als JPG exportieren",
@@ -232,7 +233,8 @@
         "todo": "To-Do",
         "stats": "Statistiken",
         "settings": "Einstellungen",
-        "export": "Export",
+        "export": "Datenverwaltung",
+        "data": "Datenverwaltung",
         "more": "Mehr",
         "drawer_title": "Navigation",
         "week_overview": "Wochenübersicht",
@@ -444,6 +446,12 @@
     "title": "Zeitwerk",
     "goal": "Ziel",
     "export": {
+        "data": {
+            "title": "Daten verwalten",
+            "sub": "Importiere und exportiere deine Zeitwerk-Daten an einem zentralen Ort.",
+            "import": "Backup importieren",
+            "backup": "Vollständiges Backup exportieren"
+        },
         "title": "Export",
         "sub": "Exportiere deine Daten in verschiedenen Formaten",
         "scope": {
@@ -519,7 +527,8 @@
         "tags": "Tags",
         "entries_count": "{count} Einträge",
         "import": "Import",
-        "export": "Export",
+        "export": "Datenverwaltung",
+        "data": "Datenverwaltung",
         "delete_confirm_yes": "Ja, löschen",
         "add": "Hinzufügen",
         "update": "Aktualisieren",

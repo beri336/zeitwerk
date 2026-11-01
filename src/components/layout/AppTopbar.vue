@@ -51,7 +51,7 @@
         </div>
       </template>
 
-      <template v-if="route.path === '/dashboard'">
+      <template v-if="false && route.path === '/dashboard'">
         <button class="btn btn-secondary btn-sm topbar-action-btn" @click="handleImport"
           :title="$t('topbar.import_json')" :aria-label="$t('topbar.import_json')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
