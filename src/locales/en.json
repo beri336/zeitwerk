@@ -89,7 +89,14 @@
         "error_no_date": "Please select a date."
     },
     "pwa": {
+        "online": "Online",
+        "offline": "Offline",
+        "online_hint": "The app is connected.",
+        "offline_hint": "The app continues locally. Changes are saved locally.",
+        "check_connection": "Check connection",
         "new_version": "New version available",
+        "update_ready": "The update is ready to install.",
+        "update_waiting_online": "The update will install when you are online again.",
         "update_now": "Update now",
         "updating": "Updating…",
         "later": "Later",

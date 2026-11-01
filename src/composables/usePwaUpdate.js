@@ -1,4 +1,6 @@
-import { ref, watch } from 'vue'
+// src/composables/usePwaUpdate.js
+
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 const needRefresh = ref(false)
@@ -27,21 +29,45 @@ export function usePwaUpdate() {
     }
 
     async function update() {
+        if (!navigator.onLine)
+            return false
+
         updating.value = true
         try {
             await updateServiceWorker?.(true)
+            return true
         } finally {
             updating.value = false
         }
     }
 
     async function checkForUpdates() {
-        if (!registration.value)
+        if (!registration.value || !navigator.onLine)
             return false
 
-        await registration.value.update()
-        return needRefresh.value
+        try {
+            await registration.value.update()
+            return needRefresh.value
+        } catch (error) {
+            console.error('[Zeitwerk] Update check failed:', error)
+            return false
+        }
     }
 
-    return { needRefresh, updating, update, checkForUpdates }
+    function dismissUpdate() {
+        needRefresh.value = false
+    }
+
+    let intervalId
+    const handleOnline = () => checkForUpdates()
+    onMounted(() => {
+        window.addEventListener('online', handleOnline)
+        intervalId = window.setInterval(checkForUpdates, 15 * 60 * 1000)
+    })
+    onUnmounted(() => {
+        window.removeEventListener('online', handleOnline)
+        window.clearInterval(intervalId)
+    })
+
+    return { needRefresh, updating, update, checkForUpdates, dismissUpdate }
 }

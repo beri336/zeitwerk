@@ -12,7 +12,7 @@
 
     <AppBottomNav />
     <ToastList />
-    <PwaUpdatePrompt />
+    <PwaStatusBanner />
   </div>
 </template>
 
@@ -22,7 +22,7 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppTopbar from '@/components/layout/AppTopbar.vue'
 import AppBottomNav from '@/components/layout/AppBottomNav.vue'
 import ToastList from '@/components/ui/ToastList.vue'
-import PwaUpdatePrompt from '@/components/ui/PwaUpdatePrompt.vue'
+import PwaStatusBanner from '@/components/ui/PwaStatusBanner.vue'
 import { useAutoRecovery } from '@/composables/useRecovery'
 
 const isDark = ref(false)

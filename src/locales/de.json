@@ -89,7 +89,14 @@
         "error_no_date": "Bitte wähle ein Datum."
     },
     "pwa": {
+        "online": "Online",
+        "offline": "Offline",
+        "online_hint": "Die App ist verbunden.",
+        "offline_hint": "Die App läuft lokal weiter. Änderungen werden lokal gespeichert.",
+        "check_connection": "Verbindung prüfen",
         "new_version": "Neue Version verfügbar",
+        "update_ready": "Update kann jetzt installiert werden.",
+        "update_waiting_online": "Update wird installiert, sobald du wieder online bist.",
         "update_now": "Jetzt aktualisieren",
         "updating": "Wird aktualisiert…",
         "later": "Später",
