@@ -156,6 +156,17 @@
           </div>
         </div>
 
+        <section class="shortcut-settings" aria-labelledby="shortcut-settings-title">
+            <div class="privacy-label" id="shortcut-settings-title">{{ $t("shortcuts.settings_title") }}</div>
+            <div class="privacy-hint">{{ $t("shortcuts.settings_subtitle") }}</div>
+            <div class="shortcut-settings-list">
+              <div v-for="shortcut in shortcutList" :key="shortcut.key" class="shortcut-settings-row">
+                <span>{{ $t(shortcut.label) }}</span>
+                <kbd>{{ shortcut.key }}</kbd>
+              </div>
+            </div>
+        </section>
+
         <div class="recovery-settings">
           <div class="recovery-header">
             <div>
@@ -339,6 +350,15 @@ import { useCalendarStore } from "@/composables/useCalendarStore";
 import { useProfileStore } from "@/composables/useProfileStore";
 import DeviceChipExt from "@/components/ui/DeviceChipExt.vue";
 import SettingsNotification from "@/components/ui/NotificationSettings.vue";
+
+const shortcutList = [
+  { key: "?", label: "shortcuts.help" },
+  { key: "Esc", label: "shortcuts.close" },
+  { key: "⌘/Ctrl + S", label: "shortcuts.save_entry" },
+  { key: "⌘/Ctrl + Enter", label: "shortcuts.confirm" },
+  { key: "⌘/Ctrl + E", label: "shortcuts.export_csv" },
+  { key: "⌘/Ctrl + Shift + E", label: "shortcuts.export_backup" },
+];
 
 const { t, locale } = useI18n();
 const currentLocale = computed(() => locale.value);
@@ -674,6 +694,39 @@ const previewGrossDailyRate = computed(() => {
 .form-hint {
   font-size: var(--text-xs);
   color: var(--color-text-faint);
+}
+
+.shortcut-settings {
+  grid-column: 1 / -1;
+  margin-top: var(--space-2);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-divider);
+}
+
+.shortcut-settings-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-3);
+}
+
+.shortcut-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.shortcut-settings-row kbd {
+  padding: 0.15rem 0.35rem;
+  color: var(--color-text-faint);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: 0.65rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: nowrap;
 }
 
 /* Form Input */

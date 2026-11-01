@@ -25,6 +25,7 @@
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             <span class="topbar-action-label">{{ $t("common.export") }}</span>
+            <ShortcutHint label="⌘⇧E" />
           </button>
 
           <Transition name="dropdown">
@@ -83,6 +84,7 @@
             <line x1="16" y1="17" x2="8" y2="17" />
           </svg>
           <span class="topbar-action-label">CSV</span>
+          <ShortcutHint label="⌘E" />
         </button>
       </template>
 
@@ -161,6 +163,7 @@ import ImportConfirmModal from "@/components/ImportConfirmModal.vue";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useExport } from "@/composables/useExport";
 import { useRecovery } from "@/composables/useRecovery";
+import ShortcutHint from "@/components/ui/ShortcutHint.vue";
 
 const { t } = useI18n();
 

@@ -62,6 +62,7 @@
             @click="submit"
           >
             {{ $t("csv.submit") }}
+            <ShortcutHint label="⌘↵" />
           </button>
         </div>
       </div>
@@ -73,6 +74,7 @@
 import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { useI18n } from "vue-i18n";
+import ShortcutHint from "@/components/ui/ShortcutHint.vue";
 
 const { t } = useI18n();
 

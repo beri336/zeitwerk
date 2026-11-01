@@ -13,6 +13,7 @@
     <AppBottomNav />
     <ToastList />
     <PwaStatusBanner />
+    <ShortcutHelp />
   </div>
 </template>
 
@@ -23,6 +24,7 @@ import AppTopbar from '@/components/layout/AppTopbar.vue'
 import AppBottomNav from '@/components/layout/AppBottomNav.vue'
 import ToastList from '@/components/ui/ToastList.vue'
 import PwaStatusBanner from '@/components/ui/PwaStatusBanner.vue'
+import ShortcutHelp from '@/components/ui/ShortcutHelp.vue'
 import { useAutoRecovery } from '@/composables/useRecovery'
 
 const isDark = ref(false)

@@ -105,6 +105,18 @@
         "no_updates": "No updates available – you are up to date.",
         "check_failed": "The update check failed."
     },
+    "shortcuts": {
+        "title": "Keyboard shortcuts",
+        "subtitle": "Press ? anytime to open this overview.",
+        "settings_title": "Keyboard shortcuts",
+        "settings_subtitle": "Use the keyboard for common actions.",
+        "help": "Open or close shortcut help",
+        "close": "Close dialog or modal",
+        "save_entry": "Save entry",
+        "confirm": "Confirm action",
+        "export_csv": "Open CSV export",
+        "export_backup": "Export full backup"
+    },
     "notifications": {
         "title": "Notifications",
         "sub": "Choose when Zeitwerk sends you alerts.",

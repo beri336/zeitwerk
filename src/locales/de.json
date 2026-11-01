@@ -105,6 +105,18 @@
         "no_updates": "Keine Updates vorhanden – du bist auf dem neuesten Stand.",
         "check_failed": "Die Update-Prüfung ist fehlgeschlagen."
     },
+    "shortcuts": {
+        "title": "Tastatur-Shortcuts",
+        "subtitle": "Drücke ? jederzeit, um diese Übersicht zu öffnen.",
+        "settings_title": "Tastatur-Shortcuts",
+        "settings_subtitle": "Häufige Aktionen lassen sich direkt über die Tastatur ausführen.",
+        "help": "Shortcut-Hilfe öffnen oder schließen",
+        "close": "Dialog oder Modal schließen",
+        "save_entry": "Eintrag speichern",
+        "confirm": "Aktion bestätigen",
+        "export_csv": "CSV-Export öffnen",
+        "export_backup": "Vollständiges Backup exportieren"
+    },
     "notifications": {
         "title": "Benachrichtigungen",
         "sub": "Lege fest, wann Zeitwerk dir Hinweise schickt.",

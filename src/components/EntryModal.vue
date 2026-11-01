@@ -192,9 +192,11 @@
             <template v-if="!pendingDelete">
               <button class="btn btn-secondary" @click="close">
                 {{ $t("common.cancel") }}
+                <ShortcutHint label="Esc" />
               </button>
               <button class="btn btn-primary" @click="save">
                 {{ editEntry ? $t("common.update") : $t("common.add") }}
+                <ShortcutHint label="⌘S" />
               </button>
             </template>
           </div>
@@ -213,6 +215,7 @@ import { ABSENCE_TYPES, getAbsenceType } from "@/composables/useAbsence";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useI18n } from "vue-i18n";
 import { getDefaultWorkplace } from "@/composables/useEntryDefaults";
+import ShortcutHint from "@/components/ui/ShortcutHint.vue";
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
