@@ -17,4 +17,10 @@ defineProps({
     font-weight: 500;
     white-space: nowrap;
 }
+
+@media (max-width: 767px) {
+    .shortcut-hint {
+        display: none;
+    }
+}
 </style>

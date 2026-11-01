@@ -9,6 +9,18 @@
     <div class="topbar-title">{{ topbarTitle }}</div>
 
     <div class="topbar-right">
+      <div ref="connectionStatusRef" class="connection-status-wrap">
+        <button class="connection-status" :class="{ 'connection-status--offline': !isOnline }"
+          type="button" :aria-expanded="statusPopoverOpen"
+          :aria-label="isOnline ? $t('pwa.online') : $t('pwa.offline')"
+          @click="statusPopoverOpen = !statusPopoverOpen">
+          <span class="connection-status__dot" aria-hidden="true"></span>
+        </button>
+
+        <div v-if="statusPopoverOpen" class="connection-status-popover" role="status">
+          {{ isOnline ? $t('pwa.status_online') : $t('pwa.status_offline') }}
+        </div>
+      </div>
       <LanguageSwitcher />
     </div>
 
@@ -164,8 +176,12 @@ import { usePrivacy } from "@/composables/usePrivacy";
 import { useExport } from "@/composables/useExport";
 import { useRecovery } from "@/composables/useRecovery";
 import ShortcutHint from "@/components/ui/ShortcutHint.vue";
+import { useOnlineStatus } from "@/composables/useOnlineStatus";
 
 const { t } = useI18n();
+const { isOnline } = useOnlineStatus();
+const statusPopoverOpen = ref(false);
+const connectionStatusRef = ref(null);
 
 const { privacyMode, toggle } = usePrivacy();
 
@@ -314,18 +330,34 @@ function confirmImport({ createBackup }) {
   }
 }
 
-// Close when clicked outside of export menu
+// close when clicked outside of export menu
 onMounted(() => {
+  const closeStatusPopover = (event) => {
+    if (connectionStatusRef.value && !connectionStatusRef.value.contains(event.target))
+      statusPopoverOpen.value = false;
+  };
+  const closeStatusOnScroll = () => {
+    statusPopoverOpen.value = false;
+  };
+
+  document.addEventListener("click", closeStatusPopover);
+  window.addEventListener("scroll", closeStatusOnScroll, true);
+
   document.addEventListener("click", (e) => {
     if (exportDropRef.value && !exportDropRef.value.contains(e.target))
       showExportMenu.value = false;
+  });
+
+  onUnmounted(() => {
+    document.removeEventListener("click", closeStatusPopover);
+    window.removeEventListener("scroll", closeStatusOnScroll, true);
   });
 });
 
 function triggerExport(format) {
   showExportMenu.value = false;
   chartExportTrigger.value = format;
-  // Reset after a short time
+  // reset after a short time
   setTimeout(() => (chartExportTrigger.value = null), 100);
 }
 </script>
@@ -545,5 +577,59 @@ function triggerExport(format) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.connection-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.connection-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-success) 14%, transparent);
+}
+
+.connection-status--offline .connection-status__dot {
+  background: var(--color-gold);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-gold) 14%, transparent);
+}
+
+.connection-status-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.connection-status:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.connection-status-popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-xs);
+  white-space: nowrap;
 }
 </style>

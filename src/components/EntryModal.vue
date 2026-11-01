@@ -32,13 +32,24 @@
 
           <div class="form-grid" style="margin-top: var(--space-4)">
             <!-- Date + Actual -->
-            <div class="form-group">
+            <div class="form-group date-field">
               <label class="form-label">{{ $t("entry.date_label") }}</label>
               <input class="form-input" type="date" v-model="form.date" />
             </div>
-            <div class="form-group">
+
+            <div class="form-group planned-field">
               <label class="form-label">{{ $t("entry.planned_label") }}</label>
               <input class="form-input" type="number" step="0.5" min="0" max="24" v-model.number="form.plannedHours" />
+            </div>
+
+            <div v-if="showTimeFields" class="preview-bar actual-preview">
+              <span class="form-label">{{ $t("entry.preview_actual_label") }}</span>
+              <strong>{{ formatHours(previewActual) }}</strong>
+              <span class="preview-hint">
+                {{ $t("entry.preview_actual_hint", {
+                  count: form.timeEntries.filter((entry) => entry.start && entry.end).length,
+                }) }}
+              </span>
             </div>
 
             <!-- Gross Preview -->
@@ -67,9 +78,21 @@
 
                 <div class="time-blocks">
                   <div v-for="(block, index) in form.timeEntries" :key="index" class="time-block">
-                    <span class="block-label">{{
-                      $t("entry.block_label", { index: index + 1 })
-                    }}</span>
+                    <div class="time-block-header">
+                      <span class="block-label">{{
+                        $t("entry.block_label", { index: index + 1 })}}
+                      </span>
+
+                      <button class="btn btn-secondary btn-sm add-block-btn" type="button" @click="addBlock">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" aria-hidden="true">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        <span class="add-block-label-long">{{ $t("entry.add_block") }}</span>
+                        <span class="add-block-label-short">{{ $t("entry.add_block_short") }}</span>
+                      </button>
+                    </div>
 
                     <div class="block-fields">
                       <div class="form-group">
@@ -101,14 +124,6 @@
                     </button>
                   </div>
                 </div>
-
-                <button class="btn btn-secondary btn-sm add-block-btn" @click="addBlock">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                  {{ $t("entry.add_block") }}
-                </button>
               </div>
             </template>
 
@@ -123,6 +138,11 @@
                   })
                 }}</span>
               </div>
+
+              <label v-if="isApprovalType" class="approval-row">
+                <input v-model="form.approved" type="checkbox" />
+                <span>{{ $t("entry.approved") }}</span>
+              </label>
             </div>
 
             <!-- Notes -->
@@ -144,23 +164,6 @@
               <textarea class="form-input form-textarea" v-model="form.remarks" rows="4" maxlength="2000"
                 :placeholder="$t('entry.remarks_placeholder')" />
             </div>
-
-            <!-- Preview Total-Actual -->
-            <div v-if="showTimeFields && previewActual > 0" class="preview-bar">
-              <span class="form-label">{{
-                $t("entry.preview_actual_label")
-              }}</span>
-              <strong>{{ formatHours(previewActual) }}</strong>
-              <span class="preview-hint">
-                {{
-                  $t("entry.preview_actual_hint", {
-                    count: form.timeEntries.filter(
-                      (entry) => entry.start && entry.end,
-                    ).length,
-                  })
-                }}
-              </span>
-            </div>
           </div>
 
           <div class="modal-footer">
@@ -170,16 +173,16 @@
                 <span class="delete-confirm-label">{{
                   $t("entry.delete_confirm")
                 }}</span>
-                <button class="btn btn-danger btn-sm" @click="deleteAndClose">
+                <button class="btn btn-danger btn-sm modal-action" @click="deleteAndClose">
                   {{ $t("common.delete_confirm_yes") }}
                 </button>
-                <button class="btn btn-secondary btn-sm" @click="cancelDelete">
+                <button class="btn btn-secondary btn-sm modal-action" @click="cancelDelete">
                   {{ $t("common.cancel") }}
                 </button>
               </template>
 
               <!-- Normal condition -->
-              <button v-else class="btn btn-ghost btn-sm delete-btn" @click="askDelete" style="margin-right: auto">
+              <button v-else class="btn btn-ghost btn-sm delete-btn modal-action" @click="askDelete" style="margin-right: auto">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6l-1 14H6L5 6" />
@@ -190,11 +193,11 @@
             </template>
 
             <template v-if="!pendingDelete">
-              <button class="btn btn-secondary" @click="close">
+              <button class="btn btn-secondary modal-action" @click="close">
                 {{ $t("common.cancel") }}
                 <ShortcutHint label="Esc" />
               </button>
-              <button class="btn btn-primary" @click="save">
+              <button class="btn btn-primary modal-action" @click="save">
                 {{ editEntry ? $t("common.update") : $t("common.add") }}
                 <ShortcutHint label="⌘S" />
               </button>
@@ -242,6 +245,7 @@ const defaultForm = () => ({
   plannedHours: store.settings.hoursPerDay,
   notes: "",
   remarks: "",
+  approved: false,
 });
 const form = ref(defaultForm());
 
@@ -270,7 +274,10 @@ const currentType = computed(() => ({
   ...getAbsenceType(form.value?.typ ?? "on-site"),
   label: t(`absence.${form.value?.typ ?? "on-site"}`),
 }));
+
 const showTimeFields = computed(() => currentType.value.counter);
+const isApprovalType = computed(() => ["vacation", "sick"].includes(form.value?.typ));
+
 const previewActual = computed(() =>
   form.value ? calcActualHours(form.value) : 0,
 );
@@ -414,6 +421,38 @@ function save() {
   flex-wrap: wrap;
 }
 
+.actual-preview {
+  border: 1px solid var(--color-primary-highlight);
+  background: var(--color-primary-highlight);
+  color: var(--color-text);
+}
+
+.actual-preview strong {
+  color: var(--color-primary);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.approval-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.approval-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
 .preview-salary {
   color: var(--color-gold);
   font-variant-numeric: tabular-nums;
@@ -460,6 +499,14 @@ function save() {
   color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 0;
+}
+
+.time-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
 
@@ -482,12 +529,14 @@ function save() {
 
 /* Add Block Button */
 .add-block-btn {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   border-style: dashed;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  white-space: nowrap;
 }
 
 /* Delete Button */
@@ -513,6 +562,10 @@ function save() {
   font-family: inherit;
 }
 
+.add-block-label-short {
+  display: none;
+}
+
 /* Mobile */
 @media (max-width: 767px) {
   .modal-content {
@@ -530,8 +583,26 @@ function save() {
     grid-template-columns: 1fr 1fr;
   }
 
+  .form-grid {
+    gap: var(--space-3);
+  }
+
+  .form-label {
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+
+  .actual-preview {
+    padding: var(--space-3);
+  }
+
   .typ-btn {
     min-height: 40px;
+  }
+
+  .add-block-btn {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
   }
 
   /* iOS zoom prevention - inputs under 16px trigger auto-zoom */
@@ -560,8 +631,20 @@ function save() {
     font-size: 10px;
   }
 
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .absence-hint {
     font-size: var(--text-xs);
+  }
+
+  .add-block-label-long {
+    display: none;
+  }
+
+  .add-block-label-short {
+    display: inline;
   }
 }
 </style>

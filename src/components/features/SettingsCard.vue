@@ -983,6 +983,10 @@ select.form-input {
     margin-left: var(--space-4);
   }
 
+  .shortcut-settings {
+    display: none;
+  }
+
   .btn-primary {
     margin-left: 0;
   }
@@ -1055,7 +1059,14 @@ select.form-input {
   input[type="number"],
   input[type="text"],
   textarea.form-input {
-    font-size: 16px;
+    font-size: 16px !important;
+  }
+
+  .form-input,
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
 </style>

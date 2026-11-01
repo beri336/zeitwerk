@@ -51,6 +51,58 @@
       </div>
     </section>
 
+    <button class="dashboard-add-btn" type="button" @click="openAdd"
+      :aria-label="$t('dashboard.btn-add-entry')" :title="$t('dashboard.btn-add-entry')">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </button>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions" :aria-label="$t('dashboard.quick_actions.title')">
+      <div class="quick-actions__heading">
+        <h3>{{ $t("dashboard.quick_actions.title") }}</h3>
+        <span>{{ $t("dashboard.quick_actions.subtitle") }}</span>
+      </div>
+
+      <div class="quick-actions__grid">
+        <button class="quick-action quick-action--primary" @click="toggleTracking">
+          <span class="quick-action__icon" aria-hidden="true">
+            <svg v-if="store.liveStatus === 'idle' || store.liveStatus === 'break'" viewBox="0 0 24 24"
+              fill="currentColor">
+              <path d="M8 5.14v13.72a1 1 0 0 0 1.53.85l10.29-6.86a1 1 0 0 0 0-1.66L9.53 4.29A1 1 0 0 0 8 5.14Z" />
+            </svg>
+
+            <svg v-else viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+            </svg>
+          </span>
+          <span>{{ trackingLabel }}</span>
+        </button>
+
+        <button class="quick-action" @click="openAdd">
+          <span class="quick-action__icon" aria-hidden="true">+</span>
+          <span>{{ $t("dashboard.quick_actions.add_entry") }}</span>
+        </button>
+
+        <button class="quick-action" :disabled="store.liveStatus !== 'working'" @click="startBreak">
+          <span class="quick-action__icon" aria-hidden="true">Ⅱ</span>
+          <span>{{ $t("dashboard.quick_actions.add_break") }}</span>
+        </button>
+
+        <button class="quick-action" @click="openToday">
+          <span class="quick-action__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="17" rx="2" />
+              <path d="M8 2v4M16 2v4M3 9h18" />
+            </svg>
+          </span>
+          <span>{{ $t("dashboard.quick_actions.today") }}</span>
+        </button>
+      </div>
+    </section>
+
     <!-- Absence Legend -->
     <AbsenceLegend />
 
@@ -146,66 +198,12 @@
       </div>
     </section>
 
-    <!-- Quick Actions -->
-    <section class="quick-actions" :aria-label="$t('dashboard.quick_actions.title')">
-      <div class="quick-actions__heading">
-        <h3>{{ $t("dashboard.quick_actions.title") }}</h3>
-        <span>{{ $t("dashboard.quick_actions.subtitle") }}</span>
-      </div>
-      <div class="quick-actions__grid">
-        <button class="quick-action quick-action--primary" @click="toggleTracking">
-          <span class="quick-action__icon" aria-hidden="true">
-            <svg v-if="store.liveStatus === 'idle' || store.liveStatus === 'break'" viewBox="0 0 24 24"
-              fill="currentColor">
-              <path d="M8 5.14v13.72a1 1 0 0 0 1.53.85l10.29-6.86a1 1 0 0 0 0-1.66L9.53 4.29A1 1 0 0 0 8 5.14Z" />
-            </svg>
-            <svg v-else viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
-            </svg>
-          </span>
-          <span>{{ trackingLabel }}</span>
-        </button>
-        <button class="quick-action" @click="openAdd">
-          <span class="quick-action__icon" aria-hidden="true">+</span>
-          <span>{{ $t("dashboard.quick_actions.add_entry") }}</span>
-        </button>
-        <button class="quick-action" :disabled="store.liveStatus !== 'working'" @click="startBreak">
-          <span class="quick-action__icon" aria-hidden="true">Ⅱ</span>
-          <span>{{ $t("dashboard.quick_actions.add_break") }}</span>
-        </button>
-        <button class="quick-action" @click="openToday">
-          <span class="quick-action__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="17" rx="2" />
-              <path d="M8 2v4M16 2v4M3 9h18" />
-            </svg>
-          </span>
-          <span>{{ $t("dashboard.quick_actions.today") }}</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- ── Add Bar Item ── -->
-    <div class="add-bar">
-      <button class="btn btn-primary" @click="openAdd">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        {{ $t('dashboard.btn-add-entry') }}
-      </button>
-    </div>
-
-    <!-- ── Month Table ── -->
+    <!-- Month Table -->
     <MonthTable @edit="openEdit" />
 
-    <!-- ── Modals to add entries ── -->
+    <!-- Modals to add entries -->
     <EntryModal v-model="showModal" :edit-entry="editEntry" />
     <HolidayImportModal v-model="showHolidayModal" />
-    <button class="mobile-add-time" @click="openAdd">
-      <span aria-hidden="true">+</span>
-      {{ $t("dashboard.quick_actions.add_time") }}
-    </button>
   </main>
 </template>
 
@@ -657,6 +655,37 @@ function openToday() {
   color: var(--color-text);
 }
 
+.dashboard-add-btn {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: 20;
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  box-shadow: var(--shadow-lg);
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl, var(--shadow-lg));
+}
+
+.dashboard-add-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
 /* Add Bar */
 .add-bar {
   display: flex;
@@ -675,6 +704,13 @@ function openToday() {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
+}
+
+.dashboard-add-btn {
+  right: var(--space-4);
+  bottom: calc(72px + env(safe-area-inset-bottom) + var(--space-4));
+  width: 48px;
+  height: 48px;
 }
 
 .quick-actions__heading {
@@ -745,6 +781,14 @@ function openToday() {
   width: 16px;
   height: 16px;
 }
+/* 
+.quick-action__label:hover {
+  color: var(--color-primary);
+}
+
+quick-action__icon:hover {
+  background: var(--color-primary);
+} */
 
 .mobile-add-time {
   display: none;

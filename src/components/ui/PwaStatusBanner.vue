@@ -2,20 +2,6 @@
 
 <template>
     <div class="pwa-status-stack">
-        <div class="pwa-status-banner" :class="{ 'pwa-status-banner--offline': !isOnline }"
-            role="status" aria-live="polite">
-            <div class="pwa-status__text">
-                <span class="pwa-status__dot" aria-hidden="true"></span>
-                <span>{{ isOnline ? $t('pwa.online') : $t('pwa.offline') }}</span>
-                <span class="pwa-status__hint">
-                    {{ isOnline ? $t('pwa.online_hint') : $t('pwa.offline_hint') }}
-                </span>
-            </div>
-            <button v-if="!isOnline" class="btn btn-ghost btn-sm" type="button" @click="checkConnection">
-                {{ $t('pwa.check_connection') }}
-            </button>
-        </div>
-
         <div v-if="needRefresh" class="pwa-status-banner pwa-update-banner" role="status" aria-live="polite">
             <div class="pwa-status__text">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -45,27 +31,7 @@ import { useOnlineStatus } from '@/composables/useOnlineStatus'
 import { usePwaUpdate } from '@/composables/usePwaUpdate'
 
 const { isOnline } = useOnlineStatus()
-const { needRefresh, updating, update, checkForUpdates, dismissUpdate } = usePwaUpdate()
-
-async function checkConnection() {
-    if (navigator.onLine) {
-        isOnline.value = true
-        await checkForUpdates()
-        return
-    }
-
-    try {
-        await fetch(`${window.location.origin}/manifest.webmanifest`, {
-            cache: 'no-store',
-            signal: AbortSignal.timeout(5000),
-        })
-        isOnline.value = true
-        await checkForUpdates()
-    } catch (error) {
-        console.warn('[Zeitwerk] Connection check failed:', error)
-        isOnline.value = false
-    }
-}
+const { needRefresh, updating, update, dismissUpdate } = usePwaUpdate()
 </script>
 
 <style scoped>
