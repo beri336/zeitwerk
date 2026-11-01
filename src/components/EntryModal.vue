@@ -212,6 +212,7 @@ import { calcActualHours, formatHours, today } from "@/composables/useTime";
 import { ABSENCE_TYPES, getAbsenceType } from "@/composables/useAbsence";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useI18n } from "vue-i18n";
+import { getDefaultWorkplace } from "@/composables/useEntryDefaults";
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -227,7 +228,7 @@ const { t } = useI18n();
 
 const defaultForm = () => ({
   date: today(),
-  typ: store.settings.defaultWorkplace === "homeoffice" ? "homeoffice" : "on-site",
+  typ: getDefaultWorkplace(store.settings),
   timeEntries: [
     {
       start: "08:00",
