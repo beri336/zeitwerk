@@ -114,6 +114,18 @@ export function employmentOverlapsYear(employment, year) {
     return true
 }
 
+export function employmentsInYear(employments, year) {
+    const list = employments ?? []
+    const dated = list
+        .filter(employment => employment.start && employmentOverlapsYear(employment, year))
+        .sort((first, second) => first.start.localeCompare(second.start))
+
+    if (dated.length)
+        return dated
+
+    return list.slice(0, 1)
+}
+
 export function employmentForYear(employments, year, today = todayIso()) {
     const list = employments ?? []
     if (String(today).startsWith(String(year))) {

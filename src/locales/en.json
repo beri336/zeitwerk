@@ -750,7 +750,8 @@
             "vac_used_sub": "Days taken",
             "vac_left_extra_sub": "incl. {extra} extra",
             "vac_extra": "Extra vacation left",
-            "vac_extra_sub": "of {total}, used first"
+            "vac_extra_sub": "of {total}, used first",
+            "vac_extra_none": "no extra days"
         }
     }
 }

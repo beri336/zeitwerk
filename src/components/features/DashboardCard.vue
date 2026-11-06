@@ -190,15 +190,32 @@
         <KpiCard v-if="yearGrossLabel" :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
           :sub="$t('dashboard.year.gross_sub')" variant="ok" :private="true" />
 
-        <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(store.usedVacationDays)"
-          :sub="$t('dashboard.year.vac_used_sub')" />
+        <template v-if="store.yearVacationBalances.length < 2">
+          <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(store.usedVacationDays)"
+            :sub="$t('dashboard.year.vac_used_sub')" />
 
-        <KpiCard :label="$t('dashboard.year.vac_left')" :value="String(store.remainingVacationDays)"
-          :sub="vacationLeftSub" />
+          <KpiCard :label="$t('dashboard.year.vac_left')" :value="String(store.remainingVacationDays)"
+            :sub="vacationLeftSub" />
 
-        <KpiCard v-if="store.extraVacationAllowance > 0" :label="$t('dashboard.year.vac_extra')"
-          :value="String(store.remainingExtraVacationDays)"
-          :sub="$t('dashboard.year.vac_extra_sub', { total: store.extraVacationAllowance })" />
+          <KpiCard v-if="store.extraVacationAllowance > 0" :label="$t('dashboard.year.vac_extra')"
+            :value="String(store.remainingExtraVacationDays)"
+            :sub="$t('dashboard.year.vac_extra_sub', { total: store.extraVacationAllowance })" />
+        </template>
+
+        <div v-else class="vacation-by-job">
+          <section v-for="job in store.yearVacationBalances" :key="job.id" class="vacation-job">
+            <h4 class="vacation-job__title">{{ job.name || $t("settings.employments.untitled") }}</h4>
+            <div class="vacation-job__stats">
+              <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(job.used)"
+                :sub="$t('dashboard.year.vac_used_sub')" />
+              <KpiCard :label="$t('dashboard.year.vac_left')" :value="String(job.remaining)"
+                :sub="vacationLeftText(job)" />
+              <KpiCard :label="$t('dashboard.year.vac_extra')" :value="String(job.remainingExtra)" :sub="job.extra > 0
+                ? $t('dashboard.year.vac_extra_sub', { total: job.extra })
+                : $t('dashboard.year.vac_extra_none')" />
+            </div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -247,6 +264,14 @@ const vacationLeftSub = computed(() => {
   const name = store.viewedEmployment?.name;
   return name ? `${base} · ${name}` : base;
 });
+
+function vacationLeftText(job) {
+  if (job.remainingExtra > 0)
+    return t("dashboard.year.vac_left_extra_sub", { extra: job.remainingExtra });
+  return job.remaining === 1
+    ? t("dashboard.year.vac_day_left_sub")
+    : t("dashboard.year.vac_days_left_sub");
+}
 
 const nowTick = ref(Date.now());
 let todayTimer = null;
@@ -544,6 +569,26 @@ function openToday() {
   background: var(--color-border);
   opacity: 0.6;
 }
+
+.vacation-by-job {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.vacation-job__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.vacation-job__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
 
 .today-summary {
   position: relative;
@@ -932,6 +977,11 @@ quick-action__icon:hover {
 
   .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .vacation-job__stats {
+    grid-template-columns: 1fr;
     gap: var(--space-3);
   }
 

@@ -714,7 +714,8 @@
             "vac_used_sub": "Genommene Tage",
             "vac_left_extra_sub": "davon {extra} zusätzliche",
             "vac_extra": "Zusatzurlaub übrig",
-            "vac_extra_sub": "von {total}, wird zuerst verbraucht"
+            "vac_extra_sub": "von {total}, wird zuerst verbraucht",
+            "vac_extra_none": "keine zusätzlichen Tage"
         }
     }
 }

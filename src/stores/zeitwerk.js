@@ -11,6 +11,7 @@ import {
     earliestEmploymentStart,
     employmentForDate,
     employmentForYear,
+    employmentsInYear,
     employmentOverlapsYear,
     entryIsBeforeStart,
     findOverlap,
@@ -141,7 +142,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     const viewedVacation = computed(() =>
         vacationBalance(viewedEmployment.value ?? settings.value, countVacationDays(currYear.value))
-)
+    )
 
     const usedVacationDays = computed(() => viewedVacation.value.used)
     const extraVacationAllowance = computed(() => viewedVacation.value.extra)
@@ -149,6 +150,13 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     const remainingRegularVacationDays = computed(() => viewedVacation.value.remainingRegular)
     const remainingVacationDays = computed(() => viewedVacation.value.remaining)
 
+    const yearVacationBalances = computed(() =>
+        employmentsInYear(employments.value, currYear.value).map(employment => ({
+            id: employment.id,
+            name: employment.name,
+            ...vacationBalance(employment, countVacationDays(currYear.value, employment)),
+        }))
+    )
 
     // Persist
     function persist() {
@@ -999,7 +1007,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         recoverActiveSession,
         deleteAllEntries,
         monthGross, weekGrossGroups,
-        usedVacationDays, remainingVacationDays,
+        usedVacationDays, remainingVacationDays, yearVacationBalances,
         extraVacationAllowance, remainingExtraVacationDays, remainingRegularVacationDays,
         countVacationDays, employmentForDate: date => employmentForDate(employments.value, date),
     }

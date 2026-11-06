@@ -64,6 +64,35 @@ describe('employments', () => {
         expect(earned).toBeCloseTo(expected)
     })
 
+    it('lists vacation for every employment in the same year', () => {
+        const store = useZeitwerkStore()
+        store.currYear = 2026
+        store.updateEmployment(store.employments[0].id, {
+            name: 'Erste',
+            start: '2026-01-01',
+            end: '2026-07-01',
+            vacationDaysPerYear: 30,
+            extraVacationDays: 4,
+        })
+
+        const second = store.addEmployment()
+        store.updateEmployment(second.id, {
+            name: 'Zweite',
+            start: '2026-07-01',
+            end: '',
+            vacationDaysPerYear: 20,
+            extraVacationDays: 2,
+        })
+        store.addEntry({ date: '2026-03-02', typ: 'vacation', timeEntries: [] })
+        store.addEntry({ date: '2026-08-03', typ: 'vacation', timeEntries: [] })
+        store.addEntry({ date: '2026-08-04', typ: 'vacation', timeEntries: [] })
+
+        expect(store.yearVacationBalances).toMatchObject([
+            { name: 'Erste', used: 1, remainingExtra: 3, remaining: 33 },
+            { name: 'Zweite', used: 2, remainingExtra: 0, remaining: 20 },
+        ])
+    })
+
     it('rejects overlapping employments', () => {
         const store = useZeitwerkStore()
         const first = store.employments[0]
