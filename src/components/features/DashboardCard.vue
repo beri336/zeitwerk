@@ -161,8 +161,8 @@
         <KpiCard v-if="longestDay" :label="$t('dashboard.month.longest')"
           :value="formatHours(calcActualHours(longestDay))" :sub="longestDay.date" />
 
-        <KpiCard v-if="store.grossHourlyRate > 0" :label="$t('dashboard.month.gross')" :value="mask(monthGrossLabel)"
-          :sub="$t('dashboard.month.gross_sub')" variant="ok" :private="true" />
+        <KpiCard v-if="store.monthGross > 0 || store.grossHourlyRate > 0" :label="$t('dashboard.month.gross')"
+          :value="mask(monthGrossLabel)" :sub="$t('dashboard.month.gross_sub')" variant="ok" :private="true" />
       </div>
     </section>
 
@@ -187,7 +187,7 @@
         <KpiCard :label="$t('dashboard.year.publicholiday')" :value="String(yearTypeCounts.publicholiday)" />
         <KpiCard :label="$t('dashboard.year.other')" :value="String(yearTypeCounts.other)" />
 
-        <KpiCard v-if="store.grossHourlyRate > 0" :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
+        <KpiCard v-if="yearGrossLabel" :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
           :sub="$t('dashboard.year.gross_sub')" variant="ok" :private="true" />
 
         <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(store.usedVacationDays)"
@@ -239,12 +239,13 @@ const { showToast } = useToast();
 
 const vacationLeftSub = computed(() => {
   const extraLeft = store.remainingExtraVacationDays;
-  if (extraLeft > 0)
-    return t("dashboard.year.vac_left_extra_sub", { extra: extraLeft });
-
-  return store.remainingVacationDays === 1
-    ? t("dashboard.year.vac_day_left_sub")
-    : t("dashboard.year.vac_days_left_sub");
+  const base = extraLeft > 0
+    ? t("dashboard.year.vac_left_extra_sub", { extra: extraLeft })
+    : store.remainingVacationDays === 1
+      ? t("dashboard.year.vac_day_left_sub")
+      : t("dashboard.year.vac_days_left_sub");
+  const name = store.viewedEmployment?.name;
+  return name ? `${base} · ${name}` : base;
 });
 
 const nowTick = ref(Date.now());
@@ -380,7 +381,7 @@ const monthDiffVariant = computed(() => {
 const monthActualVariant = computed(() => monthDiffVariant.value);
 
 const monthGrossLabel = computed(() => {
-  if (!store.grossHourlyRate) return "N/A";
+  if (!store.monthGross && !store.grossHourlyRate) return "N/A";
 
   return new Intl.NumberFormat(locale.value === "de" ? "de-DE" : "en-GB", {
     style: "currency",
@@ -444,7 +445,7 @@ const yearDiff = computed(() =>
 );
 
 const yearGrossLabel = computed(() => {
-  if (!store.grossHourlyRate) return "";
+  if (!total && !store.grossHourlyRate) return ""
 
   const total = yearEntries.value.reduce(
     (s, e) => s + store.grossEarnedForEntry(e),

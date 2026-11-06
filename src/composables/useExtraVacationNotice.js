@@ -6,6 +6,7 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useNotifications } from '@/composables/useNotifications'
 import { useToast } from '@/composables/useToast'
 import { getExtraVacationNotice, parseIsoDate } from '@/composables/extraVacationNotice'
+import { todayIso } from '@/composables/employments'
 
 const STORAGE_KEY = 'zeitwerk_extra_vacation_notice'
 
@@ -34,22 +35,27 @@ export function useExtraVacationNotice() {
     const { showToast } = useToast()
     const { t, locale } = useI18n()
 
-    function usedDaysForDeadline(deadline) {
+    function employmentForNotice() {
+        return store.employmentForDate(todayIso()) || store.employments[0] || null
+    }
+
+    function usedDaysForDeadline(deadline, employment) {
         const year = Number(String(deadline).slice(0, 4))
         if (!Number.isInteger(year))
             return store.usedVacationDays
 
-        return store.countVacationDays(year)
+        return store.countVacationDays(year, employment)
     }
 
     function check() {
-        const deadline = store.settings.extraVacationDeadline
+        const employment = employmentForNotice()
+        const deadline = employment?.extraVacationDeadline || ''
         const today = new Date()
         const notice = getExtraVacationNotice({
-            extraDays: store.settings.extraVacationDays,
-            usedDays: usedDaysForDeadline(deadline),
+            extraDays: employment?.extraVacationDays,
+            usedDays: usedDaysForDeadline(deadline, employment),
             deadline,
-            noticeDays: store.settings.extraVacationNoticeDays,
+            noticeDays: employment?.extraVacationNoticeDays,
             today,
         })
 
@@ -81,9 +87,9 @@ export function useExtraVacationNotice() {
 
     watch(
         () => [
-            store.settings.extraVacationDays,
-            store.settings.extraVacationDeadline,
-            store.settings.extraVacationNoticeDays,
+            store.employments.map(employment =>
+                `${employment.id}:${employment.extraVacationDays}:${employment.extraVacationDeadline}:${employment.extraVacationNoticeDays}`
+            ).join('|'),
             store.entries
                 .filter(entry => entry.typ === 'vacation')
                 .map(entry => entry.date)

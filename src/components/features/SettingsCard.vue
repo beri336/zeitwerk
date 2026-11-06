@@ -10,7 +10,46 @@
       </div>
 
       <div class="settings-body">
+        <!-- Employment -->
+        <section class="employments" aria-labelledby="employments-title">
+          <div class="privacy-label" id="employments-title">{{ $t("settings.employments.title") }}</div>
+          <div class="privacy-hint">{{ $t("settings.employments.sub") }}</div>
+          <div class="employment-list">
+            <button v-for="job in orderedEmployments" :key="job.id" type="button" class="employment-item"
+              :class="{ active: job.id === selectedEmploymentId }" @click="loadEmployment(job.id)">
+              <strong>{{ job.name || $t("settings.employments.untitled") }}</strong>
+              <span>{{ employmentRange(job) }}</span>
+            </button>
+          </div>
+          <div class="employment-actions">
+            <button class="btn btn-secondary btn-sm" type="button" @click="addEmployment">
+              {{ $t("settings.employments.add") }}
+            </button>
+            <button v-if="store.employments.length > 1" class="btn btn-danger btn-sm" type="button"
+              @click="removeEmployment">
+              {{ $t("settings.employments.remove") }}
+            </button>
+          </div>
+        </section>
+
+        <!-- Settings -->
         <div class="form-grid">
+          <!-- Employment Details -->
+          <div class="form-group">
+            <label class="form-label">{{ $t("settings.employments.name") }}</label>
+            <input class="form-input" type="text" maxlength="80" v-model="form.employmentName" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ $t("settings.employments.start") }}</label>
+            <input class="form-input" type="date" v-model="form.employmentStart" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ $t("settings.employments.end") }}</label>
+            <input class="form-input" type="date" v-model="form.employmentEnd" />
+            <span class="form-hint">{{ $t("settings.employments.end_hint") }}</span>
+          </div>
+
+          <!-- Working hours per day -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_day")
@@ -372,6 +411,7 @@
 import { reactive, ref, watch, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
+import { contractFrom, todayIso, vacationBalance } from "@/composables/employments";
 import { useToast } from "@/composables/useToast";
 import { STATES } from "@/composables/useHolidays";
 import { usePrivacy } from "@/composables/usePrivacy";
@@ -411,7 +451,15 @@ const calendarStore = useCalendarStore();
 const profileStore = useProfileStore();
 const { snapshots, restoreSnapshot, deleteSnapshot, exportSnapshot } = useRecovery();
 
-const form = reactive({ ...store.settings });
+const form = reactive({
+  ...store.settings,
+  employmentName: "",
+  employmentStart: "",
+  employmentEnd: "",
+});
+const selectedEmploymentId = ref(store.employments[0]?.id ?? null);
+let syncingEmployment = false;
+
 const { bytes, formatted, calculate } = useStorageSize();
 const showDeleteConfirm = ref(false);
 const deleteConfirmText = ref("");
@@ -420,10 +468,77 @@ const canDeleteAll = computed(
   () => deleteConfirmText.value.trim().toUpperCase() === "DELETE",
 );
 
+const orderedEmployments = computed(() =>
+  [...store.employments].sort((first, second) =>
+    (first.start || "9999-12-31").localeCompare(second.start || "9999-12-31"),
+  ),
+);
+
+function employmentRange(job) {
+  if (!job.start && !job.end) return t("settings.employments.unbounded");
+  const end = job.end || t("settings.employments.open_ended");
+  return job.start ? `${job.start} – ${end}` : end;
+}
+
+function loadEmployment(id) {
+  const job = store.employments.find((item) => item.id === id) ?? store.employments[0];
+  if (!job) return;
+  syncingEmployment = true;
+  selectedEmploymentId.value = job.id;
+  Object.assign(form, contractFrom(job), {
+    employmentName: job.name,
+    employmentStart: job.start,
+    employmentEnd: job.end,
+  });
+  syncingEmployment = false;
+}
+
+function addEmployment() {
+  const created = store.addEmployment();
+  loadEmployment(created.id);
+}
+
+function removeEmployment() {
+  const nextId = store.removeEmployment(selectedEmploymentId.value);
+  if (!nextId) {
+    showToast(t("settings.employments.kept_one"), "ok");
+    return;
+  }
+  loadEmployment(nextId);
+  showToast(t("settings.employments.removed"), "ok");
+}
+
+loadEmployment(
+  store.employmentForDate(todayIso())?.id || store.employments[0]?.id,
+);
+
+const GLOBAL_SETTING_KEYS = [
+  "maxWorkHours",
+  "warnWorkHours",
+  "inactivityMinutes",
+  "recoveryEnabled",
+  "recoveryFrequency",
+];
+
 // Save every setting change immediately.
 watch(form,
   () => {
-    store.saveSettings({ ...form });
+    if (syncingEmployment) return;
+
+    store.saveSettings(Object.fromEntries(
+      GLOBAL_SETTING_KEYS.map((key) => [key, form[key]]),
+    ));
+
+    const result = store.updateEmployment(selectedEmploymentId.value, {
+      name: form.employmentName,
+      start: form.employmentStart,
+      end: form.employmentEnd,
+      ...contractFrom(form),
+    });
+    if (!result.ok) {
+      showToast(t(`settings.employments.${result.reason}`), "error");
+      loadEmployment(selectedEmploymentId.value);
+    }
   },
   { deep: true },
 );
@@ -564,13 +679,17 @@ function confirmDeleteAll() {
 // calculate gross locally
 // Stundenlohn: Monatslohn / 4 Wochen / workDays / hoursPerDay
 const extraVacationBalance = computed(() => {
-  const total = store.extraVacationAllowance;
-  if (total <= 0) return "";
+  const job = store.employments.find((item) => item.id === selectedEmploymentId.value);
+  const balance = vacationBalance(
+    job,
+    store.countVacationDays(Number(todayIso().slice(0, 4)), job),
+  );
+  if (balance.extra <= 0) return "";
 
   return t("settings.hints.extra_vacation_balance", {
-    remaining: store.remainingExtraVacationDays,
-    total,
-    regular: store.remainingRegularVacationDays,
+    remaining: balance.remainingExtra,
+    total: balance.extra,
+    regular: balance.remainingRegular,
   });
 });
 
@@ -712,6 +831,49 @@ const previewGrossDailyRate = computed(() => {
 
 .btn-secondary {
   margin-left: var(--space-1);
+}
+
+/* Employment List */
+.employments {
+  margin-bottom: var(--space-5);
+}
+
+.employment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.employment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.employment-item.active {
+  border-color: var(--color-primary);
+}
+
+.employment-item span {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.employment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 /* Form Grid */

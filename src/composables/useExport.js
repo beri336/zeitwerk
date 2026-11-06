@@ -4,9 +4,10 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useCalendarStore } from '@/composables/useCalendarStore'
 import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
+import { earliestEmploymentStart, entryIsBeforeStart, normalizeEmployment } from '@/composables/employments'
 
 export const BACKUP_FORMAT = 'zeitwerk-backup'
-export const CURRENT_BACKUP_VERSION = 2
+export const CURRENT_BACKUP_VERSION = 3
 
 class ImportValidationError extends Error {
     constructor(code) {
@@ -24,6 +25,8 @@ export function useExport() {
         const todos = useTodoStore()
         const profile = useProfileStore()
 
+        const trackedFrom = earliestEmploymentStart(zeitwerk.employments)
+
         return {
             meta: {
                 exportedAt: new Date().toISOString(),
@@ -31,8 +34,9 @@ export function useExport() {
                 version: CURRENT_BACKUP_VERSION,
             },
             zeitwerk: {
-                entries: zeitwerk.entries,
+                entries: zeitwerk.entries.filter(entry => !entryIsBeforeStart(entry, trackedFrom)),
                 settings: zeitwerk.settings,
+                employments: zeitwerk.employments,
             },
             calendar: {
                 events: calendar.events,
@@ -59,7 +63,9 @@ export function useExport() {
     // CSV (Zeiteinträge)
     function exportCSV(entries = null) {
         const zeitwerk = useZeitwerkStore()
-        const rows = entries ?? zeitwerk.entries
+        const trackedFrom = earliestEmploymentStart(zeitwerk.employments)
+        const rows = (entries ?? zeitwerk.entries)
+            .filter(entry => !entryIsBeforeStart(entry, trackedFrom))
 
         const header = ['date', 'typ', 'plannedHours', 'actualHours', 'notes', 'remarks']
         const lines = [
@@ -110,12 +116,20 @@ export function useExport() {
         const todos = useTodoStore()
         const profile = useProfileStore()
 
-        zeitwerk.entries = normalized.zeitwerk.entries
-
         Object.assign(zeitwerk.settings, normalized.zeitwerk.settings)
 
-        calendar.events = normalized.calendar.events
+        zeitwerk.employments = normalized.zeitwerk.employments.length
+            ? normalized.zeitwerk.employments.map(employment =>
+                normalizeEmployment(employment, normalized.zeitwerk.settings))
+            : [normalizeEmployment({ id: 'emp_initial', name: '' }, {
+                ...zeitwerk.settings,
+                ...normalized.zeitwerk.settings,
+            })]
+        zeitwerk.entries = normalized.zeitwerk.entries
+            .filter(entry => !entryIsBeforeStart(entry, earliestEmploymentStart(zeitwerk.employments)))
+        zeitwerk.applyEmploymentCoverage()
 
+        calendar.events = normalized.calendar.events
 
         todos.todos = normalized.todos.todos
 
@@ -164,6 +178,7 @@ export function useExport() {
             zeitwerk: {
                 entries: data.zeitwerk.entries,
                 settings: data.zeitwerk.settings ?? {},
+                employments: Array.isArray(data.zeitwerk.employments) ? data.zeitwerk.employments : [],
             },
             calendar: {
                 events: data.calendar?.events ?? [],

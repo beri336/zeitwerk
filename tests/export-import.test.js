@@ -21,7 +21,7 @@ describe('export and import', () => {
                                  { type: 'application/json' })
 
         await expect(readImportFile(valid)).resolves.toMatchObject({
-            meta: { format: 'zeitwerk-backup', version: 2 },
+            meta: { format: 'zeitwerk-backup', version: 3 },
             zeitwerk: { entries: [{ id: 1 }], settings: {} },
         })
         await expect(readImportFile(invalid)).rejects.toThrow('invalid_json')
@@ -33,7 +33,7 @@ describe('export and import', () => {
         expect(migrateImport({
             zeitwerk: { entries: [{ id: 1 }] },
         })).toMatchObject({
-            meta: { version: 2, migratedFrom: 0 },
+            meta: { version: 3, migratedFrom: 0 },
             calendar: { events: [] },
             todos: { todos: [] },
             profile: {},

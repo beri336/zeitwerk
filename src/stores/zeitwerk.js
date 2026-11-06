@@ -5,6 +5,21 @@ import { ref, computed, watch } from 'vue'
 import { getKW, MONTH_NAMES } from '@/composables/useTime'
 import { getAbsenceType } from '@/composables/useAbsence'
 import { getHolidaysForMonth, getHolidays } from '@/composables/useHolidays'
+import {
+    CONTRACT_KEYS,
+    contractFrom,
+    earliestEmploymentStart,
+    employmentForDate,
+    employmentForYear,
+    employmentOverlapsYear,
+    entryIsBeforeStart,
+    findOverlap,
+    hourlyRate,
+    managedHolidayYears,
+    normalizeEmployment,
+    todayIso,
+    vacationBalance,
+} from '@/composables/employments'
 
 const STORAGE_KEY = 'zeitwerk_data'
 
@@ -72,18 +87,25 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         ...(stored.settings ?? {})
     })
 
+    const employments = ref(
+        Array.isArray(stored.employments) && stored.employments.length
+            ? stored.employments.map(employment => normalizeEmployment(employment, settings.value))
+            : [normalizeEmployment({ id: 'emp_initial', name: '' }, settings.value)]
+    )
+
     const activeSession = ref({
         ...DEFAULT_ACTIVE_SESSION,
         ...(stored.activeSession ?? {})
     })
 
     watch(
-        [entries, settings, activeSession],
+        [entries, settings, activeSession, employments],
         () => {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
                 entries: entries.value,
                 settings: settings.value,
-                activeSession: activeSession.value
+                activeSession: activeSession.value,
+                employments: employments.value,
             }))
         },
         { deep: true } // deep because it is an array/ object
@@ -102,88 +124,155 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         return date.getFullYear() === year
     }
 
-    function countVacationDays(year) {
-        return entries.value.filter(entry => isVacationInYear(entry, year)).length
+    function countVacationDays(year, employment = null) {
+        const job = employment ?? employmentForYear(employments.value, year, todayIso())
+        return entries.value.filter(entry => {
+            if (!isVacationInYear(entry, year))
+                return false
+            if (!job?.start && employments.value.every(item => !item.start))
+                return true
+            return employmentForDate(employments.value, String(entry.date).slice(0, 10))?.id === job?.id
+        }).length
     }
 
-    const usedVacationDays = computed(() => countVacationDays(currYear.value))
-
-    const yearlyVacationAllowance = computed(() => {
-        const raw = Number(settings.value.vacationDaysPerYear)
-        return Number.isFinite(raw) ? Math.max(0, raw) : 30
-    })
-
-    // Carry-over days are spent before the regular yearly allowance.
-    const extraVacationAllowance = computed(() => {
-        const raw = Number(settings.value.extraVacationDays)
-        return Number.isFinite(raw) ? Math.max(0, raw) : 0
-    })
-
-    const remainingExtraVacationDays = computed(() =>
-        Math.max(0, extraVacationAllowance.value - usedVacationDays.value)
+    const viewedEmployment = computed(() =>
+        employmentForYear(employments.value, currYear.value, todayIso())
     )
 
-    const remainingRegularVacationDays = computed(() => {
-        const usedRegular = Math.max(0, usedVacationDays.value - extraVacationAllowance.value)
-        return Math.max(0, yearlyVacationAllowance.value - usedRegular)
-    })
+    const viewedVacation = computed(() =>
+        vacationBalance(viewedEmployment.value ?? settings.value, countVacationDays(currYear.value))
+)
 
-    const remainingVacationDays = computed(() =>
-        remainingExtraVacationDays.value + remainingRegularVacationDays.value
-    )
+    const usedVacationDays = computed(() => viewedVacation.value.used)
+    const extraVacationAllowance = computed(() => viewedVacation.value.extra)
+    const remainingExtraVacationDays = computed(() => viewedVacation.value.remainingExtra)
+    const remainingRegularVacationDays = computed(() => viewedVacation.value.remainingRegular)
+    const remainingVacationDays = computed(() => viewedVacation.value.remaining)
+
 
     // Persist
     function persist() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             entries: entries.value,
             settings: settings.value,
-            activeSession: activeSession.value
+            activeSession: activeSession.value,
+            employments: employments.value,
         }))
     }
 
-    // Public holidays
-    // Removes all holidays from a given year and adds new ones
-    function syncHolidays(year, state) {
-        if (!state)
+    function mirrorActiveEmployment() {
+        const active = employmentForDate(employments.value, todayIso())
+        if (!active)
+
+            return
+        settings.value = { ...settings.value, ...contractFrom(active) }
+    }
+
+    function applyContractPatch(data) {
+        const patch = {}
+        CONTRACT_KEYS.forEach(key => {
+            if (key in data)
+                patch[key] = data[key]
+        })
+        if (!Object.keys(patch).length)
             return
 
-        // Remove all holiday entries for this year
-        entries.value = entries.value.filter(entry => {
-            if (entry.typ !== 'publicholiday')
-                return true // keep other types
+        const target = employmentForDate(employments.value, todayIso()) || employments.value[0]
+        if (!target)
+            return
 
-            const date = new Date(entry.date)
-            const year = date.getFullYear()
+        const index = employments.value.findIndex(employment => employment.id === target.id)
+        if (index < 0)
+            return
+        employments.value[index] = normalizeEmployment({ ...target, ...patch, id: target.id })
+    }
 
-            return year !== year // only remove this year
-        })
+    function holidayEntry(holiday, employment, index) {
+        return {
+            id: Date.now() + index,
+            date: holiday.date,
+            typ: 'publicholiday',
+            timeEntries: [],
+            plannedHours: employment?.hoursPerDay || settings.value.hoursPerDay,
+            notes: holiday.name,
+        }
+    }
 
-        // Add new holidays for the entire year
-        const holidays = getHolidays(year, state)
-        holidays.forEach((h, i) => {
-            entries.value.push({
-                id: Date.now() + i,
-                date: h.date,
-                typ: 'publicholiday',
-                timeEntries: [], // public holidays have no time entries
-                plannedHours: settings.value.hoursPerDay,
-                notes: h.name
+    function addHolidaysForYear(year) {
+        const dated = employments.value.filter(employment =>
+            employment.start && employmentOverlapsYear(employment, year)
+        )
+        const sources = dated.length ? dated : employments.value.slice(0, 1)
+        const seen = new Set(
+            entries.value
+                .filter(entry => entry.typ === 'publicholiday')
+                .map(entry => String(entry.date).slice(0, 10))
+        )
+
+        sources.forEach(employment => {
+            getHolidays(year, employment.state || settings.value.state || 'BW').forEach((holiday, index) => {
+                if (seen.has(holiday.date))
+                    return
+                const owner = employmentForDate(employments.value, holiday.date)
+                if (dated.length && owner?.id !== employment.id)
+                    return
+                entries.value.push(holidayEntry(holiday, employment, index))
+                seen.add(holiday.date)
             })
         })
+    }
 
+    function pruneBeforeFirstEmployment() {
+        const start = earliestEmploymentStart(employments.value)
+        if (!start)
+            return
+
+        entries.value = entries.value.filter(entry => !entryIsBeforeStart(entry, start))
+    }
+
+    function removeUncoveredHolidays() {
+        if (!employments.value.some(employment => employment.start))
+            return
+
+        entries.value = entries.value.filter(entry => {
+            if (entry.typ !== 'publicholiday')
+                return true
+            return Boolean(employmentForDate(employments.value, String(entry.date).slice(0, 10)))
+        })
+    }
+
+    // Rebuild public holidays inside employment ranges. Days before the first start are dropped.
+    function rebuildHolidays() {
+        pruneBeforeFirstEmployment()
+        const years = new Set(managedHolidayYears(employments.value, todayIso()))
+        entries.value = entries.value.filter(entry => {
+            if (entry.typ !== 'publicholiday')
+                return true
+            const year = Number(String(entry.date).slice(0, 4))
+            return !years.has(year)
+        })
+        years.forEach(year => addHolidaysForYear(year))
         persist()
     }
 
-    // When you first launch the program, enter the holidays for the current year,
-    //  but only if there are no holidays scheduled for this year yet.
-    const initYear = new Date().getFullYear()
-    const hasHolidaysThisYear = entries.value.some(entry =>
-        entry.typ === 'publicholiday' &&
-        new Date(entry.date).getFullYear() === initYear
-    )
-    if (!hasHolidaysThisYear && settings.value.state) {
-        syncHolidays(initYear, settings.value.state)
-        // persist() is called by syncHolidays
+    function syncHolidays() {
+        rebuildHolidays()
+    }
+
+    function applyEmploymentCoverage() {
+        pruneBeforeFirstEmployment()
+        removeUncoveredHolidays()
+        persist()
+    }
+
+    pruneBeforeFirstEmployment()
+    removeUncoveredHolidays()
+    if (!entries.value.some(entry =>
+        entry.typ === 'publicholiday'
+        && String(entry.date).startsWith(String(new Date().getFullYear()))
+    )) {
+        addHolidaysForYear(new Date().getFullYear())
+        persist()
     }
 
     // Computed
@@ -274,36 +363,29 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         return effectiveActualHours(entry)
     })
 
-    // Watcher
-    // Change state -> resync holidays for the current year
-    watch(
-        () => settings.value.state,
-        (newState, oldState) => {
-            if (!newState || !oldState || newState === oldState)
-                return
-
-            syncHolidays(currYear.value, newState)
-        },
-        { immediate: false }
-    )
-
     // Year change -> add holidays for the new year if none are present
     watch(
         () => currYear.value,
         (newYear) => {
-            const already = entries.value.some(e =>
-                e.typ === 'publicholiday' &&
-                new Date(e.date).getFullYear() === newYear
+            const already = entries.value.some(entry =>
+                entry.typ === 'publicholiday' &&
+                String(entry.date).startsWith(String(newYear))
             )
-            if (!already && settings.value.state) {
-                syncHolidays(newYear, settings.value.state)
+
+            if (!already) {
+                addHolidaysForYear(newYear)
+                persist()
             }
-        },
-        { immediate: false }
+        }
     )
 
     // CRUD
     function addEntry(data) {
+        const trackedFrom = earliestEmploymentStart(employments.value)
+
+        if (entryIsBeforeStart({ date: data?.date }, trackedFrom))
+            return null
+
         entries.value.push({
             id: Date.now(),
             date: '',
@@ -324,10 +406,17 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     function updateEntry(id, data) {
         const index = entries.value.findIndex(entry => entry.id === id)
+        if (index < 0)
+            return
 
-        if (index >= 0)
-            entries.value[index] = { ...entries.value[index], ...data }
+        const next = { ...entries.value[index], ...data }
+        if (entryIsBeforeStart(next, earliestEmploymentStart(employments.value))) {
+            entries.value = entries.value.filter(entry => entry.id !== id)
+            persist()
+            return
+        }
 
+        entries.value[index] = next
         persist()
     }
 
@@ -479,8 +568,70 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     // Settings
     function saveSettings(data) {
+        const previousState = settings.value.state
         settings.value = { ...settings.value, ...data }
-        persist()
+        applyContractPatch(data)
+        if (data.state && data.state !== previousState)
+            rebuildHolidays()
+        else
+            persist()
+    }
+
+    function updateEmployment(id, patch) {
+        const index = employments.value.findIndex(employment => employment.id === id)
+        if (index < 0)
+            return { ok: false, reason: 'missing' }
+
+        const current = employments.value[index]
+        const next = normalizeEmployment({ ...current, ...patch, id })
+        if (next.start && next.end && next.end <= next.start)
+            return { ok: false, reason: 'end_before_start', employment: current }
+
+        const overlap = findOverlap(employments.value, next)
+        if (overlap)
+            return { ok: false, reason: 'overlap', employment: current }
+
+        const rangeChanged = current.start !== next.start
+            || current.end !== next.end
+            || current.state !== next.state
+        employments.value[index] = next
+        mirrorActiveEmployment()
+        if (rangeChanged)
+            rebuildHolidays()
+        else
+            persist()
+        return { ok: true, employment: next }
+    }
+
+    function addEmployment() {
+        const today = todayIso()
+        const openIndex = employments.value.findIndex(employment =>
+            employment.start && !employment.end && employment.start < today
+        )
+        if (openIndex >= 0)
+            employments.value[openIndex] = { ...employments.value[openIndex], end: today }
+
+        const template = employments.value[employments.value.length - 1] || settings.value
+        const created = normalizeEmployment({
+            ...contractFrom(template),
+            name: '',
+            start: today,
+            end: '',
+        })
+        employments.value.push(created)
+        mirrorActiveEmployment()
+        rebuildHolidays()
+        return created
+    }
+
+    function removeEmployment(id) {
+        if (employments.value.length <= 1)
+            return null
+
+        employments.value = employments.value.filter(employment => employment.id !== id)
+        mirrorActiveEmployment()
+        rebuildHolidays()
+        return employments.value[0]?.id ?? null
     }
 
     // Month navigation
@@ -506,8 +657,11 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     function exportJSON() {
         const blob = new Blob(
             [JSON.stringify({
-                entries: entries.value,
+                entries: entries.value.filter(entry =>
+                    !entryIsBeforeStart(entry, earliestEmploymentStart(employments.value))
+                ),
                 settings: settings.value,
+                employments: employments.value,
                 exportedAt: new Date().toISOString()
             }, null, 2)],
             { type: 'application/json' }
@@ -574,6 +728,12 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             const dd = pad(cursor.getDate())
             const isoDate = `${yyyy}-${mm}-${dd}`
 
+            const trackedFrom = earliestEmploymentStart(employments.value)
+            if (trackedFrom && isoDate < trackedFrom) {
+                cursor.setDate(cursor.getDate() + 1)
+                continue
+            }
+
             const entry = entries.value.find(item => item.date === isoDate) ?? null
             const date = new Date(`${isoDate}T00:00:00`)
 
@@ -606,7 +766,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
                 actualValue == null ? '' : actualValue.toFixed(2),
                 plannedValue == null ? '' : plannedValue.toFixed(2),
                 diffValue == null ? '' : diffValue.toFixed(2),
-                grossHourlyRate.value ? grossHourlyRate.value.toFixed(2) : '',
+                rateForDate(isoDate) ? rateForDate(isoDate).toFixed(2) : '',
                 grossEarned == null ? '' : grossEarned.toFixed(2),
                 entry?.notes || ''
             ].map(quote).join(';'))
@@ -724,25 +884,32 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
     // Enter holidays as entries for a month (manually via a modal window)
     function importHolidays(year, month) {
+        const start = earliestEmploymentStart(employments.value)
         const holidays = getHolidaysForMonth(year, month, settings.value.state)
         let added = 0
         let skipped = 0
 
-        holidays.forEach((h, i) => {
-            const exists = entries.value.find(e => e.date === h.date)
+        holidays.forEach((holiday, index) => {
+            if (start && holiday.date < start) {
+                skipped++
+                return
+            }
+
+            if (employments.value.some(employment => employment.start)
+                && !employmentForDate(employments.value, holiday.date)) {
+                skipped++
+                return
+            }
+
+            const exists = entries.value.find(entry => entry.date === holiday.date)
             if (exists) {
                 skipped++
                 return
             }
 
-            entries.value.push({
-                id: Date.now() + i,
-                date: h.date,
-                typ: 'publicholiday',
-                timeEntries: [],
-                plannedHours: settings.value.hoursPerDay,
-                notes: h.name
-            })
+            const owner = employmentForDate(employments.value, holiday.date)
+            entries.value.push(holidayEntry(holiday, owner, index))
+
             added++
         })
 
@@ -752,15 +919,15 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // Calculate gross salary based on gross monthly salary and hours worked
-    const grossHourlyRate = computed(() => {
-        const monthly = Number(settings.value.grossMonthlySalary || 0)
-        const weeklyHours = Number(settings.value.hoursPerWeek || 0)
+    function rateForDate(isoDate) {
+        const employment = employmentForDate(employments.value, isoDate)
+        const monthly = employment?.grossMonthlySalary ?? settings.value.grossMonthlySalary
+        const weeklyHours = employment?.hoursPerWeek ?? settings.value.hoursPerWeek
 
-        if (!monthly || !weeklyHours)
-            return 0
+        return hourlyRate(monthly, weeklyHours)
+    }
 
-        return (monthly * 12) / (weeklyHours * 52)
-    })
+    const grossHourlyRate = computed(() => rateForDate(todayIso()))
 
     const grossDailyRate = computed(() => {
         const monthly = Number(settings.value.grossMonthlySalary || 0)
@@ -776,7 +943,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         if (!entry)
             return 0
 
-        return grossHourlyRate.value * effectiveActualHours(entry)
+        return rateForDate(String(entry.date).slice(0, 10)) * effectiveActualHours(entry)
     }
 
     // Live-tracking timer
@@ -818,15 +985,15 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     return {
-        entries, settings, currYear, currMonth,
+        entries, settings, employments, viewedEmployment, currYear, currMonth,
         currMonthLabel, entriesForMonth, weekGroups,
         monthActual, monthPlanned, monthDiff,
         persist,
         addEntry, updateEntry, deleteEntry, patchEntryField,
-        saveSettings,
+        saveSettings, updateEmployment, addEmployment, removeEmployment,
         prevMonth, nextMonth,
         exportJSON, importJSON, exportCSV,
-        effectiveActualHours, importHolidays, syncHolidays,
+        effectiveActualHours, importHolidays, syncHolidays, applyEmploymentCoverage,
         grossHourlyRate, grossDailyRate, grossEarnedForEntry,
         activeSession, todayEntry, liveStatus, liveWorkedHours, startWork, startBreak, resumeWork, finishWorkDay, resetActiveSession,
         recoverActiveSession,
@@ -834,6 +1001,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         monthGross, weekGrossGroups,
         usedVacationDays, remainingVacationDays,
         extraVacationAllowance, remainingExtraVacationDays, remainingRegularVacationDays,
-        countVacationDays,
+        countVacationDays, employmentForDate: date => employmentForDate(employments.value, date),
     }
 })
