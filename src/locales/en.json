@@ -364,6 +364,8 @@
             "tracking_sub": "Automatic stop, overtime warning, and inactivity.",
             "appearance": "Appearance",
             "appearance_sub": "Language and whether amounts stay visible.",
+            "app": "App",
+            "app_sub": "Reset this employment's contract values and check for a new version.",
             "device": "This device",
             "device_sub": "Details the browser provides itself. It does not expose a MAC address."
         },

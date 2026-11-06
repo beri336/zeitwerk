@@ -362,6 +362,8 @@
             "tracking_sub": "Automatisches Stoppen, Überstundenwarnung und Inaktivität.",
             "appearance": "Darstellung",
             "appearance_sub": "Sprache und ob Beträge sichtbar sind.",
+            "app": "App",
+            "app_sub": "Vertragswerte der gewählten Beschäftigung zurücksetzen und nach einer neuen Version suchen.",
             "device": "Dieses Gerät",
             "device_sub": "Angaben, die der Browser selbst liefert. Eine MAC-Adresse stellt er nicht bereit."
         },
