@@ -722,7 +722,13 @@
             "vac_left_extra_sub": "davon {extra} zusätzliche",
             "vac_extra": "Zusatzurlaub übrig",
             "vac_extra_sub": "von {total}, wird zuerst verbraucht",
-            "vac_extra_none": "keine zusätzlichen Tage"
+            "vac_extra_none": "keine zusätzlichen Tage",
+            "carryover_one": "Bei {name} ist aus {from} noch 1 Urlaubstag übrig. Als zusätzliche Urlaubstage für {year} übernehmen?",
+            "carryover": "Bei {name} sind aus {from} noch {days} Urlaubstage übrig. Als zusätzliche Urlaubstage für {year} übernehmen?",
+            "carryover_accept": "Übernehmen",
+            "carryover_dismiss": "Nicht übernehmen",
+            "carryover_done_one": "1 zusätzlicher Urlaubstag für {year} übernommen.",
+            "carryover_done": "{days} zusätzliche Urlaubstage für {year} übernommen."
         }
     }
 }

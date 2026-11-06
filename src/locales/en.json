@@ -758,7 +758,13 @@
             "vac_left_extra_sub": "incl. {extra} extra",
             "vac_extra": "Extra vacation left",
             "vac_extra_sub": "of {total}, used first",
-            "vac_extra_none": "no extra days"
+            "vac_extra_none": "no extra days",
+            "carryover_one": "{name} has 1 unused vacation day from {from}. Add it as extra vacation for {year}?",
+            "carryover": "{name} has {days} unused vacation days from {from}. Add them as extra vacation for {year}?",
+            "carryover_accept": "Apply",
+            "carryover_dismiss": "Not now",
+            "carryover_done_one": "1 extra vacation day applied for {year}.",
+            "carryover_done": "{days} extra vacation days applied for {year}."
         }
     }
 }

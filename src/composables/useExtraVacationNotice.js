@@ -6,7 +6,7 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useNotifications } from '@/composables/useNotifications'
 import { useToast } from '@/composables/useToast'
 import { getExtraVacationNotice, parseIsoDate } from '@/composables/extraVacationNotice'
-import { todayIso } from '@/composables/employments'
+import { extraDaysForYear, todayIso } from '@/composables/employments'
 
 const STORAGE_KEY = 'zeitwerk_extra_vacation_notice'
 
@@ -51,8 +51,10 @@ export function useExtraVacationNotice() {
         const employment = employmentForNotice()
         const deadline = employment?.extraVacationDeadline || ''
         const today = new Date()
+        const deadlineYear = Number(String(deadline).slice(0, 4))
+
         const notice = getExtraVacationNotice({
-            extraDays: employment?.extraVacationDays,
+            extraDays: extraDaysForYear(employment, Number.isInteger(deadlineYear) ? deadlineYear : today.getFullYear()),
             usedDays: usedDaysForDeadline(deadline, employment),
             deadline,
             noticeDays: employment?.extraVacationNoticeDays,
@@ -88,7 +90,7 @@ export function useExtraVacationNotice() {
     watch(
         () => [
             store.employments.map(employment =>
-                `${employment.id}:${employment.extraVacationDays}:${employment.extraVacationDeadline}:${employment.extraVacationNoticeDays}`
+                `${employment.id}:${employment.extraVacationDays}:${employment.extraVacationDeadline}:${employment.extraVacationNoticeDays}:${JSON.stringify(employment.extraVacationByYear || {})}`
             ).join('|'),
             store.entries
                 .filter(entry => entry.typ === 'vacation')

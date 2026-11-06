@@ -93,6 +93,65 @@ describe('employments', () => {
         ])
     })
 
+    it('suggests leftover vacation for the same employment and applies it only after a click', () => {
+        const store = useZeitwerkStore()
+        const first = store.employments[0]
+
+        store.updateEmployment(first.id, {
+            name: 'Erste',
+            start: '2025-01-01',
+            end: '',
+            vacationDaysPerYear: 30,
+            extraVacationDays: 4,
+        })
+        store.addEntry({ date: '2026-03-02', typ: 'vacation', timeEntries: [] })
+
+        store.currYear = 2026
+        const before = store.remainingVacationDays
+        expect(store.vacationCarryoverOffers).toMatchObject([
+            { employmentId: first.id, fromYear: 2025, year: 2026, days: 34 },
+        ])
+
+        store.dismissVacationCarryover(first.id, 2026)
+        expect(store.vacationCarryoverOffers).toEqual([])
+        expect(store.remainingVacationDays).toBe(before)
+
+        store.updateEmployment(first.id, { dismissedVacationCarryover: {} })
+        const accepted = store.acceptVacationCarryover(first.id, 2026)
+        expect(accepted.days).toBe(34)
+        expect(store.extraVacationAllowance).toBe(34)
+        expect(store.remainingExtraVacationDays).toBe(33)
+        expect(store.employments[0].extraVacationByYear['2025']).toBe(4)
+
+        store.currYear = 2025
+        expect(store.extraVacationAllowance).toBe(4)
+        expect(store.remainingVacationDays).toBe(34)
+        expect(store.vacationCarryoverOffers).toEqual([])
+    })
+
+    it('does not offer leftover vacation to a different employment', () => {
+        const store = useZeitwerkStore()
+        const first = store.employments[0]
+
+        store.updateEmployment(first.id, {
+            name: 'Erste',
+            start: '2026-01-01',
+            end: '2027-01-01',
+            vacationDaysPerYear: 30,
+            extraVacationDays: 0,
+        })
+        const second = store.addEmployment()
+        store.updateEmployment(second.id, {
+            name: 'Zweite',
+            start: '2027-01-01',
+            end: '',
+            vacationDaysPerYear: 20,
+        })
+
+        store.currYear = 2027
+        expect(store.vacationCarryoverOffers).toEqual([])
+    })
+
     it('rejects overlapping employments', () => {
         const store = useZeitwerkStore()
         const first = store.employments[0]

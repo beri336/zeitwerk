@@ -190,6 +190,20 @@
         <KpiCard v-if="yearGrossLabel" :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
           :sub="$t('dashboard.year.gross_sub')" variant="ok" :private="true" />
 
+        <div v-for="offer in store.vacationCarryoverOffers" :key="`${offer.employmentId}-${offer.year}`"
+          class="carryover">
+          <p>{{ carryoverText(offer) }}</p>
+          <div class="carryover__actions">
+            <button class="btn btn-primary btn-sm" type="button" @click="acceptCarryover(offer)">
+              {{ $t("dashboard.year.carryover_accept") }}
+            </button>
+            <button class="btn btn-secondary btn-sm" type="button"
+              @click="store.dismissVacationCarryover(offer.employmentId, offer.year)">
+              {{ $t("dashboard.year.carryover_dismiss") }}
+            </button>
+          </div>
+        </div>
+
         <template v-if="store.yearVacationBalances.length < 2">
           <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(store.usedVacationDays)"
             :sub="$t('dashboard.year.vac_used_sub')" />
@@ -261,13 +275,31 @@ const vacationLeftSub = computed(() => {
     : store.remainingVacationDays === 1
       ? t("dashboard.year.vac_day_left_sub")
       : t("dashboard.year.vac_days_left_sub");
+
   const name = store.viewedEmployment?.name;
+
   return name ? `${base} · ${name}` : base;
 });
+
+function carryoverText(offer) {
+  const name = offer.name || t("settings.employments.untitled");
+  const key = offer.days === 1 ? "dashboard.year.carryover_one" : "dashboard.year.carryover";
+
+  return t(key, { name, from: offer.fromYear, year: offer.year, days: offer.days });
+}
+
+function acceptCarryover(offer) {
+  const accepted = store.acceptVacationCarryover(offer.employmentId, offer.year);
+  if (!accepted) return;
+
+  const key = accepted.days === 1 ? "dashboard.year.carryover_done_one" : "dashboard.year.carryover_done";
+  showToast(t(key, { days: accepted.days, year: accepted.year }), "ok");
+}
 
 function vacationLeftText(job) {
   if (job.remainingExtra > 0)
     return t("dashboard.year.vac_left_extra_sub", { extra: job.remainingExtra });
+
   return job.remaining === 1
     ? t("dashboard.year.vac_day_left_sub")
     : t("dashboard.year.vac_days_left_sub");
@@ -568,6 +600,31 @@ function openToday() {
   height: 1px;
   background: var(--color-border);
   opacity: 0.6;
+}
+
+.carryover {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+}
+
+.carryover p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.carryover__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .vacation-by-job {

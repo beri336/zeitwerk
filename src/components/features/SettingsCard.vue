@@ -677,13 +677,17 @@ function confirmDeleteAll() {
 }
 
 // calculate gross locally
-// Stundenlohn: Monatslohn / 4 Wochen / workDays / hoursPerDay
+// daily salary: monthly salary / 4 weeks / workDays / hoursPerDay
 const extraVacationBalance = computed(() => {
   const job = store.employments.find((item) => item.id === selectedEmploymentId.value);
+  const year = Number(todayIso().slice(0, 4));
+
   const balance = vacationBalance(
     job,
-    store.countVacationDays(Number(todayIso().slice(0, 4)), job),
+    store.countVacationDays(year, job),
+    year,
   );
+
   if (balance.extra <= 0) return "";
 
   return t("settings.hints.extra_vacation_balance", {
@@ -703,7 +707,7 @@ const previewGrossHourlyRate = computed(() => {
   return monthly / 4 / workDays / hoursDay;
 });
 
-// Tageslohn: Monatslohn / 4 Wochen / workDays
+// daily salary: monthly salary / 4 weeks / workDays
 const previewGrossDailyRate = computed(() => {
   const monthly = Number(form.grossMonthlySalary || 0);
   const workDays = Number(form.workDays || 5);

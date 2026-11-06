@@ -51,7 +51,25 @@ export function normalizeEmployment(raw = {}, fallback = {}) {
         extraVacationDays: Math.max(0, finite(source.extraVacationDays, 0)),
         extraVacationDeadline: isIsoDate(source.extraVacationDeadline) ? source.extraVacationDeadline : '',
         extraVacationNoticeDays: Math.max(0, finite(source.extraVacationNoticeDays, 30)),
+        extraVacationByYear: vacationYearMap(source.extraVacationByYear),
+        dismissedVacationCarryover: vacationYearMap(source.dismissedVacationCarryover),
     }
+}
+
+function vacationYearMap(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+        return {}
+
+    const map = {}
+    Object.entries(value).forEach(([year, days]) => {
+        if (!/^\d{4}$/.test(year))
+            return
+        const number = Number(days)
+        if (!Number.isFinite(number) || number < 0)
+            return
+        map[year] = number
+    })
+    return map
 }
 
 export function contractFrom(source = {}) {
@@ -144,9 +162,22 @@ export function employmentForYear(employments, year, today = todayIso()) {
     return overlapping[0] ?? null
 }
 
-export function vacationBalance(employment, usedDays) {
+export function extraDaysForYear(employment, year) {
+    const manual = Math.max(0, finite(employment?.extraVacationDays, 0))
+    if (year == null || year === '')
+        return manual
+
+    const map = employment?.extraVacationByYear
+    const key = String(year)
+    if (map && Object.prototype.hasOwnProperty.call(map, key))
+        return Math.max(0, finite(map[key], 0))
+
+    return manual
+}
+
+export function vacationBalance(employment, usedDays, year) {
     const yearly = Math.max(0, finite(employment?.vacationDaysPerYear, 30))
-    const extra = Math.max(0, finite(employment?.extraVacationDays, 0))
+    const extra = extraDaysForYear(employment, year)
     const used = Math.max(0, finite(usedDays, 0))
     const remainingExtra = Math.max(0, extra - used)
     const usedRegular = Math.max(0, used - extra)
@@ -165,7 +196,60 @@ export function hourlyRate(monthly, weeklyHours) {
     const hours = Number(weeklyHours) || 0
     if (!salary || !hours)
         return 0
+
     return (salary * 12) / (hours * 52)
+}
+
+function sameEmploymentOwns(employments, employment, isoDate) {
+    return employmentForDate(employments, isoDate)?.id === employment?.id
+}
+
+// Leftover days are a suggestion for the same employment. Accepting stores them
+// for the new year only; declining leaves both years unchanged.
+export function vacationCarryoverOffer({ employment, employments, year, usedPreviousYear }) {
+    const targetYear = Number(year)
+    if (!employment || !Number.isInteger(targetYear))
+        return null
+
+    const previousYear = targetYear - 1
+    if (!sameEmploymentOwns(employments, employment, `${previousYear}-12-31`))
+        return null
+    if (!sameEmploymentOwns(employments, employment, `${targetYear}-01-01`))
+        return null
+
+    const accepted = employment.extraVacationByYear
+    if (accepted && Object.prototype.hasOwnProperty.call(accepted, String(targetYear)))
+        return null
+
+    const days = vacationBalance(employment, usedPreviousYear, previousYear).remaining
+    if (!(days > 0))
+        return null
+
+    const dismissed = employment.dismissedVacationCarryover?.[String(targetYear)]
+    if (Number(dismissed) === days)
+        return null
+
+    return {
+        employmentId: employment.id,
+        year: targetYear,
+        fromYear: previousYear,
+        days,
+    }
+}
+
+export function pinVacationYearsBefore(employment, year) {
+    const targetYear = Number(year)
+    const startYear = employment?.start
+        ? Number(String(employment.start).slice(0, 4))
+        : targetYear - 1
+    const byYear = { ...(employment?.extraVacationByYear || {}) }
+
+    for (let pinned = startYear; pinned < targetYear; pinned++) {
+        const key = String(pinned)
+        if (!Object.prototype.hasOwnProperty.call(byYear, key))
+            byYear[key] = extraDaysForYear(employment, pinned)
+    }
+    return byYear
 }
 
 export function entryIsBeforeStart(entry, start) {

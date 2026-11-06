@@ -15,6 +15,8 @@ import {
     employmentForYear,
     employmentsInYear,
     employmentOverlapsYear,
+    pinVacationYearsBefore,
+    vacationCarryoverOffer,
     entryIsBeforeStart,
     findOverlap,
     hourlyRate,
@@ -143,7 +145,11 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     )
 
     const viewedVacation = computed(() =>
-        vacationBalance(viewedEmployment.value ?? settings.value, countVacationDays(currYear.value))
+        vacationBalance(
+            viewedEmployment.value ?? settings.value,
+            countVacationDays(currYear.value),
+            currYear.value,
+        )
     )
 
     const usedVacationDays = computed(() => viewedVacation.value.used)
@@ -156,8 +162,22 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         employmentsInYear(employments.value, currYear.value).map(employment => ({
             id: employment.id,
             name: employment.name,
-            ...vacationBalance(employment, countVacationDays(currYear.value, employment)),
+            ...vacationBalance(employment, countVacationDays(currYear.value, employment), currYear.value),
         }))
+    )
+
+    const vacationCarryoverOffers = computed(() =>
+        employmentsInYear(employments.value, currYear.value)
+            .map(employment => {
+                const offer = vacationCarryoverOffer({
+                    employment,
+                    employments: employments.value,
+                    year: currYear.value,
+                    usedPreviousYear: countVacationDays(currYear.value - 1, employment),
+                })
+
+                return offer ? { ...offer, name: employment.name } : null
+            }).filter(Boolean)
     )
 
     // Persist
@@ -194,7 +214,28 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const index = employments.value.findIndex(employment => employment.id === target.id)
         if (index < 0)
             return
-        employments.value[index] = normalizeEmployment({ ...target, ...patch, id: target.id })
+        employments.value[index] = syncEditedExtraYear(
+            normalizeEmployment({ ...target, ...patch, id: target.id }),
+            patch,
+        )
+    }
+
+    function syncEditedExtraYear(employment, patch) {
+        if (!patch || !('extraVacationDays' in patch) || ('extraVacationByYear' in patch))
+            return employment
+
+        const year = String(new Date().getFullYear())
+        const map = employment.extraVacationByYear
+        if (!map || !Object.prototype.hasOwnProperty.call(map, year))
+            return employment
+
+        return {
+            ...employment,
+            extraVacationByYear: {
+                ...map,
+                [year]: employment.extraVacationDays,
+            },
+        }
     }
 
     function holidayEntry(holiday, employment, index) {
@@ -604,13 +645,58 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const rangeChanged = current.start !== next.start
             || current.end !== next.end
             || current.state !== next.state
-        employments.value[index] = next
+        employments.value[index] = syncEditedExtraYear(next, patch)
         mirrorActiveEmployment()
+
         if (rangeChanged)
             rebuildHolidays()
         else
             persist()
-        return { ok: true, employment: next }
+
+        return { ok: true, employment: employments.value[index] }
+    }
+
+    function acceptVacationCarryover(employmentId, year) {
+        const employment = employments.value.find(item => item.id === employmentId)
+        const offer = vacationCarryoverOffer({
+            employment,
+            employments: employments.value,
+            year,
+            usedPreviousYear: countVacationDays(Number(year) - 1, employment),
+        })
+        if (!offer)
+            return null
+
+        const byYear = pinVacationYearsBefore(employment, offer.year)
+        byYear[String(offer.year)] = offer.days
+        const patch = { extraVacationByYear: byYear }
+        if (offer.year === new Date().getFullYear())
+            patch.extraVacationDays = offer.days
+
+        const result = updateEmployment(employmentId, patch)
+
+        return result.ok ? offer : null
+    }
+
+    function dismissVacationCarryover(employmentId, year) {
+        const employment = employments.value.find(item => item.id === employmentId)
+        const offer = vacationCarryoverOffer({
+            employment,
+            employments: employments.value,
+            year,
+            usedPreviousYear: countVacationDays(Number(year) - 1, employment),
+        })
+        if (!offer)
+            return null
+
+        const result = updateEmployment(employmentId, {
+            dismissedVacationCarryover: {
+                ...(employment.dismissedVacationCarryover || {}),
+                [String(offer.year)]: offer.days,
+            },
+        })
+
+        return result.ok ? offer : null
     }
 
     function addEmployment() {
@@ -629,8 +715,10 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             end: '',
         })
         employments.value.push(created)
+
         mirrorActiveEmployment()
         rebuildHolidays()
+
         return created
     }
 
@@ -1027,7 +1115,8 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         recoverActiveSession,
         deleteAllEntries,
         monthGross, weekGrossGroups,
-        usedVacationDays, remainingVacationDays, yearVacationBalances,
+        usedVacationDays, remainingVacationDays, yearVacationBalances, vacationCarryoverOffers,
+        acceptVacationCarryover, dismissVacationCarryover,
         extraVacationAllowance, remainingExtraVacationDays, remainingRegularVacationDays,
         countVacationDays, employmentForDate: date => employmentForDate(employments.value, date),
     }
