@@ -4,7 +4,13 @@ import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { useCalendarStore } from '@/composables/useCalendarStore'
 import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
-import { earliestEmploymentStart, entryIsBeforeStart, normalizeEmployment } from '@/composables/employments'
+import {
+    dateBelongsToEmployment,
+    earliestEmploymentStart,
+    employmentForDate,
+    entryIsBeforeStart,
+    normalizeEmployment
+} from '@/composables/employments'
 
 export const BACKUP_FORMAT = 'zeitwerk-backup'
 export const CURRENT_BACKUP_VERSION = 3
@@ -19,30 +25,52 @@ class ImportValidationError extends Error {
 
 export function useExport() {
 
-    function collectAll() {
+    function collectAll({ employmentId = '', from = '', to = '' } = {}) {
         const zeitwerk = useZeitwerkStore()
         const calendar = useCalendarStore()
         const todos = useTodoStore()
         const profile = useProfileStore()
+        const scoped = Boolean(employmentId || from || to)
 
-        const trackedFrom = earliestEmploymentStart(zeitwerk.employments)
+        function inExport(isoDate) {
+            const date = String(isoDate ?? '').slice(0, 10)
+            if (!dateBelongsToEmployment(zeitwerk.employments, date, employmentId))
+                return false
+
+            if (from && date < from)
+                return false
+
+            if (to && date > to)
+                return false
+
+            return true
+        }
 
         return {
             meta: {
                 exportedAt: new Date().toISOString(),
                 format: BACKUP_FORMAT,
                 version: CURRENT_BACKUP_VERSION,
+                ...(employmentId ? { employmentId } : {}),
+                ...(from ? { from } : {}),
+                ...(to ? { to } : {}),
             },
             zeitwerk: {
-                entries: zeitwerk.entries.filter(entry => !entryIsBeforeStart(entry, trackedFrom)),
+                entries: zeitwerk.entries.filter(entry => inExport(entry.date)),
                 settings: zeitwerk.settings,
-                employments: zeitwerk.employments,
+                employments: employmentId
+                    ? zeitwerk.employments.filter(employment => employment.id === employmentId)
+                    : zeitwerk.employments,
             },
             calendar: {
-                events: calendar.events,
+                events: scoped
+                    ? calendar.events.filter(event => inExport(event.date))
+                    : calendar.events,
             },
             todos: {
-                todos: todos.todos,
+                todos: scoped
+                    ? todos.todos.filter(todo => todo.dueDate && inExport(todo.dueDate))
+                    : todos.todos,
             },
             profile: {
                 ...profile.profile,
@@ -51,32 +79,36 @@ export function useExport() {
     }
 
     // JSON
-    function exportJSON() {
-        const data = collectAll()
+    function exportJSON(options = {}) {
+        const data = collectAll(options)
         const blob = new Blob(
             [JSON.stringify(data, null, 2)],
             { type: 'application/json' }
         )
-        download(blob, `zeitwerk-backup-${dateTimeStamp()}-${deviceLabel()}.json`)
+        download(blob, options.filename || `zeitwerk-backup-${dateTimeStamp()}-${deviceLabel()}.json`)
     }
 
     // CSV (Zeiteinträge)
-    function exportCSV(entries = null) {
+    function exportCSV(entries = null, { employmentId = '' } = {}) {
         const zeitwerk = useZeitwerkStore()
-        const trackedFrom = earliestEmploymentStart(zeitwerk.employments)
         const rows = (entries ?? zeitwerk.entries)
-            .filter(entry => !entryIsBeforeStart(entry, trackedFrom))
+            .filter(entry => dateBelongsToEmployment(
+                zeitwerk.employments,
+                String(entry.date ?? '').slice(0, 10),
+                employmentId,
+            ))
 
-        const header = ['date', 'typ', 'plannedHours', 'actualHours', 'notes', 'remarks']
+        const header = ['date', 'employer', 'typ', 'plannedHours', 'actualHours', 'notes', 'remarks']
         const lines = [
             header.join(';'),
-            ...rows.map(e => [
-                e.date,
-                e.typ ?? 'on-site',
-                e.plannedHours ?? '',
-                zeitwerk.effectiveActualHours(e).toFixed(2),
-                `"${(e.notes ?? '').replace(/"/g, '""')}"`,
-                `"${(e.remarks ?? '').replace(/"/g, '""')}"`,
+            ...rows.map(entry => [
+                entry.date,
+                employmentForDate(zeitwerk.employments, String(entry.date).slice(0, 10))?.name ?? '',
+                entry.typ ?? 'on-site',
+                entry.plannedHours ?? '',
+                zeitwerk.effectiveActualHours(entry).toFixed(2),
+                `"${(entry.notes ?? '').replace(/"/g, '""')}"`,
+                `"${(entry.remarks ?? '').replace(/"/g, '""')}"`,
             ].join(';'))
         ]
 

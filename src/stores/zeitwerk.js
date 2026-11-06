@@ -8,7 +8,9 @@ import { getHolidaysForMonth, getHolidays } from '@/composables/useHolidays'
 import {
     CONTRACT_KEYS,
     contractFrom,
+    dateBelongsToEmployment,
     earliestEmploymentStart,
+    employmentFileSlug,
     employmentForDate,
     employmentForYear,
     employmentsInYear,
@@ -698,7 +700,14 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // Export as CSV for Excel, with semicolon as separator and UTF-8 BOM
-    function exportCSV({ fromYear, fromMonth, toYear = fromYear, toMonth = fromMonth } = {}) {
+    function exportCSV({
+        fromYear,
+        fromMonth,
+        toYear = fromYear,
+        toMonth = fromMonth,
+        employmentId = '',
+        download = true,
+    } = {}) {
         const pad = num => String(num).padStart(2, '0')
         const quote = value => `"${String(value ?? '').replace(/"/g, '""')}"`
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -712,6 +721,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
         const headers = [
             'Date',
+            'Employer',
             'Weekday',
             'KW',
             'Type',
@@ -736,8 +746,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             const dd = pad(cursor.getDate())
             const isoDate = `${yyyy}-${mm}-${dd}`
 
-            const trackedFrom = earliestEmploymentStart(employments.value)
-            if (trackedFrom && isoDate < trackedFrom) {
+            if (!dateBelongsToEmployment(employments.value, isoDate, employmentId)) {
                 cursor.setDate(cursor.getDate() + 1)
                 continue
             }
@@ -764,6 +773,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
             rows.push([
                 `${dd}.${mm}.${yyyy}`,
+                employmentForDate(employments.value, isoDate)?.name ?? '',
                 days[date.getDay()],
                 getKW(isoDate),
                 entry?.typ || '',
@@ -783,6 +793,9 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         }
 
         const csv = [headers.map(quote).join(';'), ...rows].join('\n')
+        if (!download)
+            return csv
+
         const bom = '\uFEFF'
         const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
 
@@ -794,7 +807,14 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             ? `${fromYear}_${pad(fromMonth + 1)}`
             : `${fromYear}_${pad(fromMonth + 1)}-to-${toYear}_${pad(toMonth + 1)}`
 
-        link.download = `zeitwerk_${rangeLabel}.csv`
+        const job = employmentId
+            ? employments.value.find(employment => employment.id === employmentId)
+            : null
+
+        link.download = job
+            ? `zeitwerk_${employmentFileSlug(job.name)}_${rangeLabel}.csv`
+            : `zeitwerk_${rangeLabel}.csv`
+
         link.style.display = 'none'
 
         document.body.appendChild(link)

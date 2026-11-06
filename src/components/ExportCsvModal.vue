@@ -4,13 +4,7 @@
 
   <Teleport to="body">
     <div v-if="isOpen" class="modal-backdrop" @click="close">
-      <div
-        class="modal-card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="csv-export-title"
-        @click.stop
-      >
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="csv-export-title" @click.stop>
         <div class="modal-header">
           <div>
             <h2 id="csv-export-title" class="modal-title">
@@ -19,17 +13,24 @@
             <p class="modal-subtitle">{{ $t("csv.subtitle") }}</p>
           </div>
 
-          <button
-            class="icon-btn"
-            type="button"
-            @click="close"
-            :aria-label="$t('csv.close_aria')"
-          >
+          <button class="icon-btn" type="button" @click="close" :aria-label="$t('csv.close_aria')">
             ×
           </button>
         </div>
 
         <div class="modal-body">
+          <!-- Employment selection -->
+          <label class="field">
+            <span class="field-label">{{ $t("csv.employment") }}</span>
+            <select v-model="employmentId" class="field-input">
+              <option value="">{{ $t("csv.all_employments") }}</option>
+              <option v-for="job in employmentOptions" :key="job.id" :value="job.id">
+                {{ employmentLabel(job) }}
+              </option>
+            </select>
+            <span class="field-hint">{{ $t("csv.employment_hint") }}</span>
+          </label>
+
           <label class="field">
             <span class="field-label">{{ $t("csv.from_month") }}</span>
             <input v-model="fromMonth" class="field-input" type="month" />
@@ -42,12 +43,7 @@
 
           <label v-if="!singleMonth" class="field">
             <span class="field-label">{{ $t("csv.to_month") }}</span>
-            <input
-              v-model="toMonth"
-              class="field-input"
-              type="month"
-              :min="fromMonth"
-            />
+            <input v-model="toMonth" class="field-input" type="month" :min="fromMonth" />
           </label>
         </div>
 
@@ -55,12 +51,7 @@
           <button class="btn btn-secondary" type="button" @click="close">
             {{ $t("common.cancel") }}
           </button>
-          <button
-            class="btn btn-primary"
-            type="button"
-            :disabled="!canSubmit"
-            @click="submit"
-          >
+          <button class="btn btn-primary" type="button" :disabled="!canSubmit" @click="submit">
             {{ $t("csv.submit") }}
             <ShortcutHint label="⌘↵" />
           </button>
@@ -88,6 +79,20 @@ const store = useZeitwerkStore();
 const singleMonth = ref(true);
 const fromMonth = ref("");
 const toMonth = ref("");
+const employmentId = ref("");
+
+const employmentOptions = computed(() =>
+  [...store.employments].sort((first, second) =>
+    (first.start || "9999").localeCompare(second.start || "9999"),
+  ),
+);
+
+function employmentLabel(job) {
+  const name = job.name || t("settings.employments.untitled");
+  if (!job.start) return name;
+  const end = job.end || t("settings.employments.open_ended");
+  return `${name} · ${job.start} – ${end}`;
+}
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -126,6 +131,24 @@ function resetToCurrentMonth() {
   fromMonth.value = current;
   toMonth.value = current;
   singleMonth.value = true;
+  employmentId.value = "";
+}
+
+function applyEmploymentPeriod(id) {
+  const job = store.employments.find((item) => item.id === id);
+  if (!job?.start) return;
+
+  fromMonth.value = job.start.slice(0, 7);
+  if (!job.end) {
+    const now = new Date();
+    toMonth.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+  } else {
+    const end = new Date(`${job.end}T00:00:00`);
+    end.setDate(end.getDate() - 1);
+    toMonth.value = `${end.getFullYear()}-${pad(end.getMonth() + 1)}`;
+  }
+  if (toMonth.value < fromMonth.value) toMonth.value = fromMonth.value;
+  singleMonth.value = fromMonth.value === toMonth.value;
 }
 
 watch(
@@ -135,6 +158,10 @@ watch(
   },
   { immediate: true },
 );
+
+watch(employmentId, (id) => {
+  if (props.modelValue && id) applyEmploymentPeriod(id);
+});
 
 const canSubmit = computed(() => {
   if (!fromMonth.value) return false;
@@ -149,6 +176,7 @@ function submit() {
   emit("confirm", {
     from: fromMonth.value,
     to: singleMonth.value ? fromMonth.value : toMonth.value,
+    employmentId: employmentId.value,
   });
 
   close();
@@ -225,6 +253,7 @@ function submit() {
 }
 
 .field-input {
+  width: 100%;
   height: 40px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -232,6 +261,11 @@ function submit() {
   color: var(--color-text);
   padding: 0 var(--space-3);
   font-family: inherit;
+}
+
+.field-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 
 /* Checkbox */

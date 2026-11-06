@@ -252,7 +252,7 @@ function handleShortcut(event) {
 onMounted(() => window.addEventListener("keydown", handleShortcut));
 onUnmounted(() => window.removeEventListener("keydown", handleShortcut));
 
-function handleCsvConfirm({ from, to }) {
+function handleCsvConfirm({ from, to, employmentId }) {
   try {
     const [fromYear, fromMonth] = from.split("-").map(Number);
     const [toYear, toMonth] = to.split("-").map(Number);
@@ -262,6 +262,7 @@ function handleCsvConfirm({ from, to }) {
       fromMonth: fromMonth - 1,
       toYear,
       toMonth: toMonth - 1,
+      employmentId,
     });
 
     showToast(

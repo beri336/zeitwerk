@@ -174,6 +174,37 @@ export function entryIsBeforeStart(entry, start) {
     return String(entry.date).slice(0, 10) < start
 }
 
+// Without an employment id, every day from the first start onward belongs.
+// With an id, only that job's half-open range [start, end) belongs.
+export function dateBelongsToEmployment(employments, isoDate, employmentId = '') {
+    if (!isIsoDate(isoDate))
+        return false
+
+    if (!employmentId)
+        return !entryIsBeforeStart({ date: isoDate }, earliestEmploymentStart(employments))
+
+    const employment = (employments ?? []).find(item => item.id === employmentId)
+
+    if (!employment)
+        return false
+
+    if (!employment.start)
+        return employmentForDate(employments, isoDate)?.id === employment.id
+
+    return employmentCoversDate(employment, isoDate)
+}
+
+export function employmentFileSlug(name) {
+    const slug = String(name || '')
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 40)
+
+    return slug || 'employment'
+}
+
 export function managedHolidayYears(employments, today = todayIso()) {
     const currentYear = Number(String(today).slice(0, 4))
     const dated = (employments ?? []).filter(employment => employment.start)

@@ -50,6 +50,9 @@
         "from_month": "From month",
         "to_month": "To month",
         "only_this_month": "Export only this month",
+        "employment": "Employment",
+        "all_employments": "All employments",
+        "employment_hint": "One employment includes only its own period. The name is written on every row.",
         "submit": "Export CSV"
     },
     "import": {
@@ -536,6 +539,9 @@
             "title": "Scope",
             "sub": "What data do you want to export?",
             "range": "Range",
+            "employment": "Employment",
+            "all_employments": "All employments",
+            "employment_hint": "One employment exports only its own period. The employer name is written on every row. Days before the first start are left out.",
             "include": "Include",
             "presets": {
                 "month": "Current Month",
@@ -559,6 +565,7 @@
             "sub": "Choose your export format",
             "csv_desc": "Spreadsheet-compatible, Excel/Sheets ready",
             "json_desc": "Raw data, developer-friendly, full backup",
+            "json_job_desc": "Backup for this employment and the selected period only",
             "pdf_desc": "Download HTML → open → Ctrl+P → Save as PDF",
             "clip_desc": "Copy as tab-separated table"
         },

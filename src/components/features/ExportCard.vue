@@ -19,8 +19,8 @@
                 <button class="btn btn-secondary" type="button" @click="exportFullJSON">
                     {{ $t('export.data.backup') }}
                 </button>
-                <input ref="importInput" type="file" accept=".json,application/json"
-                    class="hidden-file-input" @change="handleImportFile" />
+                <input ref="importInput" type="file" accept=".json,application/json" class="hidden-file-input"
+                    @change="handleImportFile" />
             </div>
         </section>
 
@@ -32,6 +32,18 @@
             </div>
             <div class="card-body">
                 <div class="filter-row">
+
+                    <!-- Employment Filter -->
+                    <div class="form-group employment-filter">
+                        <label class="form-label">{{ $t('export.scope.employment') }}</label>
+                        <select class="form-input" v-model="employmentId">
+                            <option value="">{{ $t('export.scope.all_employments') }}</option>
+                            <option v-for="job in employmentOptions" :key="job.id" :value="job.id">
+                                {{ job.name || $t('settings.employments.untitled') }} · {{ employmentRange(job) }}
+                            </option>
+                        </select>
+                        <span class="form-hint">{{ $t('export.scope.employment_hint') }}</span>
+                    </div>
 
                     <div class="form-group">
                         <label class="form-label">{{ $t('export.scope.range') }}</label>
@@ -116,7 +128,7 @@
                     <span :style="{ color: summary.diff >= 0 ? 'var(--color-success)' : 'var(--color-error)' }">
                         {{ summary.diff >= 0 ? '+' : '' }}{{ formatHours(summary.diff) }}
                     </span>
-                    {{ $t('common.diff') }} · {{ scopeLabel }}
+                    {{ $t('common.diff') }} · {{ exportLabel }}
                 </div>
             </div>
         </section>
@@ -162,7 +174,8 @@
 
                         <div class="format-info">
                             <div class="format-name">JSON</div>
-                            <div class="format-desc">{{ $t('export.format.json_desc') }}</div>
+                            <div class="format-desc">{{ employmentId ? $t('export.format.json_job_desc') :
+                                $t('export.format.json_desc') }}</div>
                         </div>
                         <button class="btn btn-secondary" @click="exportJSON">{{ $t('export.btn.export') }}</button>
                     </div>
@@ -213,22 +226,19 @@
             <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
         </Transition>
 
-        <ImportConfirmModal
-            v-model="showImportModal"
-            :current-count="store.entries.length"
-            :import-count="pendingImport?.zeitwerk?.entries?.length ?? 0"
-            @confirm="confirmImport"
-        />
+        <ImportConfirmModal v-model="showImportModal" :current-count="store.entries.length"
+            :import-count="pendingImport?.zeitwerk?.entries?.length ?? 0" @confirm="confirmImport" />
 
     </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useZeitwerkStore } from '@/stores/zeitwerk'
 import { formatHours, MONTH_NAMES } from '@/composables/useTime'
 import { useToast } from '@/composables/useToast'
 import { useI18n } from 'vue-i18n'
+import { dateBelongsToEmployment, employmentFileSlug, employmentForDate } from '@/composables/employments'
 
 import { useExport } from '@/composables/useExport'
 import { useCalendarStore } from '@/composables/useCalendarStore'
@@ -242,8 +252,38 @@ const { showToast } = useToast()
 const { t, locale } = useI18n()
 
 const scope = ref('month')
+const employmentId = ref('')
 const customFrom = ref({ year: new Date().getFullYear(), month: new Date().getMonth() })
 const customTo = ref({ year: new Date().getFullYear(), month: new Date().getMonth() })
+
+const employmentOptions = computed(() =>
+    [...store.employments].sort((first, second) => (first.start || '9999').localeCompare(second.start || '9999'))
+)
+
+watch(employmentOptions, (jobs) => {
+    if (employmentId.value && !jobs.some(job => job.id === employmentId.value))
+        employmentId.value = ''
+})
+
+function employmentRange(job) {
+    if (!job.start && !job.end) return t('settings.employments.unbounded')
+    const end = job.end || t('settings.employments.open_ended')
+    return job.start ? `${job.start} – ${end}` : end
+}
+
+function selectedEmployerName() {
+    const job = store.employments.find(item => item.id === employmentId.value)
+    if (!job) return ''
+    return job.name || t('settings.employments.untitled')
+}
+
+function employerName(entry) {
+    if (employmentId.value)
+        return selectedEmployerName()
+    const job = employmentForDate(store.employments, String(entry.date).slice(0, 10))
+    if (!job) return ''
+    return job.name || t('settings.employments.untitled')
+}
 
 const PRESETS = computed(() => [
     { value: 'month', label: t('export.scope.presets.month') },
@@ -283,6 +323,12 @@ const availableMonths = computed(() => {
         .sort((a, b) => a.year !== b.year ? a.year - b.year : a.month - b.month)
 })
 
+const exportLabel = computed(() => {
+    if (!employmentId.value)
+        return scopeLabel.value
+    return `${selectedEmployerName()} · ${scopeLabel.value}`
+})
+
 const scopeLabel = computed(() => {
     const preset = PRESETS.value.find(p => p.value === scope.value)
 
@@ -292,63 +338,74 @@ const scopeLabel = computed(() => {
 
         return from === to
             ? from
-            : `${from} – ${to}`
+            : `${from} - ${to}`
     }
 
     return preset?.label ?? ''
 })
 
-const filteredEntries = computed(() => {
+function isoDate(year, month, day) {
+    const pad = value => String(value).padStart(2, '0')
+    return `${year}-${pad(month + 1)}-${pad(day)}`
+}
+
+function startOf(year, month) {
+    return isoDate(year, month, 1)
+}
+
+function endOf(year, month) {
+    return isoDate(year, month, new Date(year, month + 1, 0).getDate())
+}
+
+const scopeBounds = computed(() => {
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth()
 
-    function startOf(y, m) { return new Date(y, m, 1) }
-    function endOf(y, m) { return new Date(y, m + 1, 0) }
-
-    let from, to
-
-    if (scope.value === 'month') {
-        from = startOf(store.currYear, store.currMonth)
-        to = endOf(store.currYear, store.currMonth)
-    } else if (scope.value === 'lastmonth') {
-        const d = new Date(year, month - 1, 1)
-        from = startOf(d.getFullYear(), d.getMonth())
-        to = endOf(d.getFullYear(), d.getMonth())
-    } else if (scope.value === '3months') {
-        const d = new Date(year, month - 2, 1)
-        from = startOf(d.getFullYear(), d.getMonth())
-        to = endOf(year, month)
-    } else if (scope.value === '6months') {
-        const d = new Date(year, month - 5, 1)
-        from = startOf(d.getFullYear(), d.getMonth())
-        to = endOf(year, month)
-    } else if (scope.value === 'year') {
-        from = startOf(store.currYear, 0)
-        to = endOf(store.currYear, 11)
-    } else if (scope.value === 'lastyear') {
-        from = startOf(year - 1, 0)
-        to = endOf(year - 1, 11)
-    } else if (scope.value === 'all') {
-        return store.entries
-    } else if (scope.value === 'custom') {
-        // ensure that -> from <= to
-        const f = new Date(customFrom.value.year, customFrom.value.month, 1)
-        const t = new Date(customTo.value.year, customTo.value.month, 1)
-
-        if (f > t) {
-            from = startOf(customTo.value.year, customTo.value.month)
-            to = endOf(customFrom.value.year, customFrom.value.month)
-        } else {
-            from = startOf(customFrom.value.year, customFrom.value.month)
-            to = endOf(customTo.value.year, customTo.value.month)
-        }
+    if (scope.value === 'all')
+        return null
+    if (scope.value === 'month')
+        return { from: startOf(store.currYear, store.currMonth), to: endOf(store.currYear, store.currMonth) }
+    if (scope.value === 'lastmonth') {
+        const date = new Date(year, month - 1, 1)
+        return { from: startOf(date.getFullYear(), date.getMonth()), to: endOf(date.getFullYear(), date.getMonth()) }
     }
+    if (scope.value === '3months') {
+        const date = new Date(year, month - 2, 1)
+        return { from: startOf(date.getFullYear(), date.getMonth()), to: endOf(year, month) }
+    }
+    if (scope.value === '6months') {
+        const date = new Date(year, month - 5, 1)
+        return { from: startOf(date.getFullYear(), date.getMonth()), to: endOf(year, month) }
+    }
+    if (scope.value === 'year')
+        return { from: startOf(store.currYear, 0), to: endOf(store.currYear, 11) }
+    if (scope.value === 'lastyear')
+        return { from: startOf(year - 1, 0), to: endOf(year - 1, 11) }
+    if (scope.value === 'custom') {
+        const fromKey = customFrom.value.year * 12 + customFrom.value.month
+        const toKey = customTo.value.year * 12 + customTo.value.month
+        const first = fromKey <= toKey ? customFrom.value : customTo.value
+        const second = fromKey <= toKey ? customTo.value : customFrom.value
+
+        return { from: startOf(first.year, first.month), to: endOf(second.year, second.month) }
+    }
+    return null
+})
+
+const filteredEntries = computed(() => {
+    const bounds = scopeBounds.value
 
     return store.entries.filter(entry => {
-        const d = new Date(entry.date)
+        const date = String(entry.date).slice(0, 10)
 
-        return d >= from && d <= to
+        if (!dateBelongsToEmployment(store.employments, date, employmentId.value))
+            return false
+
+        if (!bounds)
+            return true
+
+        return date >= bounds.from && date <= bounds.to
     })
 })
 
@@ -387,6 +444,7 @@ const summary = computed(() => {
 // CSV
 function buildCSVRows() {
     const headers = [
+        'Employer',
         'Date',
         'Day',
         'Type',
@@ -407,6 +465,7 @@ function buildCSVRows() {
         const day = new Date(entry.date + 'T00:00').toLocaleDateString('en-US', { weekday: 'short' })
 
         const row = [
+            employerName(entry),
             entry.date, day,
             entry.typ || 'on-site',
             entry.start || '',
@@ -427,14 +486,17 @@ function buildCSVRows() {
     if (include.value.summary) {
         rows.push([])
         rows.push(
-            ['SUMMARY',
+            [employmentId.value ? selectedEmployerName() : '',
+                'SUMMARY',
                 '',
                 '',
-                '', '',
                 '',
-                summary.value.actual.toFixed(2),
-                summary.value.planned.toFixed(2),
-                summary.value.diff.toFixed(2),
+                '',
+
+                '',
+            summary.value.actual.toFixed(2),
+            summary.value.planned.toFixed(2),
+            summary.value.diff.toFixed(2),
                 '']
         )
 
@@ -448,7 +510,8 @@ function buildCSVRows() {
 }
 
 function exportCSV() {
-    download(`zeitwerk-${scopeLabel.value}.csv`, buildCSVRows(), 'text/csv')
+    const name = employmentId.value ? `${employmentFileSlug(selectedEmployerName())}-` : ''
+    download(`zeitwerk-${name}${scopeLabel.value}.csv`, buildCSVRows(), 'text/csv')
     showToast(t('export.toast.csv'))
 }
 
@@ -462,22 +525,42 @@ function collectOtherStores() {
 }
 
 function exportJSON() {
+    if (employmentId.value) {
+        const bounds = scopeBounds.value
+        const slug = employmentFileSlug(selectedEmployerName())
+
+        exportFullJSON({
+            employmentId: employmentId.value,
+            from: bounds?.from ?? '',
+            to: bounds?.to ?? '',
+            filename: `zeitwerk-backup-${slug}-${new Date().toISOString().slice(0, 10)}.json`,
+        })
+
+        showToast(t('export.toast.json'))
+
+        return
+    }
+
     // continue to take time entries into account
     const payload = {
         exported: new Date().toISOString(),
-        scope: scopeLabel.value,
+        scope: exportLabel.value,
         ...(include.value.summary ? { summary: summary.value } : {}),
         // zeitwerk entries filtered by scope
         zeitwerk: {
-            entries: exportEntries.value,
+            entries: exportEntries.value.map(entry => ({
+                ...entry,
+                employer: employerName(entry),
+            })),
             settings: store.settings,
+            employments: store.employments,
         },
         // all other data is complete
         ...collectOtherStores(),
     }
 
     download(
-        `zeitwerk-${scopeLabel.value}.json`,
+        `zeitwerk-${exportLabel.value}.json`,
         JSON.stringify(payload, null, 2),
         'application/json'
     )
@@ -533,6 +616,7 @@ function exportPDF() {
 
         return `
       <tr>
+        <td>${employerName(entry)}</td>
         <td>${entry.date}</td>
         <td>${entry.typ || 'on-site'}</td>
         <td>${entry.start || '–'}</td>
@@ -548,6 +632,7 @@ function exportPDF() {
 
     const summaryRow = include.value.summary ? `
     <tr class="summary-row">
+      <td colspan="6"><strong>Total</strong></td>
       <td colspan="5"><strong>Total</strong></td>
       <td><strong>${summary.value.actual.toFixed(2)}h</strong></td>
       <td><strong>${summary.value.planned.toFixed(2)}h</strong></td>
@@ -561,7 +646,7 @@ function exportPDF() {
     const html = `<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
-<title>Zeitwerk – ${scopeLabel.value}</title>
+<title>Zeitwerk - ${exportLabel.value}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; font-size: 12px; color: #1e293b; padding: 32px; }
@@ -589,14 +674,14 @@ function exportPDF() {
 </head><body>
 <div class="header">
   <h1>Zeitwerk Export</h1>
-  <div class="meta">${scopeLabel.value} · ${rows.length} entries · ${new Date().toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-GB')}</div>
+  <div class="meta">${exportLabel.value} · ${rows.length} entries · ${new Date().toLocaleDateString(locale.value === 'de' ? 'de-DE' : 'en-GB')}</div>
 </div>
 <button class="print-btn" onclick="window.print()">
   🖨️ Print / Save as PDF
 </button>
 <table>
   <thead><tr>
-    <th>Date</th><th>Type</th><th>Start</th><th>End</th><th>Break</th>
+    <th>Employer</th><th>Date</th><th>Type</th><th>Start</th><th>End</th><th>Break</th>
     <th>Actual</th><th>Planned</th><th>Diff</th>
     ${gross ? '<th>Gross</th>' : ''}
     <th>Note</th>
@@ -607,7 +692,7 @@ function exportPDF() {
 
     // Download as .html - The user opens it and presses Ctrl+P -> Save as PDF
     download(
-        `zeitwerk-${scopeLabel.value.replace(/\s/g, '-')}.html`,
+        `zeitwerk-${exportLabel.value.replace(/\s/g, '-')}.html`,
         html,
         'text/html'
     )
@@ -620,6 +705,7 @@ const copied = ref(false)
 
 async function exportClipboard() {
     const header = [
+        'Employer',
         'Date',
         'Type',
         'Start',
@@ -637,6 +723,7 @@ async function exportClipboard() {
         const diff = (store.effectiveActualHours(entry) - (entry.plannedHours || store.settings.hoursPerDay)).toFixed(2)
 
         return [
+            employerName(entry),
             entry.date,
             entry.typ || 'on-site',
             entry.start || '',
@@ -745,7 +832,7 @@ function toast(msg) {
 }
 
 .btn-secondary {
-  width: fit-content;
+    width: fit-content;
 }
 
 /* Filters */
@@ -768,6 +855,15 @@ function toast(msg) {
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.form-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.employment-filter {
+    grid-column: 1 / -1;
 }
 
 .form-input {

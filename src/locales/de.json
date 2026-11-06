@@ -50,6 +50,9 @@
         "from_month": "Von Monat",
         "to_month": "Bis Monat",
         "only_this_month": "Nur diesen Monat exportieren",
+        "employment": "Beschäftigung",
+        "all_employments": "Alle Beschäftigungen",
+        "employment_hint": "Eine Beschäftigung enthält nur ihren Zeitraum. Der Name steht in jeder Zeile.",
         "submit": "CSV exportieren"
     },
     "import": {
@@ -499,6 +502,9 @@
             "title": "Umfang",
             "sub": "Welche Daten möchtest du exportieren?",
             "range": "Zeitraum",
+            "employment": "Beschäftigung",
+            "all_employments": "Alle Beschäftigungen",
+            "employment_hint": "Eine Beschäftigung exportiert nur ihren Zeitraum. Der Arbeitgebername steht in jeder Zeile. Tage vor dem ersten Beginn fehlen.",
             "include": "Enthalten",
             "presets": {
                 "month": "Aktueller Monat",
@@ -522,6 +528,7 @@
             "sub": "Wähle dein Exportformat",
             "csv_desc": "Tabellenkompatibel, bereit für Excel/Sheets",
             "json_desc": "Rohdaten, Entwickler-freundlich, komplettes Backup",
+            "json_job_desc": "Backup nur für diese Beschäftigung und den gewählten Zeitraum",
             "pdf_desc": "HTML herunterladen → öffnen → Strg+P → als PDF speichern",
             "clip_desc": "Als tab-getrennte Tabelle kopieren"
         },

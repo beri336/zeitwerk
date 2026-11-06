@@ -470,12 +470,12 @@ const yearDiff = computed(() =>
 );
 
 const yearGrossLabel = computed(() => {
-  if (!total && !store.grossHourlyRate) return ""
-
   const total = yearEntries.value.reduce(
     (s, e) => s + store.grossEarnedForEntry(e),
     0,
   );
+
+  if (!total && !store.grossHourlyRate) return ""
 
   return new Intl.NumberFormat(locale.value === "de" ? "de-DE" : "en-GB", {
     style: "currency",
