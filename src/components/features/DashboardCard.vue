@@ -2,12 +2,18 @@
 
 <template>
   <main class="main">
+    <nav class="dash-nav" :aria-label="$t('dashboard.jump.label')">
+      <button v-for="item in jumpItems" :key="item.id" type="button" class="dash-nav__item"
+        :class="{ 'dash-nav__item--active': activeJump === item.id }" @click="jumpTo(item.id)">
+        {{ $t(item.label) }}
+      </button>
+    </nav>
 
     <!-- Device Chip -->
     <DeviceChip />
 
     <!-- Today's Summary -->
-    <section class="today-summary" :class="`today-summary--${store.liveStatus}`">
+    <section id="dash-today" data-dash-section class="today-summary" :class="`today-summary--${store.liveStatus}`">
       <div class="corner-frame" aria-hidden="true"></div>
       <div class="today-summary__header">
         <div>
@@ -60,7 +66,8 @@
     </button>
 
     <!-- Quick Actions -->
-    <section class="quick-actions" :aria-label="$t('dashboard.quick_actions.title')">
+    <section id="dash-actions" data-dash-section class="quick-actions"
+      :aria-label="$t('dashboard.quick_actions.title')">
       <div class="quick-actions__heading">
         <h3>{{ $t("dashboard.quick_actions.title") }}</h3>
         <span>{{ $t("dashboard.quick_actions.subtitle") }}</span>
@@ -106,90 +113,129 @@
     <!-- Absence Legend -->
     <AbsenceLegend />
 
-    <!-- ── Week Overview ── -->
-    <h3>{{ $t("dashboard.week.title") }}</h3>
-    <section class="kpi-section">
+    <section id="dash-week" data-dash-section class="kpi-section">
       <div class="corner-frame" aria-hidden="true"></div>
-      <div class="kpi-grid">
-        <KpiCard :label="$t('dashboard.week.actual')" :value="formatHours(currentWeekActual)"
-          :sub="`${$t('common.planned')}: ${formatHours(currentWeekPlanned)}`"
-          :variant="currentWeekDiff >= 0 ? 'ok' : 'err'" />
-        <KpiCard :label="$t('dashboard.week.diff')"
-          :value="`${currentWeekDiff >= 0 ? '+' : ''}${formatHours(currentWeekDiff)}`"
-          :sub="currentWeekDiff >= 0 ? $t('dashboard.month.overtime') : $t('dashboard.month.missed-hours')"
-          :variant="currentWeekDiff >= 0 ? 'ok' : 'err'" />
-        <KpiCard :label="$t('common.entries')" :value="String(currentWeekEntries.length)"
-          :sub="$t('dashboard.month.work_days')" />
-        <KpiCard :label="$t('dashboard.week.days')" :value="String(currentWeekActiveDays)"
-          :sub="$t('dashboard.month.active_sub')" />
+      <header class="section-head">
+        <h3>{{ $t("dashboard.week.title") }}</h3>
+        <RouterLink class="section-link" to="/overview/week">{{ $t("dashboard.open_overview") }}</RouterLink>
+      </header>
+
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.time") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard :label="$t('dashboard.week.actual')" :value="formatHours(currentWeekActual)"
+            :sub="`${$t('common.planned')}: ${formatHours(currentWeekPlanned)}`"
+            :variant="currentWeekDiff >= 0 ? 'ok' : 'err'" />
+          <KpiCard :label="$t('dashboard.week.diff')"
+            :value="`${currentWeekDiff >= 0 ? '+' : ''}${formatHours(currentWeekDiff)}`"
+            :sub="currentWeekDiff >= 0 ? $t('dashboard.month.overtime') : $t('dashboard.month.missed-hours')"
+            :variant="currentWeekDiff >= 0 ? 'ok' : 'err'" />
+          <KpiCard :label="$t('common.entries')" :value="String(currentWeekEntries.length)"
+            :sub="$t('dashboard.month.work_days')" />
+          <KpiCard :label="$t('dashboard.week.days')" :value="String(currentWeekActiveDays)"
+            :sub="$t('dashboard.month.active_sub')" />
+          <KpiCard :label="$t('dashboard.week.homeoffice_quote')" :value="`${weekHomeofficeQuote}%`" />
+          <KpiCard :label="$t('dashboard.week.comparison')"
+            :value="`${weekComparison >= 0 ? '+' : ''}${formatHours(weekComparison)}`"
+            :sub="$t('dashboard.week.comparison_sub')" :variant="weekComparison >= 0 ? 'ok' : 'err'" />
+        </div>
+      </div>
+
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.absence") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard v-for="type in absenceTypes" :key="type" :label="absenceLabel(type)"
+            :value="String(weekTypeCounts[type])" />
+        </div>
       </div>
     </section>
 
-    <!-- ── Month Overview ── -->
-    <h3>{{ $t("dashboard.month.title") }}</h3>
-    <section class="kpi-section">
+    <!-- Month Overview -->
+    <section id="dash-month" data-dash-section class="kpi-section">
       <div class="corner-frame" aria-hidden="true"></div>
-      <div class="kpi-grid">
-        <KpiCard :label="$t('dashboard.month.actual')" :value="formatHours(store.monthActual)"
-          :sub="`${$t('common.planned')}: ${formatHours(store.monthPlanned)}`" :variant="monthActualVariant" />
+      <header class="section-head">
+        <h3>{{ $t("dashboard.month.title") }}</h3>
+        <RouterLink class="section-link" to="/overview/month">{{ $t("dashboard.open_overview") }}</RouterLink>
+      </header>
 
-        <KpiCard :label="$t('dashboard.month.diff')"
-          :value="`${store.monthDiff >= 0 ? '+' : ''}${formatHours(store.monthDiff)}`" :sub="store.monthDiff >= 0
-            ? $t('dashboard.month.overtime')
-            : $t('dashboard.month.missed-hours')
-            " :variant="monthDiffVariant" />
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.time") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard :label="$t('dashboard.month.actual')" :value="formatHours(store.monthActual)"
+            :sub="`${$t('common.planned')}: ${formatHours(store.monthPlanned)}`" :variant="monthActualVariant" />
+          <KpiCard :label="$t('dashboard.month.diff')"
+            :value="`${store.monthDiff >= 0 ? '+' : ''}${formatHours(store.monthDiff)}`" :sub="store.monthDiff >= 0
+              ? $t('dashboard.month.overtime')
+              : $t('dashboard.month.missed-hours')
+              " :variant="monthDiffVariant" />
+          <KpiCard :label="$t('common.entries')" :value="String(store.entriesForMonth.length)"
+            :sub="$t('dashboard.month.work_days')" />
+          <KpiCard :label="$t('dashboard.month.avg_hours')" :value="formatHours(avgPerDay)"
+            :sub="$t('dashboard.month.avg_sub')" />
+          <KpiCard :label="$t('dashboard.month.active_days')" :value="String(activeDays)"
+            :sub="$t('dashboard.month.active_sub')" />
+          <KpiCard :label="$t('dashboard.week.homeoffice_quote')" :value="`${monthHomeofficeQuote}%`" />
+          <KpiCard v-if="longestDay" :label="$t('dashboard.month.longest')"
+            :value="formatHours(calcActualHours(longestDay))" :sub="longestDay.date" />
+        </div>
+      </div>
 
-        <KpiCard :label="$t('dashboard.month.week_actual')" :value="formatHours(currentWeekActual)"
-          :sub="`${$t('common.planned')}: ${formatHours(store.settings.hoursPerWeek)}`" />
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.absence") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard v-for="type in absenceTypes" :key="type" :label="absenceLabel(type)"
+            :value="String(monthTypeCounts[type])" />
+        </div>
+      </div>
 
-        <KpiCard :label="$t('common.entries')" :value="String(store.entriesForMonth.length)"
-          :sub="$t('dashboard.month.work_days')" />
-
-        <KpiCard :label="$t('dashboard.month.avg_hours')" :value="formatHours(avgPerDay)"
-          :sub="$t('dashboard.month.avg_sub')" />
-
-        <KpiCard :label="$t('dashboard.month.active_days')" :value="String(activeDays)"
-          :sub="$t('dashboard.month.active_sub')" />
-
-        <KpiCard :label="$t('dashboard.month.vacation')" :value="String(monthTypeCounts.vacation)" />
-        <KpiCard :label="$t('dashboard.month.sick')" :value="String(monthTypeCounts.sick)" />
-        <KpiCard :label="$t('dashboard.month.homeoffice')" :value="String(monthTypeCounts.homeoffice)" />
-        <KpiCard :label="$t('dashboard.month.office')" :value="String(monthTypeCounts['on-site'])" />
-        <KpiCard :label="$t('dashboard.month.publicholiday')" :value="String(monthTypeCounts.publicholiday)" />
-        <KpiCard :label="$t('dashboard.month.other')" :value="String(monthTypeCounts.other)" />
-
-        <KpiCard v-if="longestDay" :label="$t('dashboard.month.longest')"
-          :value="formatHours(calcActualHours(longestDay))" :sub="longestDay.date" />
-
-        <KpiCard v-if="store.monthGross > 0 || store.grossHourlyRate > 0" :label="$t('dashboard.month.gross')"
-          :value="mask(monthGrossLabel)" :sub="$t('dashboard.month.gross_sub')" variant="ok" :private="true" />
+      <div v-if="store.monthGross > 0 || store.grossHourlyRate > 0" class="kpi-group">
+        <h4>{{ $t("dashboard.groups.pay") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard :label="$t('dashboard.month.gross')" :value="mask(monthGrossLabel)"
+            :sub="$t('dashboard.month.gross_sub')" variant="ok" :private="true" />
+        </div>
       </div>
     </section>
 
-    <!-- ── Year Overview ── -->
-    <h3>{{ $t("dashboard.year.title") }}</h3>
-    <section class="kpi-section" aria-label="Year summary">
+    <!-- Year Overview -->
+    <section id="dash-year" data-dash-section class="kpi-section" :aria-label="$t('dashboard.year.title')">
       <div class="corner-frame" aria-hidden="true"></div>
-      <div class="kpi-grid">
-        <KpiCard :label="$t('dashboard.year.months')" :value="String(yearMonthsWithEntries)" />
-        <KpiCard :label="$t('common.entries')" :value="String(yearEntries.length)" />
-        <KpiCard :label="$t('common.actual')" :value="formatHours(yearActual)" />
-        <KpiCard :label="$t('common.planned')" :value="formatHours(yearPlanned)" />
+      <header class="section-head">
+        <h3>{{ $t("dashboard.year.title") }}</h3>
+        <RouterLink class="section-link" to="/overview/year">{{ $t("dashboard.open_overview") }}</RouterLink>
+      </header>
 
-        <KpiCard :label="$t('dashboard.year.diff')" :value="`${yearDiff >= 0 ? '+' : ''}${formatHours(yearDiff)}`"
-          :sub="yearDiff >= 0 ? $t('dashboard.year.overtime') : $t('dashboard.year.missed-hours')"
-          :variant="yearDiff >= 0 ? 'ok' : 'err'" />
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.time") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard :label="$t('dashboard.year.months')" :value="String(yearMonthsWithEntries)" />
+          <KpiCard :label="$t('common.entries')" :value="String(yearEntries.length)" />
+          <KpiCard :label="$t('common.actual')" :value="formatHours(yearActual)" />
+          <KpiCard :label="$t('common.planned')" :value="formatHours(yearPlanned)" />
+          <KpiCard :label="$t('dashboard.year.diff')" :value="`${yearDiff >= 0 ? '+' : ''}${formatHours(yearDiff)}`"
+            :sub="yearDiff >= 0 ? $t('dashboard.year.overtime') : $t('dashboard.year.missed-hours')"
+            :variant="yearDiff >= 0 ? 'ok' : 'err'" />
+        </div>
+      </div>
 
-        <KpiCard :label="$t('dashboard.year.vacation')" :value="String(yearTypeCounts.vacation)" />
-        <KpiCard :label="$t('dashboard.year.sick')" :value="String(yearTypeCounts.sick)" />
-        <KpiCard :label="$t('dashboard.year.homeoffice')" :value="String(yearTypeCounts.homeoffice)" />
-        <KpiCard :label="$t('dashboard.year.office')" :value="String(yearTypeCounts['on-site'])" />
-        <KpiCard :label="$t('dashboard.year.publicholiday')" :value="String(yearTypeCounts.publicholiday)" />
-        <KpiCard :label="$t('dashboard.year.other')" :value="String(yearTypeCounts.other)" />
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.absence") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard v-for="type in absenceTypes" :key="type" :label="absenceLabel(type)"
+            :value="String(yearTypeCounts[type])" />
+        </div>
+      </div>
 
-        <KpiCard v-if="yearGrossLabel" :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
-          :sub="$t('dashboard.year.gross_sub')" variant="ok" :private="true" />
+      <div v-if="yearGrossLabel" class="kpi-group">
+        <h4>{{ $t("dashboard.groups.pay") }}</h4>
+        <div class="kpi-grid">
+          <KpiCard :label="$t('dashboard.year.gross')" :value="mask(yearGrossLabel)"
+            :sub="$t('dashboard.year.gross_sub')" variant="ok" :private="true" />
+        </div>
+      </div>
 
+      <div class="kpi-group">
+        <h4>{{ $t("dashboard.groups.vacation") }}</h4>
         <div v-for="offer in store.vacationCarryoverOffers" :key="`${offer.employmentId}-${offer.year}`"
           class="carryover">
           <p>{{ carryoverText(offer) }}</p>
@@ -204,7 +250,7 @@
           </div>
         </div>
 
-        <template v-if="store.yearVacationBalances.length < 2">
+        <div v-if="store.yearVacationBalances.length < 2" class="kpi-grid">
           <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(store.usedVacationDays)"
             :sub="$t('dashboard.year.vac_used_sub')" />
 
@@ -214,27 +260,20 @@
           <KpiCard v-if="store.extraVacationAllowance > 0" :label="$t('dashboard.year.vac_extra')"
             :value="String(store.remainingExtraVacationDays)"
             :sub="$t('dashboard.year.vac_extra_sub', { total: store.extraVacationAllowance })" />
-        </template>
+        </div>
 
         <div v-else class="vacation-by-job">
           <section v-for="job in store.yearVacationBalances" :key="job.id" class="vacation-job">
             <h4 class="vacation-job__title">{{ job.name || $t("settings.employments.untitled") }}</h4>
-            <div class="vacation-job__stats">
-              <KpiCard :label="$t('dashboard.year.vac_used')" :value="String(job.used)"
-                :sub="$t('dashboard.year.vac_used_sub')" />
-              <KpiCard :label="$t('dashboard.year.vac_left')" :value="String(job.remaining)"
-                :sub="vacationLeftText(job)" />
-              <KpiCard :label="$t('dashboard.year.vac_extra')" :value="String(job.remainingExtra)" :sub="job.extra > 0
-                ? $t('dashboard.year.vac_extra_sub', { total: job.extra })
-                : $t('dashboard.year.vac_extra_none')" />
-            </div>
           </section>
         </div>
       </div>
     </section>
 
     <!-- Month Table -->
-    <MonthTable @edit="openEdit" />
+    <div id="dash-entries" data-dash-section>
+      <MonthTable @edit="openEdit" />
+    </div>
 
     <!-- Modals to add entries -->
     <EntryModal v-model="showModal" :edit-entry="editEntry" />
@@ -307,6 +346,27 @@ function vacationLeftText(job) {
 
 const nowTick = ref(Date.now());
 let todayTimer = null;
+
+let jumpObserver = null;
+const activeJump = ref("dash-today");
+const jumpItems = [
+  { id: "dash-today", label: "dashboard.jump.today" },
+  { id: "dash-actions", label: "dashboard.jump.actions" },
+  { id: "dash-week", label: "dashboard.jump.week" },
+  { id: "dash-month", label: "dashboard.jump.month" },
+  { id: "dash-year", label: "dashboard.jump.year" },
+  { id: "dash-entries", label: "dashboard.jump.entries" },
+];
+const absenceTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
+
+function absenceLabel(type) {
+  return type === "on-site" ? t("dashboard.month.office") : t(`dashboard.month.${type}`);
+}
+
+function jumpTo(id) {
+  activeJump.value = id;
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 const todayWorkedHours = computed(() => {
   const entry = store.todayEntry;
@@ -383,33 +443,82 @@ onMounted(() => {
   todayTimer = window.setInterval(() => {
     nowTick.value = Date.now();
   }, 1_000);
+
+  jumpObserver = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+    if (visible?.target?.id) activeJump.value = visible.target.id;
+  }, {
+    root: document.querySelector(".app-content"),
+    rootMargin: "-15% 0px -55% 0px",
+    threshold: [0.2, 0.45],
+  });
+  document.querySelectorAll("[data-dash-section]").forEach((section) => jumpObserver.observe(section));
 });
 
 onUnmounted(() => {
   if (todayTimer) window.clearInterval(todayTimer);
+  jumpObserver?.disconnect();
 });
 
 // Month KPIs
-const currentWeekEntries = computed(() => {
-  const now = new Date();
-  const day = now.getDay();
-  const monday = new Date(now);
+function startOfWeek(date) {
+  const monday = new Date(date);
   monday.setHours(0, 0, 0, 0);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  const nextMonday = new Date(monday);
-  nextMonday.setDate(monday.getDate() + 7);
+  const day = monday.getDay();
+  monday.setDate(monday.getDate() - (day === 0 ? 6 : day - 1));
 
+  return monday;
+}
+
+function entriesBetween(start, end) {
   return store.entries.filter((entry) => {
     const date = new Date(`${entry.date}T00:00:00`);
-    return date >= monday && date < nextMonday;
+    return date >= start && date < end;
   });
+}
+
+function weekDiff(entries) {
+  const actual = entries.reduce((total, entry) => total + store.effectiveActualHours(entry), 0);
+  const planned = entries.reduce(
+    (total, entry) => total + (entry.plannedHours ?? store.settings.hoursPerDay),
+    0,
+  );
+  return actual - planned;
+}
+
+function homeofficeQuote(entries) {
+  const workplace = entries.filter((entry) => ["homeoffice", "on-site"].includes(entry.typ));
+  if (!workplace.length) return 0;
+  return Math.round(
+    (workplace.filter((entry) => entry.typ === "homeoffice").length / workplace.length) * 100,
+  );
+}
+
+const currentWeekRange = computed(() => {
+  const monday = startOfWeek(new Date());
+  const nextMonday = new Date(monday);
+  nextMonday.setDate(monday.getDate() + 7);
+  return { monday, nextMonday };
 });
+
+const currentWeekEntries = computed(() =>
+  entriesBetween(currentWeekRange.value.monday, currentWeekRange.value.nextMonday),
+);
+const previousWeekEntries = computed(() => {
+  const start = new Date(currentWeekRange.value.monday);
+  start.setDate(start.getDate() - 7);
+  return entriesBetween(start, currentWeekRange.value.monday);
+});
+
 const currentWeekActual = computed(() =>
   currentWeekEntries.value.reduce(
     (total, entry) => total + store.effectiveActualHours(entry),
     0,
   ),
 );
+
 const currentWeekPlanned = computed(() =>
   currentWeekEntries.value.reduce(
     (total, entry) =>
@@ -417,15 +526,33 @@ const currentWeekPlanned = computed(() =>
     0,
   ),
 );
+
 const currentWeekDiff = computed(
   () => currentWeekActual.value - currentWeekPlanned.value,
 );
+
 const currentWeekActiveDays = computed(
   () =>
     currentWeekEntries.value.filter(
       (entry) => store.effectiveActualHours(entry) > 0,
     ).length,
 );
+
+const weekComparison = computed(
+  () => weekDiff(currentWeekEntries.value) - weekDiff(previousWeekEntries.value),
+);
+
+const weekHomeofficeQuote = computed(() => homeofficeQuote(currentWeekEntries.value));
+const monthHomeofficeQuote = computed(() => homeofficeQuote(store.entriesForMonth));
+
+const weekTypeCounts = computed(() => ({
+  vacation: countByType(currentWeekEntries.value, "vacation"),
+  sick: countByType(currentWeekEntries.value, "sick"),
+  homeoffice: countByType(currentWeekEntries.value, "homeoffice"),
+  "on-site": countByType(currentWeekEntries.value, "on-site"),
+  publicholiday: countByType(currentWeekEntries.value, "publicholiday"),
+  other: countByType(currentWeekEntries.value, "other"),
+}));
 
 const monthDiffVariant = computed(() => {
   if (store.monthDiff > 0.25) return "ok";
@@ -602,6 +729,93 @@ function openToday() {
   opacity: 0.6;
 }
 
+.dash-nav {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  overflow-x: auto;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.dash-nav__item {
+  flex: 1 0 auto;
+  min-width: 76px;
+  padding: 0.45rem 0.75rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dash-nav__item:hover {
+  color: var(--color-text);
+}
+
+.dash-nav__item--active {
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-dash-section] {
+  scroll-margin-top: 64px;
+}
+
+.section-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.section-head h3 {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-head h3::after {
+  content: none;
+}
+
+.section-link {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+.kpi-group+.kpi-group {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+
+.kpi-group>h4 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
 .carryover {
   grid-column: 1 / -1;
   display: flex;
@@ -645,7 +859,6 @@ function openToday() {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-4);
 }
-
 
 .today-summary {
   position: relative;
@@ -948,6 +1161,11 @@ quick-action__icon:hover {
   background: color-mix(in oklch,
       var(--color-primary, #6366f1) 3%,
       transparent);
+}
+
+.kpi-section>*:not(.corner-frame) {
+  position: relative;
+  z-index: 1;
 }
 
 .corner-frame {

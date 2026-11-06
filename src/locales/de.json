@@ -681,6 +681,22 @@
     "dashboard": {
         "title": "Dashboard",
         "btn-add-entry": "Neuen Eintrag hinzufügen",
+        "open_overview": "In der Übersicht öffnen",
+        "jump": {
+            "label": "Bereiche",
+            "today": "Heute",
+            "actions": "Aktionen",
+            "week": "Woche",
+            "month": "Monat",
+            "year": "Jahr",
+            "entries": "Einträge"
+        },
+        "groups": {
+            "time": "Stunden",
+            "absence": "Abwesenheiten",
+            "pay": "Gehalt",
+            "vacation": "Urlaub"
+        },
         "today": {
             "eyebrow": "Heute",
             "title": "Tagesübersicht",
@@ -697,7 +713,10 @@
             "title": "Wochenübersicht",
             "actual": "Istzeit Woche",
             "diff": "Differenz Woche",
-            "days": "Aktive Tage"
+            "days": "Aktive Tage",
+            "homeoffice_quote": "Homeoffice-Quote",
+            "comparison": "Gegen Vorwoche",
+            "comparison_sub": "Veränderung der Differenz"
         },
         "quick_actions": {
             "title": "Schnellaktionen",

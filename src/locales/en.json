@@ -717,6 +717,22 @@
     "dashboard": {
         "title": "Dashboard",
         "btn-add-entry": "Add new Entry",
+        "open_overview": "Open in overview",
+        "jump": {
+            "label": "Sections",
+            "today": "Today",
+            "actions": "Actions",
+            "week": "Week",
+            "month": "Month",
+            "year": "Year",
+            "entries": "Entries"
+        },
+        "groups": {
+            "time": "Hours",
+            "absence": "Absences",
+            "pay": "Salary",
+            "vacation": "Vacation"
+        },
         "today": {
             "eyebrow": "Today",
             "title": "Today's summary",
@@ -733,7 +749,10 @@
             "title": "Week Overview",
             "actual": "Week Actual",
             "diff": "Week Difference",
-            "days": "Active Days"
+            "days": "Active Days",
+            "homeoffice_quote": "Home office share",
+            "comparison": "Vs. previous week",
+            "comparison_sub": "Change in the difference"
         },
         "quick_actions": {
             "title": "Quick actions",
