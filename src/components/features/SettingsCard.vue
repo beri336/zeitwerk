@@ -14,7 +14,7 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_day")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="12" v-model.number="form.hoursPerDay" />
             <span class="form-hint">{{ $t("settings.hints.hours_day") }}</span>
           </div>
@@ -23,7 +23,7 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_week")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="60" v-model.number="form.hoursPerWeek" />
             <span class="form-hint">{{ $t("settings.hints.hours_week") }}</span>
           </div>
@@ -32,18 +32,18 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.default_break")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="5" min="0" max="120" v-model.number="form.defaultBreak" />
             <span class="form-hint">{{
               $t("settings.hints.default_break")
-              }}</span>
+            }}</span>
           </div>
 
           <!-- Working days per week -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.work_days")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="1" min="1" max="7" v-model.number="form.workDays" />
             <span class="form-hint">{{ $t("settings.hints.work_days") }}</span>
           </div>
@@ -73,17 +73,56 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.vacation_days")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="1" min="0" max="365"
               v-model.number="form.vacationDaysPerYear" />
             <span class="form-hint">{{
               $t("settings.hints.vacation_days")
-              }}</span>
+            }}</span>
           </div>
+
+          <!-- Extra Vacation Days -->
+          <div class="form-group">
+            <label class="form-label">{{
+              $t("settings.fields.extra_vacation_days")
+            }}</label>
+            <input class="form-input" type="number" step="1" min="0" max="365"
+              v-model.number="form.extraVacationDays" />
+            <span class="form-hint">{{
+              $t("settings.hints.extra_vacation_days")
+            }}</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{
+              $t("settings.fields.extra_vacation_deadline")
+            }}</label>
+            <input class="form-input" type="date" v-model="form.extraVacationDeadline" />
+            <span class="form-hint">{{
+              $t("settings.hints.extra_vacation_deadline")
+            }}</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">{{
+              $t("settings.fields.extra_vacation_notice")
+            }}</label>
+            <input class="form-input" type="number" step="1" min="0" max="365"
+              v-model.number="form.extraVacationNoticeDays" />
+            <span class="form-hint">{{
+              $t("settings.hints.extra_vacation_notice")
+            }}</span>
+          </div>
+
+          <div v-if="extraVacationBalance" class="form-group full">
+            <span class="form-hint">{{ extraVacationBalance }}</span>
+          </div>
+
+          <!-- Salary -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.gross_salary")
-              }}</label>
+            }}</label>
 
             <!-- Normal input — only if privacy is OFF -->
             <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
@@ -94,30 +133,30 @@
 
             <span class="form-hint">{{
               $t("settings.hints.gross_salary")
-              }}</span>
+            }}</span>
             <span class="form-hint">{{
               $t("settings.hints.gross_salary_sub")
-              }}</span>
+            }}</span>
           </div>
 
           <!-- SettingsCard Template -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.autostop")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.maxWorkHours" />
             <span class="form-hint">{{ $t("settings.hints.autostop") }}</span>
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.overtime_warn")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.warnWorkHours" />
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.inactivity")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="5" min="5" max="120"
               v-model.number="form.inactivityMinutes" />
             <span class="form-hint">{{ $t("settings.hints.inactivity") }}</span>
@@ -127,7 +166,7 @@
           <div class="form-group full" v-if="previewGrossHourlyRate > 0">
             <label class="form-label">{{
               $t("settings.fields.preview")
-              }}</label>
+            }}</label>
             <div class="salary-preview">
               <span>{{
                 $t("settings.preview_hourly", {
@@ -157,14 +196,14 @@
         </div>
 
         <section class="shortcut-settings" aria-labelledby="shortcut-settings-title">
-            <div class="privacy-label" id="shortcut-settings-title">{{ $t("shortcuts.settings_title") }}</div>
-            <div class="privacy-hint">{{ $t("shortcuts.settings_subtitle") }}</div>
-            <div class="shortcut-settings-list">
-              <div v-for="shortcut in shortcutList" :key="shortcut.key" class="shortcut-settings-row">
-                <span>{{ $t(shortcut.label) }}</span>
-                <kbd>{{ shortcut.key }}</kbd>
-              </div>
+          <div class="privacy-label" id="shortcut-settings-title">{{ $t("shortcuts.settings_title") }}</div>
+          <div class="privacy-hint">{{ $t("shortcuts.settings_subtitle") }}</div>
+          <div class="shortcut-settings-list">
+            <div v-for="shortcut in shortcutList" :key="shortcut.key" class="shortcut-settings-row">
+              <span>{{ $t(shortcut.label) }}</span>
+              <kbd>{{ shortcut.key }}</kbd>
             </div>
+          </div>
         </section>
 
         <div class="recovery-settings">
@@ -173,14 +212,9 @@
               <div class="privacy-label">{{ $t("settings.recovery.title") }}</div>
               <div class="privacy-hint">{{ $t("settings.recovery.sub") }}</div>
             </div>
-            <button
-              class="toggle-switch"
-              :class="{ active: form.recoveryEnabled }"
-              @click="form.recoveryEnabled = !form.recoveryEnabled"
-              role="switch"
-              :aria-checked="form.recoveryEnabled"
-              :aria-label="$t('settings.recovery.toggle')"
-            >
+            <button class="toggle-switch" :class="{ active: form.recoveryEnabled }"
+              @click="form.recoveryEnabled = !form.recoveryEnabled" role="switch" :aria-checked="form.recoveryEnabled"
+              :aria-label="$t('settings.recovery.toggle')">
               <span class="toggle-thumb" />
             </button>
           </div>
@@ -255,8 +289,8 @@
 
           <!-- Toggle for privacy mode -->
           <button class="toggle-switch" :class="{ active: privacyMode }" @click="toggle" :aria-label="privacyMode
-              ? $t('settings.privacy.disable')
-              : $t('settings.privacy.enable')
+            ? $t('settings.privacy.disable')
+            : $t('settings.privacy.enable')
             " role="switch" :aria-checked="privacyMode">
             <span class="toggle-thumb" />
           </button>
@@ -431,6 +465,9 @@ function reset() {
     grossHourlyRate: 0,
     grossMonthlySalary: 0,
     vacationDaysPerYear: 30,
+    extraVacationDays: 0,
+    extraVacationDeadline: "",
+    extraVacationNoticeDays: 30,
     maxWorkHours: 9,
     warnWorkHours: 8,
     inactivityMinutes: 30,
@@ -526,6 +563,17 @@ function confirmDeleteAll() {
 
 // calculate gross locally
 // Stundenlohn: Monatslohn / 4 Wochen / workDays / hoursPerDay
+const extraVacationBalance = computed(() => {
+  const total = store.extraVacationAllowance;
+  if (total <= 0) return "";
+
+  return t("settings.hints.extra_vacation_balance", {
+    remaining: store.remainingExtraVacationDays,
+    total,
+    regular: store.remainingRegularVacationDays,
+  });
+});
+
 const previewGrossHourlyRate = computed(() => {
   const monthly = Number(form.grossMonthlySalary || 0);
   const workDays = Number(form.workDays || 5);

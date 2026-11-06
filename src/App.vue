@@ -26,9 +26,11 @@ import ToastList from '@/components/ui/ToastList.vue'
 import PwaStatusBanner from '@/components/ui/PwaStatusBanner.vue'
 import ShortcutHelp from '@/components/ui/ShortcutHelp.vue'
 import { useAutoRecovery } from '@/composables/useRecovery'
+import { useExtraVacationNotice } from '@/composables/useExtraVacationNotice'
 
 const isDark = ref(false)
 useAutoRecovery()
+useExtraVacationNotice()
 
 onMounted(() => {
   localStorage.removeItem('habits')

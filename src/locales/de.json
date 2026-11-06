@@ -152,6 +152,12 @@
             "label": "Inaktivitäts-Auto­pause",
             "hint": "Benachrichtigen, wenn der Timer wegen Inaktivität pausiert"
         },
+        "extra_vacation": {
+            "title": "Zusätzliche Urlaubstage",
+            "upcoming": "Noch {remaining} zusätzliche Urlaubstage. Nimm sie bis {date} — noch {days} Tage.",
+            "today": "Heute ist der letzte Tag für noch {remaining} zusätzliche Urlaubstage.",
+            "overdue": "Die Frist für noch {remaining} zusätzliche Urlaubstage war am {date}."
+        },
         "howto": {
             "chrome": {
                 "name": "Chrome / Edge",
@@ -357,6 +363,9 @@
             "state": "Bundesland",
             "default_workplace": "Standard-Arbeitsort",
             "vacation_days": "Urlaubstage / Jahr",
+            "extra_vacation_days": "Zusätzliche Urlaubstage",
+            "extra_vacation_deadline": "Zusatzurlaub nehmen bis",
+            "extra_vacation_notice": "Hinweis vorher (Tage)",
             "gross_salary": "Bruttogehalt pro Monat",
             "autostop": "Auto-Stopp nach (h)",
             "overtime_warn": "Überstundenwarnung nach (h)",
@@ -372,6 +381,10 @@
             "state": "Für automatische Feiertagserkennung",
             "default_workplace": "Wird auf neue Einträge angewendet",
             "vacation_days": "z.B. 30 für 30 Urlaubstage/Jahr",
+            "extra_vacation_days": "z.B. 4, wenn aus dem Vorjahr noch 4 Tage übrig sind. Standard 0. Wird vor dem Jahresurlaub verbraucht.",
+            "extra_vacation_deadline": "Bis zu diesem Datum müssen die zusätzlichen Tage genommen sein.",
+            "extra_vacation_notice": "z.B. 30 für eine Benachrichtigung etwa einen Monat vorher",
+            "extra_vacation_balance": "Zuerst werden die zusätzlichen Tage verbraucht: noch {remaining} von {total}. Regulär bleiben danach {regular}.",
             "gross_salary": "z.B. 3000 für 3000 €/Monat",
             "gross_salary_sub": "Wird zur Berechnung des brutto Stunden- und Tagessatzes verwendet",
             "autostop": "Arbeitssitzung stoppt automatisch",
@@ -680,7 +693,10 @@
             "vac_left": "Verbleibender Urlaub",
             "vac_day_left_sub": "Verbleibender Tag",
             "vac_days_left_sub": "Verbleibende Tage",
-            "vac_used_sub": "Genommene Tage"
+            "vac_used_sub": "Genommene Tage",
+            "vac_left_extra_sub": "davon {extra} zusätzliche",
+            "vac_extra": "Zusatzurlaub übrig",
+            "vac_extra_sub": "von {total}, wird zuerst verbraucht"
         }
     }
 }

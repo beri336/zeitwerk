@@ -152,6 +152,12 @@
             "label": "Inactivity Auto-Pause",
             "hint": "Notify when timer is paused due to inactivity"
         },
+        "extra_vacation": {
+            "title": "Extra vacation days",
+            "upcoming": "{remaining} extra vacation days left. Take them by {date} — {days} days left.",
+            "today": "Today is the last day for {remaining} extra vacation days.",
+            "overdue": "The deadline for {remaining} extra vacation days was {date}."
+        },
         "howto": {
             "chrome": {
                 "name": "Chrome / Edge",
@@ -360,6 +366,9 @@
             "state": "State",
             "default_workplace": "Default workplace",
             "vacation_days": "Vacation Days / Year",
+            "extra_vacation_days": "Extra vacation days",
+            "extra_vacation_deadline": "Take extra vacation by",
+            "extra_vacation_notice": "Remind beforehand (days)",
             "gross_salary": "Gross Monthly Salary",
             "autostop": "Auto-stop after (h)",
             "overtime_warn": "Overtime warning after (h)",
@@ -371,10 +380,14 @@
             "hours_day": "e.g., 8 for 8h/Day",
             "hours_week": "e.g., 40 for 40h/Week",
             "default_break": "Will be automatically entered",
-            "work_days": "e.g., 5 for Mon–Fri",
+            "work_days": "e.g., 5 for Mon-Fri",
             "state": "For automatic holiday detection",
             "default_workplace": "Applied to new entries",
             "vacation_days": "e.g., 30 for 30 vacation days/year",
+            "extra_vacation_days": "e.g. 4 if 4 days were left from last year. Default 0. Used before the yearly allowance.",
+            "extra_vacation_deadline": "The extra days must be taken by this date.",
+            "extra_vacation_notice": "e.g. 30 for a reminder about one month before",
+            "extra_vacation_balance": "Extra days are used first: {remaining} of {total} left. {regular} regular days remain after that.",
             "gross_salary": "e.g., 3000 for 3000€/Month",
             "gross_salary_sub": "Used to calculate gross hourly and daily earnings",
             "autostop": "Work session stops automatically",
@@ -717,7 +730,10 @@
             "vac_left": "Remaining Vacation",
             "vac_day_left_sub": "Day left",
             "vac_days_left_sub": "Days left",
-            "vac_used_sub": "Days taken"
+            "vac_used_sub": "Days taken",
+            "vac_left_extra_sub": "incl. {extra} extra",
+            "vac_extra": "Extra vacation left",
+            "vac_extra_sub": "of {total}, used first"
         }
     }
 }

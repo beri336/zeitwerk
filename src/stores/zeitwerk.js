@@ -25,6 +25,9 @@ const DEFAULT_SETTINGS = {
     state: 'BW',
     grossMonthlySalary: 0,
     vacationDaysPerYear: 30,
+    extraVacationDays: 0,
+    extraVacationDeadline: '',
+    extraVacationNoticeDays: 30,
 }
 
 function loadStorage() {
@@ -90,21 +93,44 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     const currMonth = ref(new Date().getMonth()) // 0-indexed
 
     // count vacations per year
-    const vacationEntriesForYear = computed(() =>
-        entries.value.filter(entry => {
-            const date = new Date(entry.date + 'T00:00:00')
-            return date.getFullYear() === currYear.value && entry.typ === 'vacation'
-        })
+    function isVacationInYear(entry, year) {
+        if (entry?.typ !== 'vacation' || !entry.date)
+            return false
+
+        const raw = String(entry.date)
+        const date = new Date(raw.includes('T') ? raw : `${raw}T00:00:00`)
+        return date.getFullYear() === year
+    }
+
+    function countVacationDays(year) {
+        return entries.value.filter(entry => isVacationInYear(entry, year)).length
+    }
+
+    const usedVacationDays = computed(() => countVacationDays(currYear.value))
+
+    const yearlyVacationAllowance = computed(() => {
+        const raw = Number(settings.value.vacationDaysPerYear)
+        return Number.isFinite(raw) ? Math.max(0, raw) : 30
+    })
+
+    // Carry-over days are spent before the regular yearly allowance.
+    const extraVacationAllowance = computed(() => {
+        const raw = Number(settings.value.extraVacationDays)
+        return Number.isFinite(raw) ? Math.max(0, raw) : 0
+    })
+
+    const remainingExtraVacationDays = computed(() =>
+        Math.max(0, extraVacationAllowance.value - usedVacationDays.value)
     )
 
-    const usedVacationDays = computed(() => vacationEntriesForYear.value.length)
-
-    const remainingVacationDays = computed(() => {
-        const raw = Number(settings.value.vacationDaysPerYear)
-        const total = Number.isFinite(raw) ? raw : 30
-
-        return Math.max(0, total - usedVacationDays.value)
+    const remainingRegularVacationDays = computed(() => {
+        const usedRegular = Math.max(0, usedVacationDays.value - extraVacationAllowance.value)
+        return Math.max(0, yearlyVacationAllowance.value - usedRegular)
     })
+
+    const remainingVacationDays = computed(() =>
+        remainingExtraVacationDays.value + remainingRegularVacationDays.value
+    )
 
     // Persist
     function persist() {
@@ -807,5 +833,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         deleteAllEntries,
         monthGross, weekGrossGroups,
         usedVacationDays, remainingVacationDays,
+        extraVacationAllowance, remainingExtraVacationDays, remainingRegularVacationDays,
+        countVacationDays,
     }
 })

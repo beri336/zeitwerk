@@ -51,8 +51,8 @@
       </div>
     </section>
 
-    <button class="dashboard-add-btn" type="button" @click="openAdd"
-      :aria-label="$t('dashboard.btn-add-entry')" :title="$t('dashboard.btn-add-entry')">
+    <button class="dashboard-add-btn" type="button" @click="openAdd" :aria-label="$t('dashboard.btn-add-entry')"
+      :title="$t('dashboard.btn-add-entry')">
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round">
         <path d="M12 5v14M5 12h14" />
@@ -194,7 +194,11 @@
           :sub="$t('dashboard.year.vac_used_sub')" />
 
         <KpiCard :label="$t('dashboard.year.vac_left')" :value="String(store.remainingVacationDays)"
-          :sub="store.remainingVacationDays === 1 ? $t('dashboard.year.vac_day_left_sub') : $t('dashboard.year.vac_days_left_sub')" />
+          :sub="vacationLeftSub" />
+
+        <KpiCard v-if="store.extraVacationAllowance > 0" :label="$t('dashboard.year.vac_extra')"
+          :value="String(store.remainingExtraVacationDays)"
+          :sub="$t('dashboard.year.vac_extra_sub', { total: store.extraVacationAllowance })" />
       </div>
     </section>
 
@@ -227,10 +231,22 @@ import HolidayImportModal from "@/components/HolidayImportModal.vue";
 import DeviceChip from "@/components/ui/DeviceChip.vue";
 
 const { t, locale } = useI18n();
+
 const store = useZeitwerkStore();
 const router = useRouter();
 const { mask } = usePrivacy();
 const { showToast } = useToast();
+
+const vacationLeftSub = computed(() => {
+  const extraLeft = store.remainingExtraVacationDays;
+  if (extraLeft > 0)
+    return t("dashboard.year.vac_left_extra_sub", { extra: extraLeft });
+
+  return store.remainingVacationDays === 1
+    ? t("dashboard.year.vac_day_left_sub")
+    : t("dashboard.year.vac_days_left_sub");
+});
+
 const nowTick = ref(Date.now());
 let todayTimer = null;
 
@@ -781,6 +797,7 @@ function openToday() {
   width: 16px;
   height: 16px;
 }
+
 /* 
 .quick-action__label:hover {
   color: var(--color-primary);
