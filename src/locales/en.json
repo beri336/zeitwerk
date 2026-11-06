@@ -18,13 +18,13 @@
         "empty_sub": "Add your first time entry.",
         "col_date": "Date",
         "col_time_entries": "Time Entries",
-        "col_pauses": "Pauses",
+        "col_pauses": "Breaks",
         "col_actual_day": "Actual (Day)",
         "col_planned_day": "Planned (Day)",
         "col_notes": "Notes",
         "col_actions": "Actions",
         "pauses_value": "{minutes} min",
-        "week_total": "KW {week} · Week total",
+        "week_total": "CW {week} · Week total",
         "month_total": "Month total",
         "toast_deleted": "Entry deleted."
     },
@@ -271,7 +271,7 @@
         "comparison_hint": "Previous period: {value} overtime"
     },
     "todos": {
-        "title": "To-Do's Overview",
+        "title": "To-Do Overview",
         "add_btn": "Add new To-Do",
         "add_subtask": "Add Subtask",
         "badge_pending": "{count} pending",
@@ -304,7 +304,7 @@
         },
         "priority": {
             "low": "Low",
-            "middle": "Middle",
+            "middle": "Medium",
             "high": "High"
         },
         "empty": {
@@ -345,8 +345,7 @@
                 "monthly": "Monthly"
             },
             "restore": "Restore",
-            "export": "Data management",
-            "data": "Data management",
+            "export": "Export",
             "delete": "Delete",
             "confirm_restore": "Restore this recovery backup? Your current data will be backed up first.",
             "summary": "{entries} entries · {events} events · {todos} to-dos · {size}",
@@ -563,7 +562,7 @@
         "this_year": "This Year",
         "empty_title": "No data for {month}",
         "empty_sub": "Add entries for this month to see your charts.",
-        "gross_hint_pre": "Set your 'Gross Monthly Salary (Brutto)' in the",
+        "gross_hint_pre": "Set your gross monthly salary in the",
         "gross_hint_post": "to see earnings charts.",
         "days": "Days"
     },

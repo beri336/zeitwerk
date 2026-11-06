@@ -550,7 +550,7 @@
         "tags": "Tags",
         "entries_count": "{count} Einträge",
         "import": "Import",
-        "export": "Datenverwaltung",
+        "export": "Exportieren",
         "data": "Datenverwaltung",
         "delete_confirm_yes": "Ja, löschen",
         "add": "Hinzufügen",
