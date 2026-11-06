@@ -104,8 +104,42 @@ function parseDevice() {
         isMobile,
         isTablet,
         language: navigator.language ?? 'unknown',
+        languages: (navigator.languages ?? [navigator.language]).filter(Boolean).join(', '),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+        utcOffset: formatUtcOffset(),
+        viewportW: window.innerWidth,
+        viewportH: window.innerHeight,
+        colorDepth: window.screen.colorDepth || null,
+        platform: navigator.userAgentData?.platform || navigator.platform || '',
+        touchPoints: navigator.maxTouchPoints || 0,
+        cookieEnabled: navigator.cookieEnabled,
+        connection: readConnection(),
+        userAgent: ua,
         deviceMemory: navigator.deviceMemory ?? null,
         cpuCores: navigator.hardwareConcurrency ?? null,
+    }
+}
+
+function formatUtcOffset() {
+    const minutes = -new Date().getTimezoneOffset()
+    const sign = minutes >= 0 ? '+' : '-'
+    const absolute = Math.abs(minutes)
+    const hours = String(Math.floor(absolute / 60)).padStart(2, '0')
+    const rest = String(absolute % 60).padStart(2, '0')
+
+    return `UTC${sign}${hours}:${rest}`
+}
+
+function readConnection() {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
+    if (!connection)
+        return null
+
+    return {
+        type: connection.effectiveType || '',
+        downlink: Number.isFinite(connection.downlink) ? connection.downlink : null,
+        rtt: Number.isFinite(connection.rtt) ? connection.rtt : null,
+        saveData: Boolean(connection.saveData),
     }
 }
 
@@ -136,6 +170,89 @@ export function useBattery() {
         charging,
         supported,
     }
+}
+
+export function useHostAddresses() {
+    const addresses = ref([])
+    let connection = null
+    let timer = null
+
+    onMounted(() => {
+        if (!window.RTCPeerConnection)
+            return
+
+        const found = new Set()
+        connection = new RTCPeerConnection({ iceServers: [] })
+        connection.createDataChannel('zeitwerk')
+        connection.onicecandidate = (event) => {
+            const candidate = event.candidate?.candidate
+            if (!candidate)
+                return
+
+            const address = candidate.split(' ')[4]
+            if (!address || address === '0.0.0.0' || address === '::')
+                return
+
+            found.add(address)
+            addresses.value = [...found]
+        }
+        connection.createOffer()
+            .then(offer => connection.setLocalDescription(offer))
+            .catch(() => { })
+        timer = window.setTimeout(() => connection?.close(), 2000)
+    })
+
+    onUnmounted(() => {
+        window.clearTimeout(timer)
+        connection?.close()
+    })
+
+    return addresses
+}
+
+export function useClientHints() {
+    const hints = ref(null)
+
+    onMounted(async () => {
+        const data = navigator.userAgentData
+        if (!data?.getHighEntropyValues)
+            return
+
+        try {
+            hints.value = await data.getHighEntropyValues([
+                'architecture',
+                'bitness',
+                'model',
+                'platformVersion',
+                'uaFullVersion',
+            ])
+        } catch {
+            hints.value = null
+        }
+    })
+
+    return hints
+}
+
+export function useStorageEstimate() {
+    const estimate = ref(null)
+
+    onMounted(async () => {
+        if (!navigator.storage?.estimate)
+            return
+
+        try {
+            const result = await navigator.storage.estimate()
+            estimate.value = {
+                usage: result.usage ?? 0,
+                quota: result.quota ?? 0,
+            }
+        } catch {
+            estimate.value = null
+        }
+    })
+
+    return estimate
 }
 
 export function useOnlineStatus() {

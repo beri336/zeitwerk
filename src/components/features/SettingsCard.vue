@@ -11,9 +11,12 @@
 
       <div class="settings-body">
         <!-- Employment -->
-        <section class="employments" aria-labelledby="employments-title">
-          <div class="privacy-label" id="employments-title">{{ $t("settings.employments.title") }}</div>
-          <div class="privacy-hint">{{ $t("settings.employments.sub") }}</div>
+        <section class="settings-block employments" aria-labelledby="employments-title">
+          <header class="settings-block__head">
+            <h2 id="employments-title">{{ $t("settings.employments.title") }}</h2>
+            <p>{{ $t("settings.employments.sub") }}</p>
+          </header>
+
           <div class="employment-list">
             <button v-for="job in orderedEmployments" :key="job.id" type="button" class="employment-item"
               :class="{ active: job.id === selectedEmploymentId }" @click="loadEmployment(job.id)">
@@ -21,6 +24,7 @@
               <span>{{ employmentRange(job) }}</span>
             </button>
           </div>
+
           <div class="employment-actions">
             <button class="btn btn-secondary btn-sm" type="button" @click="addEmployment">
               {{ $t("settings.employments.add") }}
@@ -30,213 +34,267 @@
               {{ $t("settings.employments.remove") }}
             </button>
           </div>
+
+          <!-- Settings -->
+          <div class="form-grid">
+            <!-- Employment Details -->
+            <div class="form-group">
+              <label class="form-label">{{ $t("settings.employments.name") }}</label>
+              <input class="form-input" type="text" maxlength="80" v-model="form.employmentName" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t("settings.employments.start") }}</label>
+              <input class="form-input" type="date" v-model="form.employmentStart" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t("settings.employments.end") }}</label>
+              <input class="form-input" type="date" v-model="form.employmentEnd" />
+              <span class="form-hint">{{ $t("settings.employments.end_hint") }}</span>
+            </div>
+          </div>
         </section>
 
-        <!-- Settings -->
-        <div class="form-grid">
-          <!-- Employment Details -->
-          <div class="form-group">
-            <label class="form-label">{{ $t("settings.employments.name") }}</label>
-            <input class="form-input" type="text" maxlength="80" v-model="form.employmentName" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ $t("settings.employments.start") }}</label>
-            <input class="form-input" type="date" v-model="form.employmentStart" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ $t("settings.employments.end") }}</label>
-            <input class="form-input" type="date" v-model="form.employmentEnd" />
-            <span class="form-hint">{{ $t("settings.employments.end_hint") }}</span>
-          </div>
+        <!-- Working hours per day -->
+        <section class="settings-block" aria-labelledby="work-title">
+          <header class="settings-block__head">
+            <h2 id="work-title">{{ $t("settings.sections.work") }}</h2>
+            <p>{{ $t("settings.sections.work_sub") }}</p>
+          </header>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.hours_day")
+                }}</label>
+              <input class="form-input" type="number" step="0.5" min="1" max="12" v-model.number="form.hoursPerDay" />
+              <span class="form-hint">{{ $t("settings.hints.hours_day") }}</span>
+            </div>
 
-          <!-- Working hours per day -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.hours_day")
-            }}</label>
-            <input class="form-input" type="number" step="0.5" min="1" max="12" v-model.number="form.hoursPerDay" />
-            <span class="form-hint">{{ $t("settings.hints.hours_day") }}</span>
+            <!-- Working hours per week -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.hours_week")
+                }}</label>
+              <input class="form-input" type="number" step="0.5" min="1" max="60" v-model.number="form.hoursPerWeek" />
+              <span class="form-hint">{{ $t("settings.hints.hours_week") }}</span>
+            </div>
+
+            <!-- Default Break -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.default_break")
+                }}</label>
+              <input class="form-input" type="number" step="5" min="0" max="120" v-model.number="form.defaultBreak" />
+              <span class="form-hint">{{
+                $t("settings.hints.default_break")
+                }}</span>
+            </div>
+
+            <!-- Working days per week -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.work_days")
+                }}</label>
+              <input class="form-input" type="number" step="1" min="1" max="7" v-model.number="form.workDays" />
+              <span class="form-hint">{{ $t("settings.hints.work_days") }}</span>
+            </div>
+
+            <!-- State selection -->
+            <div class="form-group">
+              <label class="form-label">{{ $t("settings.fields.state") }}</label>
+              <select class="form-input" v-model="form.state">
+                <option v-for="(name, code) in STATES" :key="code" :value="code">
+                  {{ name }}
+                </option>
+              </select>
+              <span class="form-hint">{{ $t("settings.hints.state") }}</span>
+            </div>
+
+            <!-- Default workplace -->
+            <div class="form-group">
+              <label class="form-label">{{ $t("settings.fields.default_workplace") }}</label>
+              <select class="form-input" v-model="form.defaultWorkplace">
+                <option value="on-site">{{ $t("absence.on-site") }}</option>
+                <option value="homeoffice">{{ $t("absence.homeoffice") }}</option>
+              </select>
+              <span class="form-hint">{{ $t("settings.hints.default_workplace") }}</span>
+            </div>
           </div>
+        </section>
 
-          <!-- Working hours per week -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.hours_week")
-            }}</label>
-            <input class="form-input" type="number" step="0.5" min="1" max="60" v-model.number="form.hoursPerWeek" />
-            <span class="form-hint">{{ $t("settings.hints.hours_week") }}</span>
-          </div>
-
-          <!-- Default Break -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.default_break")
-            }}</label>
-            <input class="form-input" type="number" step="5" min="0" max="120" v-model.number="form.defaultBreak" />
-            <span class="form-hint">{{
-              $t("settings.hints.default_break")
-            }}</span>
-          </div>
-
-          <!-- Working days per week -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.work_days")
-            }}</label>
-            <input class="form-input" type="number" step="1" min="1" max="7" v-model.number="form.workDays" />
-            <span class="form-hint">{{ $t("settings.hints.work_days") }}</span>
-          </div>
-
-          <!-- State selection -->
-          <div class="form-group">
-            <label class="form-label">{{ $t("settings.fields.state") }}</label>
-            <select class="form-input" v-model="form.state">
-              <option v-for="(name, code) in STATES" :key="code" :value="code">
-                {{ name }}
-              </option>
-            </select>
-            <span class="form-hint">{{ $t("settings.hints.state") }}</span>
-          </div>
-
-          <!-- Default workplace -->
-          <div class="form-group">
-            <label class="form-label">{{ $t("settings.fields.default_workplace") }}</label>
-            <select class="form-input" v-model="form.defaultWorkplace">
-              <option value="on-site">{{ $t("absence.on-site") }}</option>
-              <option value="homeoffice">{{ $t("absence.homeoffice") }}</option>
-            </select>
-            <span class="form-hint">{{ $t("settings.hints.default_workplace") }}</span>
-          </div>
-
-          <!-- Vacation days -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.vacation_days")
-            }}</label>
-            <input class="form-input" type="number" step="1" min="0" max="365"
-              v-model.number="form.vacationDaysPerYear" />
-            <span class="form-hint">{{
-              $t("settings.hints.vacation_days")
-            }}</span>
-          </div>
-
-          <!-- Extra Vacation Days -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.extra_vacation_days")
-            }}</label>
-            <input class="form-input" type="number" step="1" min="0" max="365"
-              v-model.number="form.extraVacationDays" />
-            <span class="form-hint">{{
-              $t("settings.hints.extra_vacation_days")
-            }}</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.extra_vacation_deadline")
-            }}</label>
-            <input class="form-input" type="date" v-model="form.extraVacationDeadline" />
-            <span class="form-hint">{{
-              $t("settings.hints.extra_vacation_deadline")
-            }}</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.extra_vacation_notice")
-            }}</label>
-            <input class="form-input" type="number" step="1" min="0" max="365"
-              v-model.number="form.extraVacationNoticeDays" />
-            <span class="form-hint">{{
-              $t("settings.hints.extra_vacation_notice")
-            }}</span>
-          </div>
-
-          <div v-if="extraVacationBalance" class="form-group full">
-            <span class="form-hint">{{ extraVacationBalance }}</span>
-          </div>
-
-          <!-- Salary -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.gross_salary")
-            }}</label>
-
-            <!-- Normal input — only if privacy is OFF -->
-            <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
-              v-model.number="form.grossMonthlySalary" />
-
-            <!-- Masked — if Privacy ON -->
-            <input v-else class="form-input" type="text" value="••••" disabled />
-
-            <span class="form-hint">{{
-              $t("settings.hints.gross_salary")
-            }}</span>
-            <span class="form-hint">{{
-              $t("settings.hints.gross_salary_sub")
-            }}</span>
-          </div>
-
-          <!-- SettingsCard Template -->
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.autostop")
-            }}</label>
-            <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.maxWorkHours" />
-            <span class="form-hint">{{ $t("settings.hints.autostop") }}</span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.overtime_warn")
-            }}</label>
-            <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.warnWorkHours" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{
-              $t("settings.fields.inactivity")
-            }}</label>
-            <input class="form-input" type="number" step="5" min="5" max="120"
-              v-model.number="form.inactivityMinutes" />
-            <span class="form-hint">{{ $t("settings.hints.inactivity") }}</span>
-          </div>
-
-          <!-- Salary Preview -->
-          <div class="form-group full" v-if="previewGrossHourlyRate > 0">
-            <label class="form-label">{{
-              $t("settings.fields.preview")
-            }}</label>
-            <div class="salary-preview">
-              <span>{{
-                $t("settings.preview_hourly", {
-                  val: mask(previewGrossHourlyRate.toFixed(2)),
-                })
-              }}</span>
-              <span>{{
-                $t("settings.preview_daily", {
-                  val: mask(previewGrossDailyRate.toFixed(2)),
-                })
+        <section class="settings-block" aria-labelledby="vacation-title">
+          <header class="settings-block__head">
+            <h2 id="vacation-title">{{ $t("settings.sections.vacation") }}</h2>
+            <p>{{ $t("settings.sections.vacation_sub") }}</p>
+          </header>
+          <div class="form-grid">
+            <!-- Vacation days -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.vacation_days")
+              }}</label>
+              <input class="form-input" type="number" step="1" min="0" max="365"
+                v-model.number="form.vacationDaysPerYear" />
+              <span class="form-hint">{{
+                $t("settings.hints.vacation_days")
               }}</span>
             </div>
-            <span class="form-hint">
-              {{
-                $t("settings.hints.preview", {
-                  days: form.workDays,
-                  hours: form.hoursPerDay,
-                })
-              }}
-            </span>
-          </div>
 
-          <div class="settings-locale">
-            <span class="settings-locale-label">{{ $t("settings.fields.language") }}</span>
-            <span class="settings-locale-value">{{ currentLocaleLabel }}</span>
-          </div>
-        </div>
+            <!-- Extra Vacation Days -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.extra_vacation_days")
+              }}</label>
+              <input class="form-input" type="number" step="1" min="0" max="365"
+                v-model.number="form.extraVacationDays" />
+              <span class="form-hint">{{
+                $t("settings.hints.extra_vacation_days")
+              }}</span>
+            </div>
 
-        <section class="shortcut-settings" aria-labelledby="shortcut-settings-title">
-          <div class="privacy-label" id="shortcut-settings-title">{{ $t("shortcuts.settings_title") }}</div>
-          <div class="privacy-hint">{{ $t("shortcuts.settings_subtitle") }}</div>
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.extra_vacation_deadline")
+              }}</label>
+              <input class="form-input" type="date" v-model="form.extraVacationDeadline" />
+              <span class="form-hint">{{
+                $t("settings.hints.extra_vacation_deadline")
+              }}</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.extra_vacation_notice")
+              }}</label>
+              <input class="form-input" type="number" step="1" min="0" max="365"
+                v-model.number="form.extraVacationNoticeDays" />
+              <span class="form-hint">{{
+                $t("settings.hints.extra_vacation_notice")
+              }}</span>
+            </div>
+
+            <div v-if="extraVacationBalance" class="form-group full">
+              <span class="form-hint">{{ extraVacationBalance }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-block" aria-labelledby="pay-title">
+          <header class="settings-block__head">
+            <h2 id="pay-title">{{ $t("settings.sections.pay") }}</h2>
+            <p>{{ $t("settings.sections.pay_sub") }}</p>
+          </header>
+          <div class="form-grid">
+            <!-- Salary -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.gross_salary")
+                }}</label>
+
+              <!-- Normal input — only if privacy is OFF -->
+              <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
+                v-model.number="form.grossMonthlySalary" />
+
+              <!-- Masked — if Privacy ON -->
+              <input v-else class="form-input" type="text" value="••••" disabled />
+
+              <span class="form-hint">{{
+                $t("settings.hints.gross_salary")
+                }}</span>
+              <span class="form-hint">{{
+                $t("settings.hints.gross_salary_sub")
+                }}</span>
+            </div>
+            <div class="form-group full" v-if="previewGrossHourlyRate > 0">
+              <label class="form-label">{{ $t("settings.fields.preview") }}</label>
+              <div class="salary-preview">
+                <span>{{ $t("settings.preview_hourly", { val: mask(previewGrossHourlyRate.toFixed(2)) }) }}</span>
+                <span>{{ $t("settings.preview_daily", { val: mask(previewGrossDailyRate.toFixed(2)) }) }}</span>
+              </div>
+              <span class="form-hint">
+                {{ $t("settings.hints.preview", { days: form.workDays, hours: form.hoursPerDay }) }}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-block" aria-labelledby="tracking-title">
+          <header class="settings-block__head">
+            <h2 id="tracking-title">{{ $t("settings.sections.tracking") }}</h2>
+            <p>{{ $t("settings.sections.tracking_sub") }}</p>
+          </header>
+          <div class="form-grid">
+            <!-- SettingsCard Template -->
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.autostop")
+              }}</label>
+              <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.maxWorkHours" />
+              <span class="form-hint">{{ $t("settings.hints.autostop") }}</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.overtime_warn")
+              }}</label>
+              <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.warnWorkHours" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{
+                $t("settings.fields.inactivity")
+              }}</label>
+              <input class="form-input" type="number" step="5" min="5" max="120"
+                v-model.number="form.inactivityMinutes" />
+              <span class="form-hint">{{ $t("settings.hints.inactivity") }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-block" aria-labelledby="appearance-title">
+          <header class="settings-block__head">
+            <h2 id="appearance-title">{{ $t("settings.sections.appearance") }}</h2>
+            <p>{{ $t("settings.sections.appearance_sub") }}</p>
+          </header>
+          <div class="appearance-row">
+            <div class="settings-locale">
+              <span class="settings-locale-label">{{ $t("settings.fields.language") }}</span>
+              <span class="settings-locale-value">{{ currentLocaleLabel }}</span>
+            </div>
+            <div class="privacy-row">
+              <div class="privacy-info">
+                <span class="privacy-icon">
+                  <svg v-if="privacyMode" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                  <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+                <div>
+                  <div class="privacy-label">{{ $t("settings.privacy.label") }}</div>
+                  <div class="privacy-hint">{{ privacyMode ? $t("settings.privacy.on") : $t("settings.privacy.off") }}
+                  </div>
+                </div>
+              </div>
+              <button class="toggle-switch" :class="{ active: privacyMode }" @click="toggle" :aria-label="privacyMode
+                ? $t('settings.privacy.disable')
+                : $t('settings.privacy.enable')
+                " role="switch" :aria-checked="privacyMode">
+                <span class="toggle-thumb" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="shortcut-settings settings-block" aria-labelledby="shortcut-settings-title">
+          <header class="settings-block__head">
+            <h2 id="shortcut-settings-title">{{ $t("shortcuts.settings_title") }}</h2>
+            <p>{{ $t("shortcuts.settings_subtitle") }}</p>
+          </header>
+
           <div class="shortcut-settings-list">
             <div v-for="shortcut in shortcutList" :key="shortcut.key" class="shortcut-settings-row">
               <span>{{ $t(shortcut.label) }}</span>
@@ -244,166 +302,132 @@
             </div>
           </div>
         </section>
-
-        <div class="recovery-settings">
-          <div class="recovery-header">
-            <div>
-              <div class="privacy-label">{{ $t("settings.recovery.title") }}</div>
-              <div class="privacy-hint">{{ $t("settings.recovery.sub") }}</div>
-            </div>
-            <button class="toggle-switch" :class="{ active: form.recoveryEnabled }"
-              @click="form.recoveryEnabled = !form.recoveryEnabled" role="switch" :aria-checked="form.recoveryEnabled"
-              :aria-label="$t('settings.recovery.toggle')">
-              <span class="toggle-thumb" />
-            </button>
-          </div>
-
-          <div v-if="form.recoveryEnabled || snapshots.length" class="recovery-body">
-            <div v-if="form.recoveryEnabled" class="form-group">
-              <label class="form-label">{{ $t("settings.recovery.frequency_label") }}</label>
-              <select class="form-input" v-model="form.recoveryFrequency">
-                <option value="daily">{{ $t("settings.recovery.frequency.daily") }}</option>
-                <option value="weekly">{{ $t("settings.recovery.frequency.weekly") }}</option>
-                <option value="biweekly">{{ $t("settings.recovery.frequency.biweekly") }}</option>
-                <option value="monthly">{{ $t("settings.recovery.frequency.monthly") }}</option>
-              </select>
-            </div>
-
-            <div v-if="snapshots.length" class="recovery-list">
-              <div v-for="snapshot in snapshots" :key="snapshot.id" class="recovery-item">
-                <div class="recovery-item__info">
-                  <strong>{{ formatRecoveryDate(snapshot.createdAt) }}</strong>
-                  <span>{{ recoverySummary(snapshot) }}</span>
-                </div>
-                <div class="recovery-item__actions">
-                  <button class="btn btn-secondary btn-sm" @click="confirmRestore(snapshot)">
-                    {{ $t("settings.recovery.restore") }}
-                  </button>
-                  <button class="btn btn-secondary btn-sm" @click="exportRecovery(snapshot)">
-                    {{ $t("settings.recovery.export") }}
-                  </button>
-                  <button class="btn btn-danger btn-sm" @click="deleteRecovery(snapshot)">
-                    {{ $t("settings.recovery.delete") }}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <span v-else class="form-hint">{{ $t("settings.recovery.empty") }}</span>
-          </div>
-        </div>
-
-        <div class="privacy-row">
-          <div class="privacy-info">
-            <!-- Privacy is on -->
-            <span class="privacy-icon">
-              <svg v-if="privacyMode" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                <line x1="1" y1="1" x2="23" y2="23" />
-              </svg>
-
-              <!-- Privacy is off -->
-              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </span>
-
-            <!-- Privacy Info -->
-            <div>
-              <div class="privacy-label">
-                {{ $t("settings.privacy.label") }}
-              </div>
-              <div class="privacy-hint">
-                {{
-                  privacyMode
-                    ? $t("settings.privacy.on")
-                    : $t("settings.privacy.off")
-                }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Toggle for privacy mode -->
-          <button class="toggle-switch" :class="{ active: privacyMode }" @click="toggle" :aria-label="privacyMode
-            ? $t('settings.privacy.disable')
-            : $t('settings.privacy.enable')
-            " role="switch" :aria-checked="privacyMode">
-            <span class="toggle-thumb" />
-          </button>
-        </div>
       </div>
-      <div class="settings-actions">
-        <button class="btn btn-secondary" @click="reset">
-          {{ $t("common.reset") }}
-        </button>
-        <button class="btn btn-secondary" :disabled="checkingForUpdates" @click="checkForUpdates">
-          {{ checkingForUpdates ? $t("pwa.checking") : $t("pwa.check_updates") }}
+    </div>
+
+
+    <section class="recovery-settings settings-block">
+      <div class="recovery-header">
+        <div>
+          <div class="privacy-label">{{ $t("settings.recovery.title") }}</div>
+          <div class="privacy-hint">{{ $t("settings.recovery.sub") }}</div>
+        </div>
+        <button class="toggle-switch" :class="{ active: form.recoveryEnabled }"
+          @click="form.recoveryEnabled = !form.recoveryEnabled" role="switch" :aria-checked="form.recoveryEnabled"
+          :aria-label="$t('settings.recovery.toggle')">
+          <span class="toggle-thumb" />
         </button>
       </div>
 
-      <!-- Notification Settings -->
-      <SettingsNotification />
+      <div v-if="form.recoveryEnabled || snapshots.length" class="recovery-body">
+        <div v-if="form.recoveryEnabled" class="form-group">
+          <label class="form-label">{{ $t("settings.recovery.frequency_label") }}</label>
+          <select class="form-input" v-model="form.recoveryFrequency">
+            <option value="daily">{{ $t("settings.recovery.frequency.daily") }}</option>
+            <option value="weekly">{{ $t("settings.recovery.frequency.weekly") }}</option>
+            <option value="biweekly">{{ $t("settings.recovery.frequency.biweekly") }}</option>
+            <option value="monthly">{{ $t("settings.recovery.frequency.monthly") }}</option>
+          </select>
+        </div>
 
-      <div class="danger-zone">
-        <div class="danger-zone__header">
-          <div class="danger-zone__title">
-            {{ $t("settings.danger.title") }}
+        <div v-if="snapshots.length" class="recovery-list">
+          <div v-for="snapshot in snapshots" :key="snapshot.id" class="recovery-item">
+            <div class="recovery-item__info">
+              <strong>{{ formatRecoveryDate(snapshot.createdAt) }}</strong>
+              <span>{{ recoverySummary(snapshot) }}</span>
+            </div>
+            <div class="recovery-item__actions">
+              <button class="btn btn-secondary btn-sm" @click="confirmRestore(snapshot)">
+                {{ $t("settings.recovery.restore") }}
+              </button>
+              <button class="btn btn-secondary btn-sm" @click="exportRecovery(snapshot)">
+                {{ $t("settings.recovery.export") }}
+              </button>
+              <button class="btn btn-danger btn-sm" @click="deleteRecovery(snapshot)">
+                {{ $t("settings.recovery.delete") }}
+              </button>
+            </div>
           </div>
-          <div class="danger-zone__sub">{{ $t("settings.danger.sub") }}</div>
+        </div>
+        <span v-else class="form-hint">{{ $t("settings.recovery.empty") }}</span>
+      </div>
+    </section>
+
+    <div class="settings-actions">
+      <button class="btn btn-secondary" @click="reset">
+        {{ $t("common.reset") }}
+      </button>
+      <button class="btn btn-secondary" :disabled="checkingForUpdates" @click="checkForUpdates">
+        {{ checkingForUpdates ? $t("pwa.checking") : $t("pwa.check_updates") }}
+      </button>
+    </div>
+
+    <!-- Notification Settings -->
+    <SettingsNotification />
+
+    <div class="danger-zone">
+      <div class="danger-zone__header">
+        <div class="danger-zone__title">
+          {{ $t("settings.danger.title") }}
+        </div>
+        <div class="danger-zone__sub">{{ $t("settings.danger.sub") }}</div>
+      </div>
+
+      <!-- Storage Usage -->
+      <div class="storage-usage">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="5" rx="9" ry="3" />
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+        </svg>
+        <span>{{ $t("settings.storage_usage") }}:
+          <strong>{{ formatted() }}</strong></span>
+        <span class="storage-bar-wrap">
+          <span class="storage-bar-fill" :style="{
+            width: Math.min((bytes / (5 * 1024 * 1024)) * 100, 100) + '%',
+          }" />
+        </span>
+        <span class="storage-limit">/ ~5 MB</span>
+      </div>
+
+      <div v-if="!showDeleteConfirm" class="danger-zone__actions">
+        <button class="btn btn-danger" @click="askDeleteAll">
+          {{ $t("settings.danger.delete_btn") }}
+        </button>
+      </div>
+
+      <div v-else class="danger-confirm">
+        <div class="danger-confirm__warning">
+          {{ $t("settings.danger.warning") }}
         </div>
 
-        <!-- Storage Usage -->
-        <div class="storage-usage">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="12" cy="5" rx="9" ry="3" />
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-          </svg>
-          <span>{{ $t("settings.storage_usage") }}:
-            <strong>{{ formatted() }}</strong></span>
-          <span class="storage-bar-wrap">
-            <span class="storage-bar-fill" :style="{
-              width: Math.min((bytes / (5 * 1024 * 1024)) * 100, 100) + '%',
-            }" />
-          </span>
-          <span class="storage-limit">/ ~5 MB</span>
-        </div>
+        <label class="form-label" for="delete-confirm-input">
+          {{ $t("settings.danger.confirm_label") }} <strong>DELETE</strong>
+        </label>
+        <input id="delete-confirm-input" v-model="deleteConfirmText" class="form-input danger-input" type="text"
+          placeholder="DELETE" autocomplete="off" />
 
-        <div v-if="!showDeleteConfirm" class="danger-zone__actions">
-          <button class="btn btn-danger" @click="askDeleteAll">
-            {{ $t("settings.danger.delete_btn") }}
+        <div class="danger-confirm__actions">
+          <button class="btn btn-secondary" @click="cancelDeleteAll">
+            {{ $t("common.cancel") }}
           </button>
-        </div>
-
-        <div v-else class="danger-confirm">
-          <div class="danger-confirm__warning">
-            {{ $t("settings.danger.warning") }}
-          </div>
-
-          <label class="form-label" for="delete-confirm-input">
-            {{ $t("settings.danger.confirm_label") }} <strong>DELETE</strong>
-          </label>
-          <input id="delete-confirm-input" v-model="deleteConfirmText" class="form-input danger-input" type="text"
-            placeholder="DELETE" autocomplete="off" />
-
-          <div class="danger-confirm__actions">
-            <button class="btn btn-secondary" @click="cancelDeleteAll">
-              {{ $t("common.cancel") }}
-            </button>
-            <button class="btn btn-danger" :disabled="!canDeleteAll" @click="confirmDeleteAll">
-              {{ $t("settings.danger.confirm_btn") }}
-            </button>
-          </div>
+          <button class="btn btn-danger" :disabled="!canDeleteAll" @click="confirmDeleteAll">
+            {{ $t("settings.danger.confirm_btn") }}
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Device Chip Extended Version -->
-    <DeviceChipExt />
+    <section class="settings-block device-block" aria-labelledby="device-title">
+      <header class="settings-block__head">
+        <h2 id="device-title">{{ $t("settings.sections.device") }}</h2>
+        <p>{{ $t("settings.sections.device_sub") }}</p>
+      </header>
+      <DeviceChipExt />
+    </section>
+
   </main>
 </template>
 
@@ -746,12 +770,51 @@ const previewGrossDailyRate = computed(() => {
 /* Settings Card */
 .settings-card {
   width: 100%;
-  max-width: var(--content-form);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+}
+
+.settings-block {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-divider);
+}
+
+.settings-block:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.settings-block__head {
+  margin-bottom: var(--space-4);
+}
+
+.settings-block__head h2 {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.settings-block__head p {
+  margin: var(--space-1) 0 0;
+  max-width: 72ch;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.device-block {
+  margin-left: var(--space-6);
+  margin-right: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.settings-card :deep(.settings-section) {
+  border-top: 1px solid var(--color-divider);
 }
 
 .settings-header {
@@ -781,11 +844,7 @@ const previewGrossDailyRate = computed(() => {
 }
 
 .recovery-settings {
-  margin-top: var(--space-5);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
+  background: transparent;
 }
 
 .recovery-header {
@@ -843,10 +902,10 @@ const previewGrossDailyRate = computed(() => {
 }
 
 .employment-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-2);
-  margin-top: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .employment-item {
@@ -883,7 +942,7 @@ const previewGrossDailyRate = computed(() => {
 /* Form Grid */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-4) var(--space-5);
 }
 
@@ -910,18 +969,17 @@ const previewGrossDailyRate = computed(() => {
   color: var(--color-text-faint);
 }
 
-.shortcut-settings {
-  grid-column: 1 / -1;
-  margin-top: var(--space-2);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--color-divider);
-}
-
 .shortcut-settings-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2) var(--space-5);
-  margin-top: var(--space-3);
+}
+
+.appearance-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
 }
 
 .shortcut-settings-row {
@@ -980,10 +1038,11 @@ select.form-input {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-top: var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-divider);
-  flex-wrap: wrap;
+  min-height: 42px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
 }
 
 .privacy-info {
@@ -1079,7 +1138,6 @@ select.form-input {
 .danger-zone {
   margin: var(--space-6);
   padding-top: var(--space-6);
-  padding-bottom: var(--space-6);
   border-top: 1px solid var(--color-divider);
   display: flex;
   flex-direction: column;
@@ -1101,7 +1159,7 @@ select.form-input {
 .danger-zone__sub {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  max-width: 42ch;
+  max-width: 72ch;
 }
 
 .danger-zone__actions {
@@ -1154,17 +1212,31 @@ select.form-input {
   padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--color-divider);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-4);
 }
 
 .settings-locale {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 42px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
   font-size: var(--text-xs);
   color: var(--color-text-muted);
+}
+
+@media (max-width: 1100px) {
+
+  .form-grid,
+  .shortcut-settings-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .settings-locale-label {
@@ -1197,10 +1269,6 @@ select.form-input {
     margin-left: var(--space-4);
   }
 
-  .shortcut-settings {
-    display: none;
-  }
-
   .btn-primary {
     margin-left: 0;
   }
@@ -1213,9 +1281,16 @@ select.form-input {
     margin: var(--space-4);
   }
 
-  .form-grid {
+  .form-grid,
+  .shortcut-settings-list,
+  .appearance-row {
     grid-template-columns: 1fr;
     gap: var(--space-3);
+  }
+
+  .device-block {
+    margin-left: var(--space-4);
+    margin-right: var(--space-4);
   }
 
   .privacy-row {
@@ -1259,7 +1334,11 @@ select.form-input {
   .danger-zone {
     margin: var(--space-3);
     padding-top: var(--space-4);
-    padding-bottom: var(--space-4);
+  }
+
+  .device-block {
+    margin-left: var(--space-3);
+    margin-right: var(--space-3);
   }
 
   .form-input {

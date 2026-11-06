@@ -8,142 +8,98 @@
       <span class="device-icon" v-html="deviceIcon"></span>
       <div class="device-info">
         <span class="device-label">{{ device.deviceLabel }}</span>
-        <span class="device-sub"
-          >{{ device.osLabel }} · {{ device.browserLabel }}
-          {{ device.browserVersion }}</span
-        >
+        <span class="device-sub">{{ device.osLabel }} · {{ device.browserLabel }}
+          {{ device.browserVersion }}</span>
       </div>
 
       <span v-if="device.isPWA" class="badge badge--pwa">{{
         $t("device.pwa")
-      }}</span>
-      <span
-        class="online-dot"
-        :class="isOnline ? 'online-dot--on' : 'online-dot--off'"
-        :title="isOnline ? $t('device.online') : $t('device.offline')"
-      >
+        }}</span>
+      <span class="online-dot" :class="isOnline ? 'online-dot--on' : 'online-dot--off'"
+        :title="isOnline ? $t('device.online') : $t('device.offline')">
       </span>
     </div>
 
     <!-- Divider -->
     <div class="device-divider"></div>
 
-    <!-- Stats Grid -->
     <div class="device-stats">
-      <!-- Screen -->
       <div class="stat-item">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <rect x="2" y="4" width="20" height="13" rx="2" />
-          <path d="M2 20h20" />
-          <path d="M8 20l1-3h6l1 3" />
-        </svg>
-
+        <span class="stat-label">{{ $t("device.screen") }}</span>
         <span>
           {{ device.screenW }}×{{ device.screenH }}
-          <span v-if="device.isRetina" class="badge badge--retina">{{
-            $t("device.retina")
-          }}</span>
+          <span v-if="device.isRetina" class="badge badge--retina">{{ $t("device.retina") }}</span>
         </span>
       </div>
 
-      <!-- Touch -->
       <div class="stat-item">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M18 11V6a2 2 0 0 0-4 0v5" />
-          <path d="M14 10V4a2 2 0 0 0-4 0v6" />
-          <path
-            d="M10 10.5V6a2 2 0 0 0-4 0v8l-1.2-1.2a1.5 1.5 0 0 0-2.1 2.1L6 18a6 6 0 0 0 6 0v-1"
-          />
-          <path d="M18 8a2 2 0 0 1 4 0v6a8 8 0 0 1-8 8h-2" />
-        </svg>
-
-        <span>{{
-          device.isTouch ? $t("device.touch") : $t("device.no_touch")
-        }}</span>
+        <span class="stat-label">{{ $t("device.viewport") }}</span>
+        <span>{{ device.viewportW }}×{{ device.viewportH }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">DPR</span>
+        <span>
+          {{ $t("device.dpr", { ratio: roundedRatio }) }}
+          <template v-if="device.colorDepth"> · {{ $t("device.color_depth", { depth: device.colorDepth }) }}</template>
+        </span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">{{ $t("device.input") }}</span>
+        <span>{{ device.isTouch ? $t("device.touch") : $t("device.no_touch") }}<template v-if="device.touchPoints"> · {{
+          device.touchPoints }}</template></span>
       </div>
 
-      <!-- CPU cores -->
       <div v-if="device.cpuCores" class="stat-item">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <rect x="7" y="7" width="10" height="10" rx="1" />
-          <path
-            d="M9 7V3M12 7V3M15 7V3M9 21v-4M12 21v-4M15 21v-4M3 9h4M3 12h4M3 15h4M21 9h-4M21 12h-4M21 15h-4"
-          />
-        </svg>
-
+        <span class="stat-label">CPU</span>
         <span>{{ $t("device.cores", { count: device.cpuCores }) }}</span>
       </div>
 
-      <!-- RAM -->
       <div v-if="device.deviceMemory" class="stat-item">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <rect x="2" y="8" width="20" height="8" rx="1" />
-          <path
-            d="M6 8V6M10 8V6M14 8V6M18 8V6M6 16v2M10 16v2M14 16v2M18 16v2"
-          />
-        </svg>
+        <span class="stat-label">RAM</span>
         <span>{{ $t("device.ram", { gb: device.deviceMemory }) }}</span>
       </div>
 
-      <!-- Language -->
-      <div class="stat-item">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path
-            d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-          />
-        </svg>
-        <span>{{ device.language }}</span>
+      <div v-if="architectureLabel" class="stat-item">
+        <span class="stat-label">{{ $t("device.architecture") }}</span>
+        <span>{{ architectureLabel }}</span>
       </div>
 
-      <!-- Pixel Ratio -->
       <div class="stat-item">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-        </svg>
-        <span>{{ $t("device.dpr", { ratio: device.pixelRatio }) }}</span>
+        <span class="stat-label">{{ $t("device.platform") }}</span>
+        <span>{{ platformLabel }}</span>
+      </div>
+
+      <div class="stat-item">
+        <span class="stat-label">{{ $t("device.timezone") }}</span>
+        <span>{{ device.timezone }} · {{ device.utcOffset }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">{{ $t("device.languages") }}</span>
+        <span>{{ device.languages }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">{{ $t("device.online_label") }}</span>
+        <span>{{ isOnline ? $t("device.online") : $t("device.offline") }}</span>
+      </div>
+      <div v-if="networkLabel" class="stat-item">
+        <span class="stat-label">{{ $t("device.network") }}</span>
+        <span>{{ networkLabel }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">{{ $t("device.local_address") }}</span>
+        <span>{{ addressLabel }}</span>
+      </div>
+      <div v-if="storageLabel" class="stat-item">
+        <span class="stat-label">{{ $t("device.storage") }}</span>
+        <span>{{ storageLabel }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">{{ $t("device.cookies") }}</span>
+        <span>{{ device.cookieEnabled ? $t("device.cookies_on") : $t("device.cookies_off") }}</span>
+      </div>
+      <div class="stat-item stat-item--wide">
+        <span class="stat-label">{{ $t("device.user_agent") }}</span>
+        <span class="stat-wrap">{{ device.userAgent }}</span>
       </div>
     </div>
 
@@ -151,27 +107,17 @@
     <template v-if="battery.supported.value">
       <div class="device-divider"></div>
       <div class="battery-row">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="7" width="18" height="10" rx="2" />
           <path d="M20 11v2" stroke-linecap="round" stroke-width="3" />
         </svg>
 
         <div class="battery-bar-wrap">
           <div class="battery-bar">
-            <div
-              class="battery-bar-fill"
-              :style="{
-                width: (battery.percent.value ?? 0) + '%',
-                background: batteryColor,
-              }"
-            ></div>
+            <div class="battery-bar-fill" :style="{
+              width: (battery.percent.value ?? 0) + '%',
+              background: batteryColor,
+            }"></div>
           </div>
         </div>
 
@@ -185,24 +131,106 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import {
   useDevice,
   useBattery,
   useOnlineStatus,
+  useHostAddresses,
+  useClientHints,
+  useStorageEstimate,
 } from "@/composables/useDevice";
 
 const device = useDevice();
 const battery = useBattery();
 const { isOnline } = useOnlineStatus();
+const addresses = useHostAddresses();
+const hints = useClientHints();
+const storage = useStorageEstimate();
 const { t } = useI18n();
+const lookedUp = ref(false);
+
+onMounted(() => {
+  window.setTimeout(() => {
+    lookedUp.value = true;
+  }, 2200);
+});
+
+const roundedRatio = computed(() => Number(device.value.pixelRatio.toFixed(2)));
+
+const addressLabel = computed(() => {
+  if (!addresses.value.length) {
+    return lookedUp.value
+      ? t("device.local_address_none")
+      : t("device.local_address_pending");
+  }
+
+  return [...addresses.value]
+    .sort((first, second) => Number(first.includes(":")) - Number(second.includes(":")))
+    .join(", ");
+});
+
+const platformLabel = computed(() => {
+  const version = hints.value?.platformVersion;
+
+  return [device.value.platform, version].filter(Boolean).join(" ");
+});
+
+const architectureLabel = computed(() => {
+  const architecture = hints.value?.architecture;
+  const bitness = hints.value?.bitness;
+  const model = hints.value?.model;
+
+  return [architecture, bitness ? `${bitness}-bit` : "", model].filter(Boolean).join(" · ");
+});
+
+const networkLabel = computed(() => {
+  const connection = device.value.connection;
+  if (!connection?.type)
+    return connection?.saveData ? t("device.save_data") : "";
+
+  const detail = t("device.network_detail", {
+    type: connection.type,
+    downlink: connection.downlink ?? "–",
+    rtt: connection.rtt ?? "–",
+  });
+
+  return connection.saveData ? `${detail} · ${t("device.save_data")}` : detail;
+});
+
+const storageLabel = computed(() => {
+  if (!storage.value?.quota)
+    return "";
+
+  return t("device.storage_detail", {
+    used: formatBytes(storage.value.usage),
+    quota: formatBytes(storage.value.quota),
+  });
+});
+
+function formatBytes(bytes) {
+  const value = Number(bytes) || 0;
+  if (value < 1024)
+    return `${value} B`;
+
+  if (value < 1024 * 1024)
+    return `${Math.round(value / 1024)} KB`;
+
+  const mb = value / (1024 * 1024);
+  if (mb < 1024)
+    return `${mb.toFixed(mb < 10 ? 1 : 0)} MB`;
+
+  return `${(mb / 1024).toFixed(1)} GB`;
+}
 
 const batteryColor = computed(() => {
   const p = battery.percent.value;
+
   if (p === null) return "var(--color-border)";
   if (p <= 20) return "#ef4444";
   if (p <= 40) return "#f59e0b";
+
   return "#22c55e";
 });
 
@@ -252,13 +280,9 @@ const deviceIcon = computed(
 .device-card {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg, 0.75rem);
-  padding: 1rem 1.125rem;
+  gap: var(--space-4);
   width: 100%;
-  max-width: 360px;
+  min-width: 0;
 }
 
 /* Header */
@@ -355,28 +379,45 @@ const deviceIcon = computed(
 /* Stats Grid */
 .device-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
 }
 
 .stat-item {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  font-size: var(--text-sm);
+  color: var(--color-text);
 }
 
-.stat-item svg {
-  flex-shrink: 0;
-  color: var(--color-text-faint);
+.stat-item--wide {
+  grid-column: 1 / -1;
 }
 
-.stat-item span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.stat-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.stat-item>span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.stat-wrap {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 
 /* Battery */
@@ -418,12 +459,8 @@ const deviceIcon = computed(
 
 /* Mobile */
 @media (max-width: 767px) {
-  .device-card {
-    max-width: 100%;
-  }
-
   .device-stats {
-    gap: 0.4rem 0.75rem;
+    grid-template-columns: 1fr;
   }
 }
 </style>
