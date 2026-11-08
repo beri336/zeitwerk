@@ -1,7 +1,8 @@
 <!-- src/components/charts/DayLengthHistogramChart.vue -->
 
 <template>
-    <ChartCard title="Day Length Distribution" :subtitle="`How long were your workdays · ${store.currMonthLabel}`">
+    <ChartCard :title="$t('diagrams.charts.day_length')"
+        :subtitle="$t('diagrams.charts.day_length_sub', { month: store.currMonthLabel })">
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>

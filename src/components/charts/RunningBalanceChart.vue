@@ -1,7 +1,8 @@
 <!-- src/components/charts/RunningBalanceChart.vue -->
 
 <template>
-    <ChartCard title="Running Balance" :subtitle="`Cumulative overtime · ${store.currMonthLabel}`">
+    <ChartCard :title="$t('diagrams.charts.running_balance')"
+        :subtitle="$t('diagrams.charts.running_balance_sub', { month: store.currMonthLabel })">
         <Line :data="chartData" :options="options" />
     </ChartCard>
 </template>

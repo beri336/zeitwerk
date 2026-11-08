@@ -589,7 +589,29 @@
         "empty_sub": "Füge Einträge für diesen Monat hinzu, um deine Diagramme zu sehen.",
         "gross_hint_pre": "Setze dein „Bruttogehalt pro Monat“ in den",
         "gross_hint_post": "um Verdienst-Diagramme zu sehen.",
-        "days": "Tage"
+        "days": "Tage",
+        "charts": {
+            "actual_planned": "Ist gegen Plan",
+            "weeks_in_month": "{count} Woche · {month} | {count} Wochen · {month}",
+            "running_balance": "Laufender Saldo",
+            "running_balance_sub": "Kumulierte Überstunden · {month}",
+            "weekday_avg": "Ø Stunden nach Wochentag",
+            "weekday_avg_sub": "{month} · Werktage und Wochenende",
+            "day_length": "Verteilung der Tageslänge",
+            "day_length_sub": "Länge der Arbeitstage · {month}",
+            "breakdown": "Aufteilung der Einträge",
+            "breakdown_sub": "{count} Eintrag · {month} | {count} Einträge · {month}",
+            "gross_week": "Bruttoverdienst pro Woche",
+            "gross_week_sub": "{month} · Beträge maskiert",
+            "month_overview": "12-Monats-Übersicht",
+            "month_overview_sub": "Ist · Plan · Differenz",
+            "month_comparison": "6-Monats-Vergleich",
+            "month_comparison_sub": "Ist gegen Plan · letzte 6 Monate",
+            "yearly_overtime": "Jahres-Überstundensaldo",
+            "yearly_overtime_sub": "Kumulierte Überstunden · {year}",
+            "yearly_gross": "Jahres-Bruttoverdienst",
+            "yearly_gross_sub": "{year} · Summe: {total}"
+        }
     },
     "common": {
         "today": "Heute",

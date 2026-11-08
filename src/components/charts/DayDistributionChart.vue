@@ -1,7 +1,8 @@
 <!-- src/components/charts/DayDistributionChart.vue -->
 
 <template>
-    <ChartCard title="Avg. Hours by Weekday" :subtitle="`${store.currMonthLabel} · Weekdays vs. Weekend`">
+    <ChartCard :title="$t('diagrams.charts.weekday_avg')"
+        :subtitle="$t('diagrams.charts.weekday_avg_sub', { month: store.currMonthLabel })">
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>

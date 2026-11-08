@@ -1,7 +1,8 @@
 <!-- src/components/charts/YearlyOvertimeChart.vue -->
 
 <template>
-    <ChartCard title="Yearly Overtime Balance" :subtitle="`Cumulative overtime · ${store.currYear}`" wide>
+    <ChartCard :title="$t('diagrams.charts.yearly_overtime')"
+        :subtitle="$t('diagrams.charts.yearly_overtime_sub', { year: store.currYear })" wide>
         <Line :data="chartData" :options="options" />
     </ChartCard>
 </template>

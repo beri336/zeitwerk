@@ -1,7 +1,8 @@
 <!-- src/components/charts/WeekBarChart.vue -->
 
 <template>
-    <ChartCard title="Actual vs. Planned" :subtitle="`${store.weekGroups.length} weeks · ${store.currMonthLabel}`">
+    <ChartCard :title="$t('diagrams.charts.actual_planned')"
+        :subtitle="$t('diagrams.charts.weeks_in_month', { count: store.weekGroups.length, month: store.currMonthLabel })">
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>

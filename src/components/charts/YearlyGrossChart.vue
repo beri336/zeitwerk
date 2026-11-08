@@ -1,8 +1,9 @@
 <!-- src/components/charts/YearlyGrossChart.vue -->
 
 <template>
-    <ChartCard v-if="store.grossHourlyRate > 0" title="Yearly Gross Earnings"
-        :subtitle="`${store.currYear} · Total: ${mask(formatEur(totalGross))}`" wide>
+    <ChartCard v-if="store.grossHourlyRate > 0" :title="$t('diagrams.charts.yearly_gross')"
+        :subtitle="$t('diagrams.charts.yearly_gross_sub', { year: store.currYear, total: mask(formatEur(totalGross)) })"
+        wide>
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>

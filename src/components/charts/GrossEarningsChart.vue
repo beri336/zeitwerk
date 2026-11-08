@@ -1,8 +1,8 @@
 <!-- src/components/charts/GrossEarningsChart.vue -->
 
 <template>
-    <ChartCard v-if="store.grossHourlyRate > 0" title="Gross Earnings by Week"
-        :subtitle="`${store.currMonthLabel} · Privacy-masked`">
+    <ChartCard v-if="store.grossHourlyRate > 0" :title="$t('diagrams.charts.gross_week')"
+        :subtitle="$t('diagrams.charts.gross_week_sub', { month: store.currMonthLabel })">
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>

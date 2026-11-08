@@ -1,7 +1,8 @@
 <!-- src/components/charts/AbsenceBreakdownChart.vue -->
 
 <template>
-    <ChartCard title="Entry Breakdown" :subtitle="`${total} entries · ${store.currMonthLabel}`">
+    <ChartCard :title="$t('diagrams.charts.breakdown')"
+        :subtitle="$t('diagrams.charts.breakdown_sub', { count: total, month: store.currMonthLabel })">
         <div class="donut-wrap">
             <Doughnut :data="chartData" :options="options" />
             <!-- Center Label -->
@@ -29,15 +30,6 @@ const { t } = useI18n()
 const store = useZeitwerkStore()
 const { colors } = useChartTheme()
 
-const TYPE_LABELS = {
-    'on-site': 'On-Site',
-    'homeoffice': 'Homeoffice',
-    'vacation': 'Vacation',
-    'sick': 'Sick',
-    'publicholiday': 'Public Holiday',
-    'other': 'Other',
-}
-
 const TYPE_COLORS = {
     'on-site': '#6366f1',
     'homeoffice': '#06b6d4',
@@ -61,10 +53,10 @@ const breakdown = computed(() => {
 const total = computed(() => breakdown.value.reduce((s, [, n]) => s + n, 0))
 
 const chartData = computed(() => ({
-    labels: breakdown.value.map(([t]) => TYPE_LABELS[t] ?? t),
+    labels: breakdown.value.map(([type]) => t(`absence.${type}`)),
     datasets: [{
         data: breakdown.value.map(([, n]) => n),
-        backgroundColor: breakdown.value.map(([t]) => TYPE_COLORS[t] ?? colors.value.border),
+        backgroundColor: breakdown.value.map(([type]) => TYPE_COLORS[type] ?? colors.value.border),
         borderColor: 'transparent',
         borderWidth: 0,
         hoverOffset: 6,

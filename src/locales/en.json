@@ -626,7 +626,29 @@
         "empty_sub": "Add entries for this month to see your charts.",
         "gross_hint_pre": "Set your gross monthly salary in the",
         "gross_hint_post": "to see earnings charts.",
-        "days": "Days"
+        "days": "Days",
+        "charts": {
+            "actual_planned": "Actual vs. Planned",
+            "weeks_in_month": "{count} week · {month} | {count} weeks · {month}",
+            "running_balance": "Running Balance",
+            "running_balance_sub": "Cumulative overtime · {month}",
+            "weekday_avg": "Avg. Hours by Weekday",
+            "weekday_avg_sub": "{month} · Weekdays vs. Weekend",
+            "day_length": "Day Length Distribution",
+            "day_length_sub": "How long were your workdays · {month}",
+            "breakdown": "Entry Breakdown",
+            "breakdown_sub": "{count} entry · {month} | {count} entries · {month}",
+            "gross_week": "Gross Earnings by Week",
+            "gross_week_sub": "{month} · Privacy-masked",
+            "month_overview": "12-Month Overview",
+            "month_overview_sub": "Actual · Planned · Difference",
+            "month_comparison": "6-Month Comparison",
+            "month_comparison_sub": "Actual vs. Planned · last 6 months",
+            "yearly_overtime": "Yearly Overtime Balance",
+            "yearly_overtime_sub": "Cumulative overtime · {year}",
+            "yearly_gross": "Yearly Gross Earnings",
+            "yearly_gross_sub": "{year} · Total: {total}"
+        }
     },
     "common": {
         "today": "Today",

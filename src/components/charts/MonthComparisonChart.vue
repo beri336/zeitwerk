@@ -1,7 +1,7 @@
 <!-- src/components/charts/MonthComparisonChart.vue -->
 
 <template>
-    <ChartCard title="6-Month Comparison" subtitle="Actual vs. Planned · last 6 months" wide>
+    <ChartCard :title="$t('diagrams.charts.month_comparison')" :subtitle="$t('diagrams.charts.month_comparison_sub')" wide>
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>

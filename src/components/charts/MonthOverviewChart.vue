@@ -1,7 +1,8 @@
 <!-- src/components/charts/MonthOverviewChart.vue -->
 
 <template>
-    <ChartCard title="12-Month Overview" subtitle="Actual · Planned · Difference" wide tall>
+    <ChartCard :title="$t('diagrams.charts.month_overview')"
+        :subtitle="$t('diagrams.charts.month_overview_sub')" wide tall>
         <Bar :data="chartData" :options="options" />
     </ChartCard>
 </template>
