@@ -2,21 +2,12 @@
 
 <template>
 
-  <section
-    class="live-card"
-    :class="[statusMeta.className, { 'is-critical': isCritical }]"
-  >
+  <section class="live-card" :class="[
+    statusMeta.className,
+    { 'is-critical': isCritical, 'has-blocks': sessionBlocks.length },
+  ]">
     <!-- LEFT: Main panel -->
     <div class="live-card__main">
-      <div class="live-card__eyebrow">
-        <span>{{ $t("common.today") }}</span>
-        <span
-          v-if="store.liveStatus === 'working'"
-          class="pulse-dot"
-          aria-hidden="true"
-        />
-      </div>
-
       <div class="live-card__header">
         <h2 class="live-card__title">{{ $t("live.title") }}</h2>
         <span class="live-card__status">
@@ -25,67 +16,43 @@
         </span>
       </div>
 
-      <p class="live-card__hint">{{ statusMeta.hint }}</p>
-
       <!-- Clock hero -->
-      <div
-        class="live-card__hero"
-        :class="{ 'hero--overtime': isOvertime, 'hero--critical': isCritical }"
-      >
-        <div
-          class="live-card__clock"
-          :class="{ 'clock--critical': isCritical }"
-        >
-          {{ formatLiveDuration(liveWorkHours) }}
+      <div class="live-card__hero" :class="{ 'hero--overtime': isOvertime, 'hero--critical': isCritical }">
+        <div class="live-card__clock-row">
+          <div class="live-card__clock" :class="{ 'clock--critical': isCritical }">
+            {{ formatLiveDuration(liveWorkHours) }}
+          </div>
+          <p class="live-card__balance" :class="{ 'is-over': isOvertime, 'is-critical': isCritical }">
+            {{ balanceLabel }}
+          </p>
         </div>
 
         <!-- Progress bar -->
-        <div
-          class="live-progress"
-          :title="`${Math.round(progressPercent)}% ${$t('live.progress_title', { hours: TARGET_HOURS.value })}`"
-        >
-          <div
-            class="live-progress__fill"
-            :class="{
-              'fill--overtime': isOvertime,
+        <div class="live-progress" :title="progressTitle">
+          <div class="live-progress__scale">
+            <div class="live-progress__fill" :style="{ width: `${goalFill}%` }" />
+          </div>
+          <div class="live-progress__over">
+            <div class="live-progress__fill" :class="{
+              'fill--overtime': isOvertime && !isCritical,
               'fill--critical': isCritical,
-            }"
-            :style="{ width: `${progressPercent}%` }"
-          />
+            }" :style="{ width: `${overtimeFill}%` }" />
+          </div>
         </div>
 
         <!-- Meta chips -->
-        <div class="live-card__meta">
+        <div v-if="startedAtLabel || store.liveStatus === 'break' || grossToday > 0" class="live-card__meta">
           <span v-if="startedAtLabel" class="live-meta-chip">
             <svg class="chip-icon" viewBox="0 0 16 16" fill="none">
-              <circle
-                cx="8"
-                cy="8"
-                r="6.5"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <path
-                d="M8 5v3.5l2 2"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
+              <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" />
+              <path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
             </svg>
             {{ $t("live.started_at", { time: startedAtLabel }) }}
           </span>
 
-          <span
-            v-if="store.liveStatus === 'break'"
-            class="live-meta-chip live-meta-chip--break"
-          >
+          <span v-if="store.liveStatus === 'break'" class="live-meta-chip live-meta-chip--break">
             <svg class="chip-icon" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M6 4v8M10 4v8"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
+              <path d="M6 4v8M10 4v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
             </svg>
             {{
               $t("live.break_duration", {
@@ -94,18 +61,7 @@
             }}
           </span>
 
-          <span
-            v-if="store.liveStatus !== 'idle'"
-            class="live-meta-chip"
-            :class="{ 'live-meta-chip--goal': isOvertime }"
-          >
-            {{ formatRemainingHours(remainingHours) }}
-          </span>
-
-          <span
-            v-if="store.grossHourlyRate > 0"
-            class="live-meta-chip live-meta-chip--earnings"
-          >
+          <span v-if="store.grossHourlyRate > 0" class="live-meta-chip live-meta-chip--earnings">
             {{
               $t("live.tracked_today", {
                 val: mask(formatCurrency(grossToday)),
@@ -117,11 +73,7 @@
 
       <!-- Actions -->
       <div class="live-card__actions">
-        <button
-          v-if="store.liveStatus === 'idle'"
-          class="btn live-btn live-btn--primary"
-          @click="onStartWork"
-        >
+        <button v-if="store.liveStatus === 'idle'" class="btn live-btn live-btn--primary" @click="onStartWork">
           <svg viewBox="0 0 16 16" fill="none" class="btn-icon">
             <polygon points="5,3 13,8 5,13" fill="currentColor" />
           </svg>
@@ -129,29 +81,16 @@
         </button>
 
         <template v-else-if="store.liveStatus === 'working'">
-          <button
-            class="btn live-btn live-btn--secondary"
-            @click="onStartBreak"
-          >
+          <button class="btn live-btn live-btn--secondary" @click="onStartBreak">
             <svg viewBox="0 0 16 16" fill="none" class="btn-icon">
-              <path
-                d="M5 4v8M11 4v8"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
+              <path d="M5 4v8M11 4v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
             {{ $t("live.start_break") }}
           </button>
-          <button class="btn live-btn live-btn--ghost" @click="onFinishWorkDay">
+          <button class="btn live-btn live-btn--finish" @click="onFinishWorkDay">
             <svg viewBox="0 0 16 16" fill="none" class="btn-icon">
-              <path
-                d="M3 8h10M9 4l4 4-4 4"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
             {{ $t("live.finish_day") }}
           </button>
@@ -164,24 +103,22 @@
             </svg>
             {{ $t("live.resume") }}
           </button>
-          <button class="btn live-btn live-btn--ghost" @click="onFinishWorkDay">
+          <button class="btn live-btn live-btn--finish" @click="onFinishWorkDay">
             <svg viewBox="0 0 16 16" fill="none" class="btn-icon">
-              <path
-                d="M3 8h10M9 4l4 4-4 4"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
             {{ $t("live.finish_day") }}
           </button>
         </template>
       </div>
+      <p v-if="!sessionBlocks.length" class="live-empty">
+        {{ $t("live.no_sessions") }}
+      </p>
     </div>
 
     <!-- RIGHT: Session blocks -->
-    <div class="live-card__side">
+    <div v-if="sessionBlocks.length" class="live-card__side">
       <div class="live-card__side-header">
         <span class="live-card__side-title">{{ $t("live.blocks_title") }}</span>
         <span v-if="sessionBlocks.length" class="side-count">{{
@@ -190,52 +127,22 @@
       </div>
 
       <div v-if="sessionBlocks.length" class="live-blocks">
-        <div
-          v-for="(block, index) in sessionBlocks"
-          :key="index"
-          class="live-block"
-          :class="{ 'live-block--active': !block.end }"
-        >
+        <div v-for="(block, index) in sessionBlocks" :key="index" class="live-block"
+          :class="{ 'live-block--active': !block.end }">
           <div class="live-block__index">{{ index + 1 }}</div>
           <div class="live-block__content">
             <span class="live-block__time">
               {{ block.start || "—" }}
               <span class="block-separator">→</span>
               <span :class="{ 'block-running': !block.end }">{{
-                block.end || "running"
+                block.end || $t("live.running")
               }}</span>
             </span>
             <span v-if="block.pause" class="live-block__pause">{{
               $t("live.block_pause", { val: block.pause })
             }}</span>
           </div>
-          <span v-if="!block.end" class="block-live-dot" />
         </div>
-      </div>
-
-      <div v-else class="live-empty">
-        <svg viewBox="0 0 24 24" fill="none" class="empty-icon">
-          <circle
-            cx="12"
-            cy="12"
-            r="9"
-            stroke="currentColor"
-            stroke-width="1.5"
-          />
-          <path
-            d="M12 7v5.5l3 3"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-          />
-        </svg>
-        {{ $t("live.no_sessions") }}
-      </div>
-
-      <!-- Daily summary if any work done -->
-      <div v-if="sessionBlocks.length" class="live-side-summary">
-        <span>{{ $t("live.total_tracked") }}</span>
-        <strong>{{ formatLiveDuration(liveWorkHours) }}</strong>
       </div>
     </div>
   </section>
@@ -476,9 +383,31 @@ const liveBreakSeconds = computed(() => {
   );
 });
 
-const progressPercent = computed(() =>
-  Math.min(100, (liveWorkHours.value / TARGET_HOURS.value) * 100),
+const overtimeHours = computed(() =>
+  Math.max(0, liveWorkHours.value - TARGET_HOURS.value),
 );
+
+const goalFill = computed(() => {
+  const target = TARGET_HOURS.value;
+  if (!target) return 0;
+
+  return Math.min(100, (liveWorkHours.value / target) * 100);
+});
+
+const overtimeFill = computed(() => {
+  const span = MAX_WORK_HOURS.value - TARGET_HOURS.value;
+  if (span <= 0)
+    return overtimeHours.value > 0 ? 100 : 0;
+
+  return Math.min(100, (overtimeHours.value / span) * 100);
+});
+
+const progressTitle = computed(() => {
+  const target = TARGET_HOURS.value || 1;
+  const percent = Math.round((liveWorkHours.value / target) * 100);
+
+  return `${percent}% ${t("live.progress_title", { hours: target })}`;
+});
 
 const isOvertime = computed(() => liveWorkHours.value >= TARGET_HOURS.value);
 const isCritical = computed(
@@ -488,6 +417,15 @@ const isCritical = computed(
 const remainingHours = computed(() =>
   Math.max(0, TARGET_HOURS.value - liveWorkHours.value),
 );
+
+const balanceLabel = computed(() => {
+  if (overtimeHours.value > 0)
+    return formatOvertimeHours(overtimeHours.value);
+  if (remainingHours.value <= 0)
+    return t("live.goal_reached");
+
+  return formatRemainingHours(remainingHours.value);
+});
 
 // Earnings
 const grossToday = computed(() => {
@@ -536,13 +474,27 @@ function formatCurrency(value) {
 
 function formatRemainingHours(hours) {
   const totalMin = Math.round(hours * 60);
-  if (totalMin <= 0) return t("live.goal_reached");
-  if (totalMin < 60) return t("live.left_time", { time: totalMin });
+  if (totalMin <= 0)
+    return t("live.goal_reached");
+  if (totalMin < 60)
+    return t("live.left_time", { time: totalMin });
+
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
+
   return m > 0
     ? t("live.left_time_hm", { h, m })
     : t("live.left_time_h", { h });
+}
+
+function formatOvertimeHours(hours) {
+  const totalMin = Math.max(1, Math.round(hours * 60));
+  if (totalMin < 60) return t("live.over_time", { time: totalMin });
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return m > 0
+    ? t("live.over_time_hm", { h, m })
+    : t("live.over_time_h", { h });
 }
 
 // Actions
@@ -572,7 +524,7 @@ function onFinishWorkDay() {
 /* Layout */
 .live-card {
   display: grid;
-  grid-template-columns: 1.45fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--space-6);
   padding: var(--space-6);
   background: var(--color-surface);
@@ -588,65 +540,38 @@ function onFinishWorkDay() {
 
 /* State Variants */
 .live-card.is-working {
-  border-color: color-mix(
-    in oklch,
-    var(--color-success) 40%,
-    var(--color-border)
-  );
-  background: color-mix(
-    in oklch,
-    var(--color-success-highlight) 25%,
-    var(--color-surface)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-success) 40%,
+      var(--color-border));
+  background: color-mix(in oklch,
+      var(--color-success-highlight) 25%,
+      var(--color-surface));
   box-shadow:
     var(--shadow-sm),
     0 0 0 1px color-mix(in oklch, var(--color-success) 15%, transparent);
 }
 
 .live-card.is-break {
-  border-color: color-mix(
-    in oklch,
-    var(--color-warning) 40%,
-    var(--color-border)
-  );
-  background: color-mix(
-    in oklch,
-    var(--color-warning-highlight) 20%,
-    var(--color-surface)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-warning) 40%,
+      var(--color-border));
+  background: color-mix(in oklch,
+      var(--color-warning-highlight) 20%,
+      var(--color-surface));
 }
 
 .live-card.is-critical {
-  border-color: color-mix(
-    in oklch,
-    var(--color-error) 45%,
-    var(--color-border)
-  );
-  background: color-mix(
-    in oklch,
-    var(--color-error-highlight, #fef2f2) 20%,
-    var(--color-surface)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-error) 45%,
+      var(--color-border));
+  background: color-mix(in oklch,
+      var(--color-error-highlight, #fef2f2) 20%,
+      var(--color-surface));
 }
 
 /* Eyebrow */
-.live-card__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-faint);
-  font-weight: 700;
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-success);
-  animation: pulse 1.8s ease-in-out infinite;
+.live-card.has-blocks {
+  grid-template-columns: 1.45fr 1fr;
 }
 
 /* Main Panel */
@@ -662,17 +587,6 @@ function onFinishWorkDay() {
   justify-content: space-between;
   gap: var(--space-3);
   flex-wrap: wrap;
-}
-
-.live-card__title {
-  font-size: var(--text-lg);
-  font-weight: 700;
-}
-
-.live-card__hint {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  max-width: 48ch;
 }
 
 /* Status Badge */
@@ -725,19 +639,39 @@ function onFinishWorkDay() {
 }
 
 .hero--overtime {
-  border-color: color-mix(
-    in oklch,
-    var(--color-warning) 30%,
-    var(--color-divider)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-warning) 30%,
+      var(--color-divider));
 }
 
 .hero--critical {
-  border-color: color-mix(
-    in oklch,
-    var(--color-error, #ef4444) 30%,
-    var(--color-divider)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-error, #ef4444) 30%,
+      var(--color-divider));
+}
+
+.live-card__clock-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.live-card__balance {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.live-card__balance.is-over {
+  color: var(--color-warning);
+}
+
+.live-card__balance.is-critical {
+  color: var(--color-error);
 }
 
 .live-card__clock {
@@ -756,10 +690,25 @@ function onFinishWorkDay() {
 
 /* Progress Bar */
 .live-progress {
+  display: flex;
+  gap: 4px;
   height: 6px;
+}
+
+.live-progress__scale,
+.live-progress__over {
+  height: 100%;
   border-radius: var(--radius-full);
   background: var(--color-surface-offset);
   overflow: hidden;
+}
+
+.live-progress__scale {
+  flex: 1;
+}
+
+.live-progress__over {
+  width: 22%;
 }
 
 .live-progress__fill {
@@ -809,11 +758,9 @@ function onFinishWorkDay() {
 .live-meta-chip--break {
   color: var(--color-warning);
   background: var(--color-warning-highlight);
-  border-color: color-mix(
-    in oklch,
-    var(--color-warning) 20%,
-    var(--color-divider)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-warning) 20%,
+      var(--color-divider));
 }
 
 .live-meta-chip--goal {
@@ -869,10 +816,10 @@ function onFinishWorkDay() {
   border: 1px solid var(--color-border);
 }
 
-.live-btn--ghost {
-  background: transparent;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-divider);
+.live-btn--finish {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+  border: 1px solid color-mix(in oklch, var(--color-error) 35%, transparent);
 }
 
 .btn-icon {
@@ -936,11 +883,9 @@ function onFinishWorkDay() {
 }
 
 .live-block--active {
-  border-color: color-mix(
-    in oklch,
-    var(--color-success) 35%,
-    var(--color-divider)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-success) 35%,
+      var(--color-divider));
 }
 
 .live-block__index {
@@ -982,42 +927,11 @@ function onFinishWorkDay() {
   color: var(--color-text-muted);
 }
 
-.block-live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-success);
-  flex-shrink: 0;
-  animation: pulse 1.8s ease-in-out infinite;
-}
-
-/* Side Summary */
-.live-side-summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-divider);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin-top: auto;
-}
-
-.live-side-summary strong {
-  color: var(--color-text);
-  font-variant-numeric: tabular-nums;
-}
-
 /* Empty State */
 .live-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-5) 0;
+  margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
-  text-align: center;
 }
 
 .empty-icon {
@@ -1028,6 +942,7 @@ function onFinishWorkDay() {
 
 /* Animation */
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -1042,7 +957,9 @@ function onFinishWorkDay() {
 
 /* Tablet */
 @media (max-width: 900px) {
-  .live-card {
+
+  .live-card,
+  .live-card.has-blocks {
     grid-template-columns: 1fr;
     gap: var(--space-4);
     padding: var(--space-4);
@@ -1071,10 +988,6 @@ function onFinishWorkDay() {
 
   .live-card__clock {
     font-size: clamp(2.2rem, 12vw, 3rem);
-  }
-
-  .live-card__hint {
-    display: none;
   }
 
   .live-blocks {
