@@ -242,7 +242,7 @@ function getMonthStats(month) {
     0,
   );
   const planned = monthEntries.reduce(
-    (sum, entry) => sum + (entry.plannedHours || store.settings.hoursPerDay),
+    (sum, entry) => sum + store.plannedHoursFor(entry),
     0,
   );
 

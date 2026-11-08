@@ -110,7 +110,7 @@
               </td>
               <td class="num">
                 {{
-                  formatHours(entry.plannedHours || store.settings.hoursPerDay)
+                  formatHours(store.plannedHoursFor(entry))
                 }}
               </td>
 
@@ -255,7 +255,7 @@ function rowStyle(entry) {
 
 function actualVariant(entry) {
   const Actual = store.effectiveActualHours(entry);
-  const planned = entry.plannedHours || store.settings.hoursPerDay;
+  const planned = store.plannedHoursFor(entry);
 
   if (Actual >= planned - 0.1) return "cell-ok";
   if (Actual > 0) return "cell-warn";

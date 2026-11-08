@@ -195,7 +195,7 @@ const statsActual = computed(() =>
 const statsPlanned = computed(() =>
   statsEntries.value.reduce(
     (total, entry) =>
-      total + (entry.plannedHours ?? store.settings.hoursPerDay),
+      total + (store.plannedHoursFor(entry)),
     0,
   ),
 );
@@ -228,7 +228,7 @@ function sumActual(entries) {
 
 function sumPlanned(entries) {
   return entries.reduce(
-    (total, entry) => total + (entry.plannedHours ?? store.settings.hoursPerDay),
+    (total, entry) => total + (store.plannedHoursFor(entry)),
     0,
   );
 }

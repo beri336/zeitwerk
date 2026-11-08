@@ -43,7 +43,7 @@ const data = computed(() =>
         })
 
         const actual = parseFloat(entries.reduce((s, e) => s + store.effectiveActualHours(e), 0).toFixed(2))
-        const planned = parseFloat(entries.reduce((s, e) => s + (e.plannedHours || store.settings.hoursPerDay), 0).toFixed(2))
+        const planned = parseFloat(entries.reduce((s, e) => s + store.plannedHoursFor(e), 0).toFixed(2))
 
         return {
             label: `${MONTH_NAMES[month].slice(0, 3)} ${year !== store.currYear ? year : ''}`.trim(),

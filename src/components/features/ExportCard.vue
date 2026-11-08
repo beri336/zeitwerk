@@ -429,7 +429,7 @@ const exportEntries = computed(() => {
 const summary = computed(() => {
     const entries = exportEntries.value
     const actual = entries.reduce((s, entry) => s + store.effectiveActualHours(entry), 0)
-    const planned = entries.reduce((s, entry) => s + (entry.plannedHours || store.settings.hoursPerDay), 0)
+    const planned = entries.reduce((s, entry) => s + (store.plannedHoursFor(entry)), 0)
     const gross = entries.reduce((s, entry) => s + store.grossEarnedForEntry(entry), 0)
 
     return {
@@ -461,7 +461,7 @@ function buildCSVRows() {
 
     const rows = exportEntries.value.map(entry => {
         const actual = store.effectiveActualHours(entry)
-        const planned = entry.plannedHours || store.settings.hoursPerDay
+        const planned = store.plannedHoursFor(entry)
         const day = new Date(entry.date + 'T00:00').toLocaleDateString('en-US', { weekday: 'short' })
 
         const row = [
@@ -610,8 +610,8 @@ function exportPDF() {
 
     const tableRows = rows.map(entry => {
         const actual = store.effectiveActualHours(entry).toFixed(2)
-        const planned = (entry.plannedHours || store.settings.hoursPerDay).toFixed(2)
-        const diff = (store.effectiveActualHours(entry) - (entry.plannedHours || store.settings.hoursPerDay)).toFixed(2)
+        const planned = (store.plannedHoursFor(entry)).toFixed(2)
+        const diff = (store.effectiveActualHours(entry) - (store.plannedHoursFor(entry))).toFixed(2)
         const diffColor = Number(diff) >= 0 ? '#22c55e' : '#ef4444'
 
         return `
@@ -719,8 +719,8 @@ async function exportClipboard() {
 
     const rows = exportEntries.value.map(entry => {
         const actual = store.effectiveActualHours(entry).toFixed(2)
-        const planned = (entry.plannedHours || store.settings.hoursPerDay).toFixed(2)
-        const diff = (store.effectiveActualHours(entry) - (entry.plannedHours || store.settings.hoursPerDay)).toFixed(2)
+        const planned = (store.plannedHoursFor(entry)).toFixed(2)
+        const diff = (store.effectiveActualHours(entry) - (store.plannedHoursFor(entry))).toFixed(2)
 
         return [
             employerName(entry),

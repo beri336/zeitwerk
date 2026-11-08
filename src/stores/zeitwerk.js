@@ -360,7 +360,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
 
             group.entries.push(entry)
             group.actual += effectiveActualHours(entry)
-            group.planned += entry.plannedHours || settings.value.hoursPerDay
+            group.planned += plannedHoursFor(entry)
         })
         groups.forEach(group => group.ActualDiff = group.actual - group.planned)
 
@@ -376,7 +376,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         entriesForMonth
             .value
             .reduce((accumulator, entry) =>
-                accumulator + (entry.plannedHours || settings.value.hoursPerDay), 0)
+                accumulator + plannedHoursFor(entry), 0)
     )
 
     const monthDiff = computed(() => monthActual.value - monthPlanned.value)
@@ -843,7 +843,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             const date = new Date(`${isoDate}T00:00:00`)
 
             const actualValue = entry ? effectiveActualHours(entry) : null
-            const plannedValue = entry ? (entry.plannedHours ?? settings.value.hoursPerDay) : null
+            const plannedValue = entry ? plannedHoursFor(entry) : null
             const diffValue = entry ? (actualValue - plannedValue) : null
             const breakMinutes = entry ? getBreakMinutes(entry) : null
             const grossEarned = entry ? grossEarnedForEntry(entry) : null
@@ -993,7 +993,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         const type = getAbsenceType(entry.typ ?? 'on-site')
 
         if (!type.counter)
-            return entry.plannedHours ?? settings.value.hoursPerDay
+            return plannedHoursFor(entry)
 
         return getWorkedMinutes(entry) / 60
     }
@@ -1035,6 +1035,27 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     // Calculate gross salary based on gross monthly salary and hours worked
+    function hoursOnDate(isoDate) {
+        const employment = employmentForDate(employments.value, String(isoDate || '').slice(0, 10))
+        const hours = Number(employment?.hoursPerDay ?? settings.value.hoursPerDay)
+        return Number.isFinite(hours) ? hours : 0
+    }
+
+    function plannedHoursFor(entry) {
+        if (typeof entry === 'string')
+            return hoursOnDate(entry)
+        if (!entry)
+            return hoursOnDate(todayIso())
+
+        if (entry.plannedHours !== null && entry.plannedHours !== undefined && entry.plannedHours !== '') {
+            const stored = Number(entry.plannedHours)
+            if (Number.isFinite(stored))
+                return stored
+        }
+
+        return hoursOnDate(entry.date)
+    }
+
     function rateForDate(isoDate) {
         const employment = employmentForDate(employments.value, isoDate)
         const monthly = employment?.grossMonthlySalary ?? settings.value.grossMonthlySalary
@@ -1110,7 +1131,7 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         prevMonth, nextMonth,
         exportJSON, importJSON, exportCSV,
         effectiveActualHours, importHolidays, syncHolidays, applyEmploymentCoverage,
-        grossHourlyRate, grossDailyRate, grossEarnedForEntry,
+        grossHourlyRate, grossDailyRate, grossEarnedForEntry, plannedHoursFor,
         activeSession, todayEntry, liveStatus, liveWorkedHours, startWork, startBreak, resumeWork, finishWorkDay, resetActiveSession,
         recoverActiveSession,
         deleteAllEntries,

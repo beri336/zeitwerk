@@ -385,7 +385,7 @@ const todayWorkedHours = computed(() => {
 });
 
 const todayExpectedHours = computed(
-  () => store.todayEntry?.plannedHours || store.settings.hoursPerDay || 0,
+  () => store.plannedHoursFor(store.todayEntry),
 );
 const todayDifference = computed(
   () => todayWorkedHours.value - todayExpectedHours.value,
@@ -482,7 +482,7 @@ function entriesBetween(start, end) {
 function weekDiff(entries) {
   const actual = entries.reduce((total, entry) => total + store.effectiveActualHours(entry), 0);
   const planned = entries.reduce(
-    (total, entry) => total + (entry.plannedHours ?? store.settings.hoursPerDay),
+    (total, entry) => total + store.plannedHoursFor(entry),
     0,
   );
   return actual - planned;
@@ -506,6 +506,7 @@ const currentWeekRange = computed(() => {
 const currentWeekEntries = computed(() =>
   entriesBetween(currentWeekRange.value.monday, currentWeekRange.value.nextMonday),
 );
+
 const previousWeekEntries = computed(() => {
   const start = new Date(currentWeekRange.value.monday);
   start.setDate(start.getDate() - 7);
@@ -522,7 +523,7 @@ const currentWeekActual = computed(() =>
 const currentWeekPlanned = computed(() =>
   currentWeekEntries.value.reduce(
     (total, entry) =>
-      total + (entry.plannedHours ?? store.settings.hoursPerDay),
+      total + store.plannedHoursFor(entry),
     0,
   ),
 );
@@ -619,7 +620,7 @@ const yearActual = computed(() =>
 
 const yearPlanned = computed(() =>
   yearEntries.value.reduce(
-    (s, e) => s + (e.plannedHours || store.settings.hoursPerDay),
+    (s, e) => s + store.plannedHoursFor(e),
     0,
   ),
 );

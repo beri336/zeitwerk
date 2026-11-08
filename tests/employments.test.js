@@ -163,4 +163,52 @@ describe('employments', () => {
         expect(result.ok).toBe(false)
         expect(result.reason).toBe('overlap')
     })
+
+    it('uses the employment hours of that day when planned hours are missing', () => {
+        const store = useZeitwerkStore()
+        store.updateEmployment(store.employments[0].id, {
+            name: 'Früher',
+            start: '2020-01-01',
+            end: '2024-01-01',
+            hoursPerDay: 6,
+        })
+        const second = store.addEmployment()
+        store.updateEmployment(second.id, {
+            name: 'Heute',
+            start: '2024-01-01',
+            end: '',
+            hoursPerDay: 8,
+        })
+
+        store.entries.push({
+            id: 'old-work',
+            date: '2020-03-02',
+            typ: 'on-site',
+            timeEntries: [{ start: '08:00', end: '14:00', pause: 0 }],
+        })
+        store.entries.push({
+            id: 'old-vacation',
+            date: '2020-03-03',
+            typ: 'vacation',
+            timeEntries: [],
+        })
+        store.entries.push({
+            id: 'old-explicit',
+            date: '2020-03-04',
+            typ: 'on-site',
+            timeEntries: [],
+            plannedHours: 7.5,
+        })
+
+        store.currYear = 2020
+        store.currMonth = 2
+
+        const work = store.entries.find(entry => entry.id === 'old-work')
+        const vacation = store.entries.find(entry => entry.id === 'old-vacation')
+        expect(store.settings.hoursPerDay).toBe(8)
+        expect(store.plannedHoursFor(work)).toBe(6)
+        expect(store.effectiveActualHours(vacation)).toBe(6)
+        expect(store.plannedHoursFor(store.entries.find(entry => entry.id === 'old-explicit'))).toBe(7.5)
+        expect(store.monthPlanned).toBe(19.5)
+    })
 })

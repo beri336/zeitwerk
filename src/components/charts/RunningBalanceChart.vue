@@ -30,7 +30,7 @@ const cumulative = computed(() => {
     return [...store.entriesForMonth]
         .sort((a, b) => a.date.localeCompare(b.date))
         .map(entry => {
-            const planned = entry.plannedHours || store.settings.hoursPerDay
+            const planned = store.plannedHoursFor(entry)
             const actual = store.effectiveActualHours(entry)
             running += actual - planned
 

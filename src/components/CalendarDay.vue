@@ -92,8 +92,8 @@ const actual = computed(() =>
 );
 const planned = computed(() =>
   entry.value
-    ? (entry.value.plannedHours ?? store.settings.hoursPerDay)
-    : store.settings.hoursPerDay,
+    ? store.plannedHoursFor(entry.value)
+    : store.plannedHoursFor(props.date),
 );
 const progress = computed(() =>
   planned.value > 0 ? Math.min(100, (actual.value / planned.value) * 100) : 0,

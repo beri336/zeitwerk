@@ -35,7 +35,7 @@ const data = computed(() => {
             return date.getFullYear() === store.currYear && date.getMonth() === i
         })
         const actual = entries.reduce((s, e) => s + store.effectiveActualHours(e), 0)
-        const planned = entries.reduce((s, e) => s + (e.plannedHours || store.settings.hoursPerDay), 0)
+        const planned = entries.reduce((s, e) => s + store.plannedHoursFor(e), 0)
         running += actual - planned
 
         return {
