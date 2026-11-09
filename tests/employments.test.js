@@ -13,10 +13,11 @@ describe('employments', () => {
         expect(store.employmentForDate('2020-06-01')?.id).toBe(store.employments[0].id)
     })
 
-    it('counts vacation inside each employment and drops days before the first start', () => {
+    it('counts vacation inside each employment and keeps historical entries', () => {
         const store = useZeitwerkStore()
         const first = store.employments[0]
 
+        store.addEntry({ date: '2019-12-20', typ: 'vacation', timeEntries: [] })
         store.updateEmployment(first.id, {
             name: 'Erste',
             start: '2020-01-01',
@@ -26,7 +27,6 @@ describe('employments', () => {
             grossMonthlySalary: 3000,
             hoursPerWeek: 40,
         })
-        store.addEntry({ date: '2019-12-20', typ: 'vacation', timeEntries: [] })
         store.addEntry({ date: '2020-03-02', typ: 'vacation', timeEntries: [] })
 
         const second = store.addEmployment()
@@ -42,7 +42,7 @@ describe('employments', () => {
         store.addEntry({ date: '2021-06-01', typ: 'vacation', timeEntries: [] })
         store.addEntry({ date: '2021-06-02', typ: 'on-site', timeEntries: [{ start: '08:00', end: '16:00', pause: 0 }] })
 
-        expect(store.entries.some(entry => entry.date === '2019-12-20')).toBe(false)
+        expect(store.entries.some(entry => entry.date === '2019-12-20')).toBe(true)
         expect(employmentForDate(store.employments, '2020-12-31')?.name).toBe('Erste')
         expect(employmentForDate(store.employments, '2021-01-01')?.name).toBe('Zweite')
 

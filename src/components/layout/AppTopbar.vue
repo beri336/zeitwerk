@@ -315,12 +315,12 @@ function getImportErrorMessage(error) {
   return t(messages[error?.code] ?? "topbar.toast_import_err");
 }
 
-// confirm import and apply it to the store, optionally creating a backup first
-function confirmImport({ createBackup }) {
+// Every import gets a safety snapshot before it can replace local data.
+function confirmImport() {
   if (!pendingImport.value) return;
 
   try {
-    if (createBackup) createSnapshot({ force: true });
+    createSnapshot({ force: true });
     applyImport(pendingImport.value);
     pendingImport.value = null;
     showImportModal.value = false;

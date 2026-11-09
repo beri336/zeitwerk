@@ -273,35 +273,15 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
         })
     }
 
-    function pruneBeforeFirstEmployment() {
-        const start = earliestEmploymentStart(employments.value)
-        if (!start)
-            return
-
-        entries.value = entries.value.filter(entry => !entryIsBeforeStart(entry, start))
-    }
-
     function removeUncoveredHolidays() {
-        if (!employments.value.some(employment => employment.start))
-            return
-
-        entries.value = entries.value.filter(entry => {
-            if (entry.typ !== 'publicholiday')
-                return true
-            return Boolean(employmentForDate(employments.value, String(entry.date).slice(0, 10)))
-        })
+        // Historical entries must remain available when employment ranges change.
+        // Public holidays are generated data and can be added again without
+        // deleting anything the user has recorded.
     }
 
-    // Rebuild public holidays inside employment ranges. Days before the first start are dropped.
+    // Rebuild public holidays without removing historical user data.
     function rebuildHolidays() {
-        pruneBeforeFirstEmployment()
         const years = new Set(managedHolidayYears(employments.value, todayIso()))
-        entries.value = entries.value.filter(entry => {
-            if (entry.typ !== 'publicholiday')
-                return true
-            const year = Number(String(entry.date).slice(0, 4))
-            return !years.has(year)
-        })
         years.forEach(year => addHolidaysForYear(year))
         persist()
     }
@@ -311,12 +291,10 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
     }
 
     function applyEmploymentCoverage() {
-        pruneBeforeFirstEmployment()
         removeUncoveredHolidays()
         persist()
     }
 
-    pruneBeforeFirstEmployment()
     removeUncoveredHolidays()
     if (!entries.value.some(entry =>
         entry.typ === 'publicholiday'
@@ -461,12 +439,6 @@ export const useZeitwerkStore = defineStore('zeitwerk', () => {
             return
 
         const next = { ...entries.value[index], ...data }
-        if (entryIsBeforeStart(next, earliestEmploymentStart(employments.value))) {
-            entries.value = entries.value.filter(entry => entry.id !== id)
-            persist()
-            return
-        }
-
         entries.value[index] = next
         persist()
     }

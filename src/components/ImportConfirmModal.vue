@@ -30,11 +30,8 @@
           <button class="btn btn-ghost" type="button" @click="cancel">
             {{ $t("common.cancel") }}
           </button>
-          <button class="btn btn-secondary" type="button" @click="confirm(true)">
+          <button class="btn btn-danger" type="button" @click="confirm(true)">
             {{ $t("import.backup_and_import") }}
-          </button>
-          <button class="btn btn-danger" type="button" @click="confirm(false)">
-            {{ $t("import.import_now") }}
           </button>
         </div>
       </div>

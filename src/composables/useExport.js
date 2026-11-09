@@ -6,9 +6,7 @@ import { useTodoStore } from '@/composables/useTodoStore'
 import { useProfileStore } from '@/composables/useProfileStore'
 import {
     dateBelongsToEmployment,
-    earliestEmploymentStart,
     employmentForDate,
-    entryIsBeforeStart,
     normalizeEmployment
 } from '@/composables/employments'
 
@@ -34,7 +32,7 @@ export function useExport() {
 
         function inExport(isoDate) {
             const date = String(isoDate ?? '').slice(0, 10)
-            if (!dateBelongsToEmployment(zeitwerk.employments, date, employmentId))
+            if (employmentId && !dateBelongsToEmployment(zeitwerk.employments, date, employmentId))
                 return false
 
             if (from && date < from)
@@ -158,7 +156,6 @@ export function useExport() {
                 ...normalized.zeitwerk.settings,
             })]
         zeitwerk.entries = normalized.zeitwerk.entries
-            .filter(entry => !entryIsBeforeStart(entry, earliestEmploymentStart(zeitwerk.employments)))
         zeitwerk.applyEmploymentCoverage()
 
         calendar.events = normalized.calendar.events

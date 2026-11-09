@@ -152,6 +152,6 @@ describe('export and import', () => {
         expect(full.zeitwerk.employments).toHaveLength(2)
         expect(full.calendar.events).toHaveLength(2)
         expect(full.todos.todos).toHaveLength(3)
-        expect(full.zeitwerk.entries.some(entry => entry.date < '2020-01-01')).toBe(false)
+        expect(full.zeitwerk.entries.some(entry => entry.date < '2020-01-01')).toBe(true)
     })
 })
