@@ -30,6 +30,18 @@
     --color-blue-highlight: #c6d8e4;
     --color-gold: #d19900;
     --color-gold-highlight: #f5ecc8;
+    --absence-office: #01696f;
+    --absence-office-bg: #c5e4e1;
+    --absence-home: #2f6a16;
+    --absence-home-bg: #d5e6c8;
+    --absence-vacation: #8d6400;
+    --absence-vacation-bg: #f6e7b8;
+    --absence-sick: #9a3260;
+    --absence-sick-bg: #f3d5e4;
+    --absence-holiday: #005f8f;
+    --absence-holiday-bg: #c9e3f4;
+    --absence-other: #5e6570;
+    --absence-other-bg: #e3e1db;
 
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
@@ -86,6 +98,18 @@
     --color-blue-highlight: #3a4550;
     --color-gold: #e8af34;
     --color-gold-highlight: #4d4332;
+    --absence-office: #8fd0d4;
+    --absence-office-bg: #1a3d42;
+    --absence-home: #9ed46a;
+    --absence-home-bg: #24381c;
+    --absence-vacation: #f0c14a;
+    --absence-vacation-bg: #3d3318;
+    --absence-sick: #ee8eb8;
+    --absence-sick-bg: #412433;
+    --absence-holiday: #86c0ea;
+    --absence-holiday-bg: #1a3348;
+    --absence-other: #c2bbb2;
+    --absence-other-bg: #32302c;
 
     --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
     --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);

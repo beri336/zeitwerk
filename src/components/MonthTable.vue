@@ -49,17 +49,19 @@
           <template v-for="(group, groupIndex) in store.weekGroups" :key="group.kw">
             <!-- Entry rows -->
             <tr v-for="(entry, entryIndex) in group.entries" :key="entry.id"
-              :class="{ 'week-separator': entryIndex === 0 && groupIndex > 0 }">
+              :class="{ 'week-separator': entryIndex === 0 && groupIndex > 0 }" :style="rowStyle(entry)">
               <td>
                 <div style="
           display: flex;
           align-items: center;
           gap: var(--space-2);
         ">
-                  <span v-if="entry.typ && entry.typ !== 'on-site'" class="typ-chip"
-                    :style="`background:${absenceMeta(entry.typ).highlight};color:${absenceMeta(entry.typ).color}`">
-                    {{ absenceMeta(entry.typ).icon }}
-                    {{ absenceMeta(entry.typ).label }}
+                  <span class="typ-chip"
+                    :style="`background:${absenceMeta(entry.typ || 'on-site').highlight};color:${absenceMeta(entry.typ || 'on-site').color}`">
+                    <AbsenceIcon :type="entry.typ || 'on-site'" :size="14" />
+                    <template v-if="entry.typ && entry.typ !== 'on-site'">
+                      {{ absenceMeta(entry.typ).label }}
+                    </template>
                   </span>
                   <span>{{ formatDate(entry.date) }}</span>
                 </div>
@@ -206,6 +208,7 @@ import {
   formatDate,
 } from "@/composables/useTime";
 import { getAbsenceType } from "@/composables/useAbsence";
+import AbsenceIcon from "@/components/icons/AbsenceIcon.vue";
 import LiveTrackerCard from "@/components/features/LiveTrackerCard.vue";
 import { usePrivacy } from "@/composables/usePrivacy";
 
@@ -246,11 +249,7 @@ function cancelEdit() {
 function rowStyle(entry) {
   const type = getAbsenceType(entry.typ ?? "on-site");
 
-  if (entry.typ && entry.typ !== "on-site") {
-    return `border-left: 3px solid ${type.color}`;
-  }
-
-  return "";
+  return `border-left: 3px solid ${type.color}`;
 }
 
 function actualVariant(entry) {

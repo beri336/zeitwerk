@@ -3,13 +3,9 @@
 <template>
 
   <div v-if="stats.length" class="legend">
-    <div
-      v-for="stat in stats"
-      :key="stat.key"
-      class="legend-item"
-      :style="`background:${stat.highlight};color:${stat.color};border-color:${stat.color}40`"
-    >
-      <span>{{ stat.icon }}</span>
+    <div v-for="stat in stats" :key="stat.key" class="legend-item"
+      :style="`background:${stat.highlight};color:${stat.color};border-color:${stat.color}40`">
+      <AbsenceIcon :type="stat.key" :size="14" />
       <span class="legend-label">{{ stat.label }}</span>
       <span class="legend-count">{{ stat.count }}x</span>
     </div>
@@ -22,6 +18,11 @@ import { useI18n } from "vue-i18n";
 
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { ABSENCE_TYPES } from "@/composables/useAbsence";
+import AbsenceIcon from "@/components/icons/AbsenceIcon.vue";
+
+const props = defineProps({
+  showAll: { type: Boolean, default: false },
+});
 
 const store = useZeitwerkStore();
 const { t } = useI18n();
@@ -35,12 +36,12 @@ const stats = computed(() => {
   });
 
   return Object.entries(ABSENCE_TYPES)
-    .filter(([key]) => counts[key])
+    .filter(([key]) => props.showAll || counts[key])
     .map(([key, type]) => ({
       key,
       ...type,
       label: t(`absence.${key}`),
-      count: counts[key],
+      count: counts[key] ?? 0,
     }));
 });
 </script>

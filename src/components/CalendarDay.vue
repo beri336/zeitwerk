@@ -2,30 +2,22 @@
 
 <template>
 
-  <button
-    class="cal-day"
-    :class="{
-      'cal-day--today': isToday,
-      'cal-day--outside': isOutside,
-      'cal-day--entry': !!entry,
-      'cal-day--absence': entry && entry.typ && entry.typ !== 'on-site',
-      'cal-day--flash': flashToday,
-      'cal-day--weekend': isWeekend,
-      'cal-day--compact': compact,
-    }"
-    :style="
-      entry && entry.typ && entry.typ !== 'on-site'
+  <button class="cal-day" :class="{
+    'cal-day--today': isToday,
+    'cal-day--outside': isOutside,
+    'cal-day--entry': !!entry,
+    'cal-day--typed': !!entry,
+    'cal-day--flash': flashToday,
+    'cal-day--weekend': isWeekend,
+    'cal-day--compact': compact,
+  }" :style="entry
         ? `--day-accent:${type.color};--day-bg:${type.highlight}`
-        : ''
-    "
-    :data-cal-date="date"
-    type="button"
-    @click="emit('click', date)"
-  >
+        : undefined
+      " :data-cal-date="date" type="button" @click="emit('click', date)">
     <div class="cal-day__header">
       <span class="cal-day__num">{{ dayNum }}</span>
-      <span v-if="entry?.typ && entry.typ !== 'on-site'" class="cal-day__icon">
-        {{ type.icon }}
+      <span v-if="entry" class="cal-day__icon">
+        <AbsenceIcon :type="entry.typ || 'on-site'" :size="14" />
       </span>
     </div>
 
@@ -48,10 +40,7 @@
     </div>
 
     <div class="cal-day__bar-track">
-      <div
-        class="cal-day__bar-fill"
-        :style="`width:${entry ? progress : 0}%;background:${progressColor}`"
-      />
+      <div class="cal-day__bar-fill" :style="`width:${entry ? progress : 0}%;background:${progressColor}`" />
     </div>
   </button>
 </template>
@@ -61,6 +50,7 @@ import { computed } from "vue";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { formatHours } from "@/composables/useTime";
 import { getAbsenceType } from "@/composables/useAbsence";
+import AbsenceIcon from "@/components/icons/AbsenceIcon.vue";
 import { usePrivacy } from "@/composables/usePrivacy";
 
 const props = defineProps({
@@ -191,42 +181,27 @@ const isWeekend = computed(() => {
   opacity: 0.6;
 }
 
-.cal-day--absence {
+.cal-day--typed {
   background: var(--day-bg, var(--color-surface));
-  border-color: var(--day-accent, var(--color-border));
+  border-color: color-mix(in oklch, var(--day-accent) 55%, var(--color-border));
 }
 
-.cal-day--entry:not(.cal-day--absence) {
-  background: color-mix(
-    in oklch,
-    var(--color-primary-highlight) 24%,
-    var(--color-surface)
-  );
-  border-color: color-mix(
-    in oklch,
-    var(--color-primary) 45%,
-    var(--color-border)
-  );
-}
-
-.cal-day--entry:not(.cal-day--absence) .cal-day__num {
-  color: var(--color-primary);
+.cal-day--typed .cal-day__num {
+  color: var(--day-accent, var(--color-text));
   font-weight: 700;
 }
 
-.cal-day--today.cal-day--entry:not(.cal-day--absence) .cal-day__num {
+.cal-day--today.cal-day--typed .cal-day__num {
   color: var(--color-text-inverse);
 }
 
-.cal-day--weekend {
-  background: color-mix(
-    in oklch,
-    var(--color-primary-highlight) 35%,
-    var(--color-surface)
-  );
+.cal-day--weekend:not(.cal-day--typed) {
+  background: color-mix(in oklch,
+      var(--color-primary-highlight) 35%,
+      var(--color-surface));
 }
 
-.cal-day--weekend .cal-day__num {
+.cal-day--weekend:not(.cal-day--typed) .cal-day__num {
   color: var(--color-warning);
   font-weight: 700;
 }

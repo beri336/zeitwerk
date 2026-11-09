@@ -33,6 +33,39 @@
 
     <p class="cal-hint">{{ $t("month.hint") }}</p>
 
+    <section class="cal-grid-wrap" aria-label="Month calendar">
+      <div class="cal-grid">
+        <div v-for="(header, index) in DAY_HEADERS" :key="header" class="cal-weekday"
+          :class="{ 'cal-weekday--weekend': isWeekendHeader(index) }">
+          {{ header }}
+        </div>
+
+        <CalendarDay v-for="day in calendarDays" :key="day.date" :date="day.date" :is-today="day.date === todayStr"
+          :is-outside="day.outside" compact :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
+      </div>
+    </section>
+
+    <section class="overview-summary" :aria-label="$t('overview.statistics')">
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.actual") }}</span>
+        <span class="cal-stat-value" :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'">
+          {{ formatHours(store.monthActual) }}
+        </span>
+      </div>
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.planned") }}</span>
+        <span class="cal-stat-value">{{ formatHours(store.monthPlanned) }}</span>
+      </div>
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.diff") }}</span>
+        <span class="cal-stat-value" :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'">
+          {{ store.monthDiff >= 0 ? "+" : "" }}{{ formatHours(store.monthDiff) }}
+        </span>
+      </div>
+    </section>
+
+    <AbsenceLegend show-all />
+
     <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
       <summary>{{ $t("overview.statistics") }}</summary>
       <div class="cal-stats">
@@ -46,46 +79,13 @@
           <span class="cal-stat-value">{{ store.entriesForMonth.length }}</span>
         </div>
 
-        <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("month.actual") }}</span>
-          <span class="cal-stat-value" :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ formatHours(store.monthActual) }}
-          </span>
-        </div>
-
-        <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("month.planned") }}</span>
-          <span class="cal-stat-value">{{
-            formatHours(store.monthPlanned)
-            }}</span>
-        </div>
-
-        <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("month.diff") }}</span>
-          <span class="cal-stat-value" :class="store.monthDiff >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ store.monthDiff >= 0 ? "+" : ""
-            }}{{ formatHours(store.monthDiff) }}
-          </span>
-        </div>
         <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
-          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
+          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") :
+            $t(`dashboard.month.${type}`) }}</span>
           <span class="cal-stat-value">{{ monthTypeCounts[type] }}</span>
         </div>
       </div>
     </details>
-
-    <section class="cal-grid-wrap" aria-label="Month calendar">
-      <div class="cal-grid">
-        <div v-for="(header, index) in DAY_HEADERS" :key="header" class="cal-weekday"
-          :class="{ 'cal-weekday--weekend': isWeekendHeader(index) }">
-          {{ header }}
-        </div>
-
-        <CalendarDay v-for="day in calendarDays" :key="day.date" :date="day.date" :is-today="day.date === todayStr"
-          :is-outside="day.outside"           compact
-          :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
-      </div>
-    </section>
 
     <EntryModal v-model="showModal" :edit-entry="editEntry" :prefill-date="clickedDate" />
   </main>
@@ -97,7 +97,7 @@ import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { formatHours } from "@/composables/useTime";
 import CalendarDay from "@/components/CalendarDay.vue";
 import EntryModal from "@/components/EntryModal.vue";
-import HolidayImportModal from "@/components/HolidayImportModal.vue";
+import AbsenceLegend from "@/components/AbsenceLegend.vue";
 import { useI18n } from "vue-i18n";
 import { countAbsenceTypes } from "@/composables/useAbsence";
 import { useOverviewStatsPreference } from "@/composables/useOverviewPreferences";
@@ -110,7 +110,7 @@ const showModal = ref(false);
 const editEntry = ref(null);
 const clickedDate = ref(null);
 const flashToday = ref(false);
-const showHolidayModal = ref(false);
+
 const { statsOpen, updateStatsOpen } = useOverviewStatsPreference("month");
 const absenceStatTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
 const monthTypeCounts = computed(() => countAbsenceTypes(store.entriesForMonth));
@@ -242,10 +242,20 @@ const workdays = computed(
 .main {
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--space-6);
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.overview-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.overview-summary .cal-stat {
+  min-width: 0;
 }
 
 /* Calendar Header */
@@ -480,7 +490,7 @@ const workdays = computed(
 /* Mobile */
 @media (max-width: 767px) {
   .main {
-    padding: var(--space-3);
+    padding: 0;
     gap: var(--space-3);
   }
 
@@ -568,7 +578,8 @@ const workdays = computed(
 /* Small Mobile */
 @media (max-width: 420px) {
   .main {
-    padding: var(--space-2);
+    padding: 0;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
     gap: var(--space-2);
   }
 

@@ -4,20 +4,8 @@
   <main class="main">
 
     <section class="year-toolbar" aria-label="Year navigation">
-      <button
-        class="year-nav-btn"
-        type="button"
-        @click="prevYear"
-        aria-label="Previous year"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <button class="year-nav-btn" type="button" @click="prevYear" aria-label="Previous year">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
@@ -26,30 +14,13 @@
         {{ store.currYear }}
       </div>
 
-      <button
-        class="year-nav-btn"
-        type="button"
-        @click="nextYear"
-        aria-label="Next year"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+      <button class="year-nav-btn" type="button" @click="nextYear" aria-label="Next year">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 18l6-6-6-6" />
         </svg>
       </button>
 
-      <button
-        class="year-current-btn"
-        type="button"
-        @click="goToCurrentYear"
-        :disabled="isCurrentYear"
-      >
+      <button class="year-current-btn" type="button" @click="goToCurrentYear" :disabled="isCurrentYear">
         {{ $t("year.this_year") }}
       </button>
     </section>
@@ -61,32 +32,34 @@
 
     <p class="year-hint">{{ $t("year.hint") }}</p>
 
-    <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
-      <summary>{{ $t("overview.statistics") }}</summary>
-      <div class="year-stats cal-stats" aria-label="Year statistics">
-        <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
-          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
-          <span class="cal-stat-value">{{ yearTypeCounts[type] }}</span>
-        </div>
+    <section class="overview-summary" :aria-label="$t('overview.statistics')">
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.actual") }}</span>
+        <span class="cal-stat-value" :class="yearDiff >= 0 ? 'stat-ok' : 'stat-err'">{{ formatHours(yearActual)
+          }}</span>
       </div>
-    </details>
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.planned") }}</span>
+        <span class="cal-stat-value">{{ formatHours(yearPlanned) }}</span>
+      </div>
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.diff") }}</span>
+        <span class="cal-stat-value" :class="yearDiff >= 0 ? 'stat-ok' : 'stat-err'">{{ yearDiff >= 0 ? "+" : "" }}{{
+          formatHours(yearDiff) }}</span>
+      </div>
+    </section>
 
     <section class="year-grid" aria-label="Year calendar overview">
-      <article
-        v-for="month in yearMonths"
-        :key="month.index"
-        class="year-month"
-        :class="[
-          monthCardClass(month),
-          { 'year-month--current': isCurrentMonthCard(month.index) },
-        ]"
-      >
+      <article v-for="month in yearMonths" :key="month.index" class="year-month" :class="[
+        monthCardClass(month),
+        { 'year-month--current': isCurrentMonthCard(month.index) },
+      ]">
         <header class="year-month-header">
           <div class="year-month-title">{{ month.name }}</div>
           <div class="year-month-meta">
             <span>{{
               $t("common.entries_count", { count: month.stats.count })
-            }}</span>
+              }}</span>
             <span :class="month.stats.diff >= 0 ? 'stat-ok' : 'stat-err'">
               {{ month.stats.diff >= 0 ? "+" : ""
               }}{{ formatHours(month.stats.diff) }}
@@ -101,26 +74,36 @@
         </div>
 
         <div class="year-days">
-          <button
-            v-for="day in month.days"
-            :key="day.date"
-            type="button"
-            class="year-day"
-            :class="dayClass(day)"
-            :aria-label="day.date"
-            @click="openDay(day.date)"
-          >
+          <button v-for="day in month.days" :key="day.date" type="button" class="year-day" :class="dayClass(day)"
+            :aria-label="day.date" :style="day.hasEntry && day.absence ? {
+              background: day.absence.highlight,
+              color: day.absence.color,
+              borderColor: day.absence.color,
+            } : undefined" @click="openDay(day.date)">
             <span class="year-day-number">{{ day.dayNumber }}</span>
           </button>
         </div>
       </article>
     </section>
 
-    <EntryModal
-      v-model="showModal"
-      :edit-entry="editEntry"
-      :prefill-date="clickedDate"
-    />
+    <AbsenceLegend show-all />
+
+    <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
+      <summary>{{ $t("overview.statistics") }}</summary>
+      <div class="year-stats cal-stats" aria-label="Year statistics">
+        <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
+          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") :
+            $t(`dashboard.month.${type}`) }}</span>
+          <span class="cal-stat-value">{{ yearTypeCounts[type] }}</span>
+        </div>
+        <div v-if="yearGrossLabel" class="cal-stat">
+          <span class="cal-stat-label">{{ $t("dashboard.year.gross") }}</span>
+          <span class="cal-stat-value">{{ mask(yearGrossLabel) }}</span>
+        </div>
+      </div>
+    </details>
+
+    <EntryModal v-model="showModal" :edit-entry="editEntry" :prefill-date="clickedDate" />
   </main>
 </template>
 
@@ -132,10 +115,12 @@ import { getAbsenceType, countAbsenceTypes } from "@/composables/useAbsence";
 import { useOverviewStatsPreference } from "@/composables/useOverviewPreferences";
 
 import EntryModal from "@/components/EntryModal.vue";
-import KpiCard from "@/components/ui/KpiCard.vue";
+import AbsenceLegend from "@/components/AbsenceLegend.vue";
+import { usePrivacy } from "@/composables/usePrivacy";
 import { useI18n } from "vue-i18n";
 
-const { t, locale } = useI18n();
+const { locale } = useI18n();
+const { mask } = usePrivacy();
 const currentLocale = computed(() => locale.value);
 
 const store = useZeitwerkStore();
@@ -284,6 +269,16 @@ const yearMonths = computed(() =>
     };
   }),
 );
+
+const yearActual = computed(() =>
+  yearMonths.value.reduce((sum, month) => sum + month.stats.actual, 0),
+);
+
+const yearPlanned = computed(() =>
+  yearMonths.value.reduce((sum, month) => sum + month.stats.planned, 0),
+);
+
+const yearDiff = computed(() => yearActual.value - yearPlanned.value);
 
 function openDay(date) {
   const existing = getEntryForDate(date);
@@ -458,10 +453,39 @@ const yearGrossLabel = computed(() => {
 /* Main Layout */
 .main {
   overflow-y: auto;
-  padding: var(--space-6);
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.overview-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.overview-summary .cal-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.overview-summary .cal-stat-label {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.overview-summary .cal-stat-value {
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Year Toolbar */
@@ -556,19 +580,15 @@ const yearGrossLabel = computed(() => {
 }
 
 .year-month--positive {
-  border-color: color-mix(
-    in oklch,
-    var(--color-success) 28%,
-    var(--color-border)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-success) 28%,
+      var(--color-border));
 }
 
 .year-month--negative {
-  border-color: color-mix(
-    in oklch,
-    var(--color-error) 28%,
-    var(--color-border)
-  );
+  border-color: color-mix(in oklch,
+      var(--color-error) 28%,
+      var(--color-border));
 }
 
 .year-month--current {
@@ -653,55 +673,37 @@ const yearGrossLabel = computed(() => {
 }
 
 .year-day--entry {
-  background: color-mix(
-    in oklch,
-    var(--color-primary) 10%,
-    var(--color-surface-2)
-  );
-  border-color: color-mix(
-    in oklch,
-    var(--color-primary) 24%,
-    var(--color-border)
-  );
+  background: color-mix(in oklch,
+      var(--color-primary) 10%,
+      var(--color-surface-2));
+  border-color: color-mix(in oklch,
+      var(--color-primary) 24%,
+      var(--color-border));
 }
 
 .year-day--absence {
-  background: color-mix(
-    in oklch,
-    var(--color-warning) 12%,
-    var(--color-surface-2)
-  );
-  border-color: color-mix(
-    in oklch,
-    var(--color-warning) 28%,
-    var(--color-border)
-  );
+  background: color-mix(in oklch,
+      var(--color-warning) 12%,
+      var(--color-surface-2));
+  border-color: color-mix(in oklch,
+      var(--color-warning) 28%,
+      var(--color-border));
 }
 
 .year-day--holiday {
-  background: color-mix(
-    in oklch,
-    var(--color-error-highlight) 45%,
-    var(--color-surface-2)
-  );
-  border-color: color-mix(
-    in oklch,
-    var(--color-error) 20%,
-    var(--color-border)
-  );
+  background: color-mix(in oklch,
+      var(--color-error-highlight) 45%,
+      var(--color-surface-2));
+  border-color: color-mix(in oklch,
+      var(--color-error) 20%,
+      var(--color-border));
 }
 
 .year-day--today,
 .year-day--today.year-day--entry,
 .year-day--today.year-day--absence,
 .year-day--today.year-day--holiday {
-  background: color-mix(
-    in oklch,
-    var(--color-gold) 28%,
-    var(--color-surface-2)
-  );
-  border-color: color-mix(in oklch, var(--color-gold) 42%, var(--color-border));
-  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-gold);
   font-weight: 700;
 }
 
@@ -731,7 +733,7 @@ const yearGrossLabel = computed(() => {
 /* Mobile */
 @media (max-width: 767px) {
   .main {
-    padding: var(--space-3);
+    padding: 0;
     gap: var(--space-3);
   }
 
@@ -783,11 +785,11 @@ const yearGrossLabel = computed(() => {
       "current current current";
   }
 
-  .year-toolbar > .year-nav-btn:first-child {
+  .year-toolbar>.year-nav-btn:first-child {
     grid-area: prev;
   }
 
-  .year-toolbar > .year-nav-btn:nth-of-type(2) {
+  .year-toolbar>.year-nav-btn:nth-of-type(2) {
     grid-area: next;
     justify-self: end;
   }
@@ -806,7 +808,8 @@ const yearGrossLabel = computed(() => {
 /* Small Mobile */
 @media (max-width: 420px) {
   .main {
-    padding: var(--space-2);
+    padding: 0;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
     gap: var(--space-2);
   }
 

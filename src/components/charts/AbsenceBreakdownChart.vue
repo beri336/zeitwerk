@@ -31,12 +31,18 @@ const store = useZeitwerkStore()
 const { colors } = useChartTheme()
 
 const TYPE_COLORS = {
-    'on-site': '#6366f1',
-    'homeoffice': '#06b6d4',
-    'vacation': '#f59e0b',
-    'sick': '#ef4444',
-    'publicholiday': '#22c55e',
-    'other': '#94a3b8',
+    'on-site': '--absence-office',
+    'homeoffice': '--absence-home',
+    'vacation': '--absence-vacation',
+    'sick': '--absence-sick',
+    'publicholiday': '--absence-holiday',
+    'other': '--absence-other',
+}
+
+function absenceColor(type) {
+    const name = TYPE_COLORS[type]
+    if (!name) return colors.value.border
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || colors.value.border
 }
 
 const breakdown = computed(() => {
@@ -56,7 +62,7 @@ const chartData = computed(() => ({
     labels: breakdown.value.map(([type]) => t(`absence.${type}`)),
     datasets: [{
         data: breakdown.value.map(([, n]) => n),
-        backgroundColor: breakdown.value.map(([type]) => TYPE_COLORS[type] ?? colors.value.border),
+        backgroundColor: breakdown.value.map(([type]) => absenceColor(type)),
         borderColor: 'transparent',
         borderWidth: 0,
         hoverOffset: 6,

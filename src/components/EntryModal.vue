@@ -21,11 +21,11 @@
           <!-- Type selector -->
           <div class="typ-selector">
             <button v-for="(type, key) in ABSENCE_TYPES" :key="key" class="typ-btn"
-              :class="{ active: form.typ === key }" :style="form.typ === key
-                ? `background:${type.highlight};color:${type.color};border-color:${type.color}`
-                : ''
-                " @click="form.typ = key">
-              <span>{{ type.icon }}</span>
+              :class="{ active: form.typ === key }" :style="{
+                '--type-color': type.color,
+                '--type-bg': type.highlight,
+              }" :aria-pressed="form.typ === key" @click="form.typ = key">
+              <AbsenceIcon :type="key" :size="16" />
               <span>{{ t(`absence.${key}`) }}</span>
             </button>
           </div>
@@ -46,9 +46,9 @@
               <span class="form-label">{{ $t("entry.preview_actual_label") }}</span>
               <strong>{{ formatHours(previewActual) }}</strong>
               <span class="preview-hint">
-                {{ $t("entry.preview_actual_hint", {
+                {{$t("entry.preview_actual_hint", {
                   count: form.timeEntries.filter((entry) => entry.start && entry.end).length,
-                }) }}
+                })}}
               </span>
             </div>
 
@@ -80,7 +80,7 @@
                   <div v-for="(block, index) in form.timeEntries" :key="index" class="time-block">
                     <div class="time-block-header">
                       <span class="block-label">{{
-                        $t("entry.block_label", { index: index + 1 })}}
+                        $t("entry.block_label", { index: index + 1 }) }}
                       </span>
 
                       <button class="btn btn-secondary btn-sm add-block-btn" type="button" @click="addBlock">
@@ -98,7 +98,7 @@
                       <div class="form-group">
                         <label class="form-label">{{
                           $t("entry.start")
-                        }}</label>
+                          }}</label>
                         <input class="form-input" type="time" v-model="block.start" />
                       </div>
 
@@ -109,7 +109,7 @@
                       <div class="form-group">
                         <label class="form-label">{{
                           $t("entry.pause")
-                        }}</label>
+                          }}</label>
                         <input class="form-input" type="number" min="0" max="240" v-model.number="block.pause" />
                       </div>
                     </div>
@@ -129,8 +129,11 @@
 
             <!-- Out-of-Office Message -->
             <div v-else class="form-group full">
-              <div class="absence-hint">
-                <span>{{ currentType.icon }}</span>
+              <div class="absence-hint" :style="{
+                background: currentType.highlight,
+                color: currentType.color,
+              }">
+                <AbsenceIcon :type="form.typ || 'on-site'" :size="16" />
                 <span>{{
                   $t("entry.absence_hint", {
                     label: currentType.label,
@@ -172,7 +175,7 @@
               <template v-if="pendingDelete">
                 <span class="delete-confirm-label">{{
                   $t("entry.delete_confirm")
-                }}</span>
+                  }}</span>
                 <button class="btn btn-danger btn-sm modal-action" @click="deleteAndClose">
                   {{ $t("common.delete_confirm_yes") }}
                 </button>
@@ -182,7 +185,8 @@
               </template>
 
               <!-- Normal condition -->
-              <button v-else class="btn btn-ghost btn-sm delete-btn modal-action" @click="askDelete" style="margin-right: auto">
+              <button v-else class="btn btn-ghost btn-sm delete-btn modal-action" @click="askDelete"
+                style="margin-right: auto">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6l-1 14H6L5 6" />
@@ -215,6 +219,7 @@ import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { useToast } from "@/composables/useToast";
 import { calcActualHours, formatHours, today } from "@/composables/useTime";
 import { ABSENCE_TYPES, getAbsenceType } from "@/composables/useAbsence";
+import AbsenceIcon from "@/components/icons/AbsenceIcon.vue";
 import { usePrivacy } from "@/composables/usePrivacy";
 import { useI18n } from "vue-i18n";
 import { getDefaultWorkplace } from "@/composables/useEntryDefaults";
@@ -400,13 +405,22 @@ function save() {
   -webkit-tap-highlight-color: transparent;
 }
 
-.typ-btn:hover {
-  background: var(--color-surface-dynamic);
-  color: var(--color-text);
+.typ-btn .absence-icon {
+  color: var(--type-color);
+}
+
+.typ-btn:hover:not(.active) {
+  background: color-mix(in oklch, var(--type-bg) 70%, var(--color-surface));
+  color: var(--type-color);
+  border-color: color-mix(in oklch, var(--type-color) 40%, var(--color-border));
 }
 
 .typ-btn.active {
-  font-weight: 600;
+  background: var(--type-bg);
+  color: var(--type-color);
+  border-color: var(--type-color);
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--type-color);
 }
 
 /* Preview Bar */

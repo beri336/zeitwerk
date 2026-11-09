@@ -30,18 +30,45 @@
 
     <p class="cal-hint">{{ $t("week.hint") }}</p>
 
+    <section class="cal-grid-wrap" aria-label="Week calendar">
+      <div class="cal-grid">
+        <div v-for="(header, index) in dayHeaders" :key="header" class="cal-weekday"
+          :class="{ 'cal-weekday--weekend': index > 4 }">
+          {{ header }}
+        </div>
+
+        <CalendarDay v-for="day in weekDays" :key="day.date" :date="day.date" :is-today="day.date === todayStr" compact
+          :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
+      </div>
+    </section>
+
+    <section class="overview-summary" :aria-label="$t('overview.statistics')">
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.actual") }}</span>
+        <span class="cal-stat-value" :class="visibleDiff >= 0 ? 'stat-ok' : 'stat-err'">
+          {{ formatHours(visibleActual) }}
+        </span>
+      </div>
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.planned") }}</span>
+        <span class="cal-stat-value">{{ formatHours(visiblePlanned) }}</span>
+      </div>
+      <div class="cal-stat">
+        <span class="cal-stat-label">{{ $t("common.diff") }}</span>
+        <span class="cal-stat-value" :class="visibleDiff >= 0 ? 'stat-ok' : 'stat-err'">
+          {{ visibleDiff >= 0 ? "+" : "" }}{{ formatHours(visibleDiff) }}
+        </span>
+      </div>
+    </section>
+
+    <AbsenceLegend show-all />
+
     <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
       <summary>{{ $t("overview.statistics") }}</summary>
       <div class="stats-period" role="group" :aria-label="$t('week.stats_period_label')">
-        <button
-          v-for="period in statsPeriods"
-          :key="period"
-          type="button"
-          class="stats-period-btn"
-          :class="{ active: statsPeriod === period }"
-          :aria-pressed="statsPeriod === period"
-          @click="statsPeriod = period"
-        >
+        <button v-for="period in statsPeriods" :key="period" type="button" class="stats-period-btn"
+          :class="{ active: statsPeriod === period }" :aria-pressed="statsPeriod === period"
+          @click="statsPeriod = period">
           {{ $t("week.stats_period", { count: period }) }}
         </button>
       </div>
@@ -54,24 +81,9 @@
           <span class="cal-stat-label">{{ $t("common.entries") }}</span>
           <span class="cal-stat-value">{{ statsEntries.length }}</span>
         </div>
-        <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("month.actual") }}</span>
-          <span class="cal-stat-value" :class="statsDiff >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ formatHours(statsActual) }}
-          </span>
-        </div>
-        <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("month.planned") }}</span>
-          <span class="cal-stat-value">{{ formatHours(statsPlanned) }}</span>
-        </div>
-        <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("month.diff") }}</span>
-          <span class="cal-stat-value" :class="statsDiff >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ statsDiff >= 0 ? "+" : "" }}{{ formatHours(statsDiff) }}
-          </span>
-        </div>
         <div v-for="type in absenceStatTypes" :key="type" class="cal-stat">
-          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") : $t(`dashboard.month.${type}`) }}</span>
+          <span class="cal-stat-label">{{ type === "on-site" ? $t("dashboard.month.office") :
+            $t(`dashboard.month.${type}`) }}</span>
           <span class="cal-stat-value">{{ statsTypeCounts[type] }}</span>
         </div>
         <div class="cal-stat">
@@ -87,34 +99,13 @@
           <span class="cal-stat-value">{{ statsHomeofficeQuote.toFixed(0) }}%</span>
         </div>
         <div class="cal-stat">
-          <span class="cal-stat-label">{{ $t("week.overtime_trend") }}</span>
-          <span class="cal-stat-value" :class="statsTrend >= 0 ? 'stat-ok' : 'stat-err'">
-            {{ statsTrend >= 0 ? "+" : "" }}{{ formatHours(statsTrend) }}
-          </span>
-        </div>
-        <div class="cal-stat">
           <span class="cal-stat-label">{{ $t("week.period_comparison") }}</span>
           <span class="cal-stat-value" :class="statsComparison >= 0 ? 'stat-ok' : 'stat-err'">
             {{ statsComparison >= 0 ? "+" : "" }}{{ formatHours(statsComparison) }}
           </span>
         </div>
       </div>
-      <p class="stats-comparison-hint">
-        {{ $t("week.comparison_hint", { value: formatHours(previousDiff) }) }}
-      </p>
     </details>
-
-    <section class="cal-grid-wrap" aria-label="Week calendar">
-      <div class="cal-grid">
-        <div v-for="(header, index) in dayHeaders" :key="header" class="cal-weekday"
-          :class="{ 'cal-weekday--weekend': index > 4 }">
-          {{ header }}
-        </div>
-
-        <CalendarDay v-for="day in weekDays" :key="day.date" :date="day.date" :is-today="day.date === todayStr"
-          compact :flash-today="flashToday && day.date === todayStr" @click="onDayClick" />
-      </div>
-    </section>
 
     <EntryModal v-model="showModal" :edit-entry="editEntry" :prefill-date="clickedDate" />
   </main>
@@ -128,6 +119,7 @@ import { useZeitwerkStore } from "@/stores/zeitwerk";
 import { formatHours } from "@/composables/useTime";
 import CalendarDay from "@/components/CalendarDay.vue";
 import EntryModal from "@/components/EntryModal.vue";
+import AbsenceLegend from "@/components/AbsenceLegend.vue";
 import { countAbsenceTypes } from "@/composables/useAbsence";
 import { useOverviewStatsPreference } from "@/composables/useOverviewPreferences";
 
@@ -159,6 +151,22 @@ const weekDays = computed(() =>
     return { date: formatDate(date) };
   }),
 );
+
+const visibleEntries = computed(() => {
+  const dates = new Set(weekDays.value.map((day) => day.date));
+  return store.entries.filter((entry) => dates.has(entry.date));
+});
+
+const visibleActual = computed(() =>
+  visibleEntries.value.reduce((total, entry) => total + store.effectiveActualHours(entry), 0),
+);
+
+const visiblePlanned = computed(() =>
+  visibleEntries.value.reduce((total, entry) => total + store.plannedHoursFor(entry), 0),
+);
+
+const visibleDiff = computed(() => visibleActual.value - visiblePlanned.value);
+
 
 const absenceStatTypes = ["vacation", "sick", "homeoffice", "on-site", "publicholiday", "other"];
 
@@ -236,9 +244,11 @@ function sumPlanned(entries) {
 const statsAverageActual = computed(() =>
   statsPeriod.value ? statsActual.value / statsPeriod.value : 0,
 );
+
 const statsAveragePlanned = computed(() =>
   statsPeriod.value ? statsPlanned.value / statsPeriod.value : 0,
 );
+
 const statsHomeofficeQuote = computed(() => {
   const workplaceEntries = statsEntries.value.filter((entry) =>
     ["homeoffice", "on-site"].includes(entry.typ),
@@ -247,12 +257,11 @@ const statsHomeofficeQuote = computed(() => {
   return (workplaceEntries.filter((entry) => entry.typ === "homeoffice").length
     / workplaceEntries.length) * 100;
 });
+
 const previousActual = computed(() => sumActual(previousStatsEntries.value));
 const previousPlanned = computed(() => sumPlanned(previousStatsEntries.value));
 const previousDiff = computed(() => previousActual.value - previousPlanned.value);
 const statsComparison = computed(() => statsDiff.value - previousDiff.value);
-const statsTrend = computed(() => statsActual.value - statsPlanned.value);
-
 
 const todayStr = computed(() => formatDate(new Date()));
 const isCurrentWeek = computed(() => weekDays.value.some(({ date }) => date === todayStr.value));
@@ -315,10 +324,20 @@ onMounted(() => {
 .main {
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--space-6);
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.overview-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.overview-summary .cal-stat {
+  min-width: 0;
 }
 
 .cal-toolbar {
@@ -561,7 +580,7 @@ onMounted(() => {
 
 @media (max-width: 767px) {
   .main {
-    padding: var(--space-3);
+    padding: 0;
     gap: var(--space-3);
   }
 
@@ -638,7 +657,8 @@ onMounted(() => {
 
 @media (max-width: 420px) {
   .main {
-    padding: var(--space-2);
+    padding: 0;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
     gap: var(--space-2);
   }
 
