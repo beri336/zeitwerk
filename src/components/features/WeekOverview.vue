@@ -61,7 +61,7 @@
       </div>
     </section>
 
-    <AbsenceLegend show-all />
+    <AbsenceLegend show-all :entries="visibleEntries" />
 
     <details class="overview-stats" :open="statsOpen" @toggle="updateStatsOpen">
       <summary>{{ $t("overview.statistics") }}</summary>

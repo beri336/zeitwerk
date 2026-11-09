@@ -22,6 +22,7 @@ import AbsenceIcon from "@/components/icons/AbsenceIcon.vue";
 
 const props = defineProps({
   showAll: { type: Boolean, default: false },
+  entries: { type: Array, default: null },
 });
 
 const store = useZeitwerkStore();
@@ -29,8 +30,9 @@ const { t } = useI18n();
 
 const stats = computed(() => {
   const counts = {};
+  const entries = props.entries ?? store.entriesForMonth;
 
-  store.entriesForMonth.forEach((entry) => {
+  entries.forEach((entry) => {
     const type = entry.typ ?? "on-site";
     counts[type] = (counts[type] ?? 0) + 1;
   });
