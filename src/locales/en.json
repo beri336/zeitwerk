@@ -375,7 +375,7 @@
         "toast_state": "State changed to {state} - Holidays updated.",
         "employments": {
             "title": "Employments",
-            "sub": "Each employment has its own hours, salary, and vacation. The first start date is the beginning of tracked time: earlier days and holidays are removed.",
+            "sub": "Each employment has its own hours, salary, and vacation. Changing periods does not delete existing entries.",
             "name": "Name",
             "start": "Start",
             "end": "End",
@@ -385,6 +385,8 @@
             "removed": "Employment removed.",
             "untitled": "Unnamed",
             "open_ended": "current",
+            "open_ended_action": "Until today",
+            "reset_date": "Clear",
             "unbounded": "No period yet",
             "overlap": "Periods must not overlap.",
             "end_before_start": "The end date must be after the start date.",

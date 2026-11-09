@@ -41,11 +41,23 @@
           </div>
           <div class="form-group">
             <label class="form-label">{{ $t("settings.employments.start") }}</label>
-            <input class="form-input" type="date" v-model="form.employmentStart" />
+            <div class="date-input-row">
+              <input class="form-input date-input" type="date" v-model="form.employmentStart" />
+              <button class="btn btn-secondary btn-sm date-reset-btn" type="button"
+                @click="resetEmploymentStart">
+                {{ $t("settings.employments.reset_date") }}
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">{{ $t("settings.employments.end") }}</label>
-            <input class="form-input" type="date" v-model="form.employmentEnd" />
+            <div class="date-input-row">
+              <input class="form-input date-input" type="date" v-model="form.employmentEnd" />
+              <button class="btn btn-secondary btn-sm date-reset-btn" type="button"
+                @click="resetEmploymentEnd">
+                {{ $t("settings.employments.open_ended_action") }}
+              </button>
+            </div>
             <span class="form-hint">{{ $t("settings.employments.end_hint") }}</span>
           </div>
         </div>
@@ -157,7 +169,13 @@
             <label class="form-label">{{
               $t("settings.fields.extra_vacation_deadline")
             }}</label>
-            <input class="form-input" type="date" v-model="form.extraVacationDeadline" />
+            <div class="date-input-row">
+              <input class="form-input date-input" type="date" v-model="form.extraVacationDeadline" />
+              <button class="btn btn-secondary btn-sm date-reset-btn" type="button"
+                @click="resetExtraVacationDeadline">
+                {{ $t("settings.employments.reset_date") }}
+              </button>
+            </div>
             <span class="form-hint">{{
               $t("settings.hints.extra_vacation_deadline")
             }}</span>
@@ -542,6 +560,18 @@ function removeEmployment() {
   }
   loadEmployment(nextId);
   showToast(t("settings.employments.removed"), "ok");
+}
+
+function resetEmploymentStart() {
+  form.employmentStart = "";
+}
+
+function resetEmploymentEnd() {
+  form.employmentEnd = "";
+}
+
+function resetExtraVacationDeadline() {
+  form.extraVacationDeadline = "";
 }
 
 loadEmployment(
@@ -938,6 +968,7 @@ const previewGrossDailyRate = computed(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  min-width: 0;
 }
 
 .form-group.full {
@@ -1002,6 +1033,33 @@ const previewGrossDailyRate = computed(() => {
   font: inherit;
   box-sizing: border-box;
   transition: border-color 0.15s;
+}
+
+.date-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.date-input-row .form-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.date-input {
+  width: 0;
+  min-width: 0;
+  flex: 1 1 0;
+  overflow: hidden;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.date-reset-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .form-input:focus {
@@ -1219,6 +1277,15 @@ select.form-input {
   .appearance-row {
     grid-template-columns: 1fr;
     gap: var(--space-3);
+    min-width: 0;
+  }
+
+  .form-group,
+  .date-input-row,
+  .form-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .privacy-row {
@@ -1237,6 +1304,57 @@ select.form-input {
   .storage-usage {
     gap: var(--space-1);
   }
+
+  .form-input {
+    font-size: 16px;
+  }
+
+  .date-input-row {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .date-input-row .date-input {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: none;
+  }
+
+  .date-reset-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .head-actions,
+  .card-actions {
+    width: 100%;
+  }
+
+  .head-actions .btn,
+  .card-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .recovery-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .recovery-item__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .recovery-item__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* Small Mobile */
@@ -1248,6 +1366,8 @@ select.form-input {
 
   .form-input {
     height: 40px;
+    width: 100%;
+    max-width: 100%;
   }
 
   /* iOS zoom prevention - inputs under 16px trigger auto-zoom */
@@ -1266,5 +1386,6 @@ select.form-input {
   textarea {
     font-size: 16px !important;
   }
+
 }
 </style>

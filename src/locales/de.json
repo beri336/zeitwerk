@@ -373,7 +373,7 @@
         "toast_state": "Bundesland auf {state} geändert - Feiertage aktualisiert.",
         "employments": {
             "title": "Beschäftigungen",
-            "sub": "Jede Beschäftigung hat eigene Arbeitszeit, eigenes Gehalt und eigene Urlaubstage. Mit dem ersten Beginn endet die Erfassung davor: ältere Tage und Feiertage werden entfernt.",
+            "sub": "Jede Beschäftigung hat eigene Arbeitszeit, eigenes Gehalt und eigene Urlaubstage. Änderungen an Zeiträumen löschen keine vorhandenen Einträge.",
             "name": "Name",
             "start": "Beginn",
             "end": "Ende",
@@ -383,6 +383,8 @@
             "removed": "Beschäftigung entfernt.",
             "untitled": "Ohne Namen",
             "open_ended": "heute",
+            "open_ended_action": "Bis heute",
+            "reset_date": "Zurücksetzen",
             "unbounded": "Noch ohne Zeitraum",
             "overlap": "Zeiträume dürfen sich nicht überschneiden.",
             "end_before_start": "Das Ende muss nach dem Beginn liegen.",
