@@ -2,9 +2,6 @@
 
 <template>
   <main class="main">
-
-
-
     <p class="settings-sub">{{ $t("settings.sub") }}</p>
 
     <section class="card" aria-labelledby="employments-title">
@@ -43,8 +40,10 @@
             <label class="form-label">{{ $t("settings.employments.start") }}</label>
             <div class="date-input-row">
               <input class="form-input date-input" type="date" v-model="form.employmentStart" />
-              <button class="btn btn-secondary btn-sm date-reset-btn" type="button"
-                @click="resetEmploymentStart">
+              <span v-if="!form.employmentStart" class="mobile-date-placeholder">
+                {{ $t("settings.mobile_date_placeholders.start") }}
+              </span>
+              <button class="btn btn-secondary btn-sm date-reset-btn" type="button" @click="resetEmploymentStart">
                 {{ $t("settings.employments.reset_date") }}
               </button>
             </div>
@@ -53,8 +52,10 @@
             <label class="form-label">{{ $t("settings.employments.end") }}</label>
             <div class="date-input-row">
               <input class="form-input date-input" type="date" v-model="form.employmentEnd" />
-              <button class="btn btn-secondary btn-sm date-reset-btn" type="button"
-                @click="resetEmploymentEnd">
+              <span v-if="!form.employmentEnd" class="mobile-date-placeholder">
+                {{ $t("settings.mobile_date_placeholders.end") }}
+              </span>
+              <button class="btn btn-secondary btn-sm date-reset-btn" type="button" @click="resetEmploymentEnd">
                 {{ $t("settings.employments.open_ended_action") }}
               </button>
             </div>
@@ -76,7 +77,7 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_day")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="12" v-model.number="form.hoursPerDay" />
             <span class="form-hint">{{ $t("settings.hints.hours_day") }}</span>
           </div>
@@ -85,7 +86,7 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.hours_week")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="60" v-model.number="form.hoursPerWeek" />
             <span class="form-hint">{{ $t("settings.hints.hours_week") }}</span>
           </div>
@@ -94,18 +95,18 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.default_break")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="5" min="0" max="120" v-model.number="form.defaultBreak" />
             <span class="form-hint">{{
               $t("settings.hints.default_break")
-              }}</span>
+            }}</span>
           </div>
 
           <!-- Working days per week -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.work_days")
-              }}</label>
+            }}</label>
             <input class="form-input" type="number" step="1" min="1" max="7" v-model.number="form.workDays" />
             <span class="form-hint">{{ $t("settings.hints.work_days") }}</span>
           </div>
@@ -145,51 +146,53 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.vacation_days")
-            }}</label>
+              }}</label>
             <input class="form-input" type="number" step="1" min="0" max="365"
               v-model.number="form.vacationDaysPerYear" />
             <span class="form-hint">{{
               $t("settings.hints.vacation_days")
-            }}</span>
+              }}</span>
           </div>
 
           <!-- Extra Vacation Days -->
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.extra_vacation_days")
-            }}</label>
+              }}</label>
             <input class="form-input" type="number" step="1" min="0" max="365"
               v-model.number="form.extraVacationDays" />
             <span class="form-hint">{{
               $t("settings.hints.extra_vacation_days")
-            }}</span>
+              }}</span>
           </div>
 
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.extra_vacation_deadline")
-            }}</label>
+              }}</label>
             <div class="date-input-row">
               <input class="form-input date-input" type="date" v-model="form.extraVacationDeadline" />
-              <button class="btn btn-secondary btn-sm date-reset-btn" type="button"
-                @click="resetExtraVacationDeadline">
+              <span v-if="!form.extraVacationDeadline" class="mobile-date-placeholder">
+                {{ $t("settings.mobile_date_placeholders.extra_vacation") }}
+              </span>
+              <button class="btn btn-secondary btn-sm date-reset-btn" type="button" @click="resetExtraVacationDeadline">
                 {{ $t("settings.employments.reset_date") }}
               </button>
             </div>
             <span class="form-hint">{{
               $t("settings.hints.extra_vacation_deadline")
-            }}</span>
+              }}</span>
           </div>
 
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.extra_vacation_notice")
-            }}</label>
+              }}</label>
             <input class="form-input" type="number" step="1" min="0" max="365"
               v-model.number="form.extraVacationNoticeDays" />
             <span class="form-hint">{{
               $t("settings.hints.extra_vacation_notice")
-            }}</span>
+              }}</span>
           </div>
 
           <div v-if="extraVacationBalance" class="form-group full">
@@ -210,7 +213,7 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.gross_salary")
-              }}</label>
+            }}</label>
 
             <!-- Normal input — only if privacy is OFF -->
             <input v-if="!privacyMode" class="form-input" type="number" step="1" min="1" max="10000"
@@ -221,10 +224,10 @@
 
             <span class="form-hint">{{
               $t("settings.hints.gross_salary")
-              }}</span>
+            }}</span>
             <span class="form-hint">{{
               $t("settings.hints.gross_salary_sub")
-              }}</span>
+            }}</span>
           </div>
           <div class="form-group full" v-if="previewGrossHourlyRate > 0">
             <label class="form-label">{{ $t("settings.fields.preview") }}</label>
@@ -251,20 +254,20 @@
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.autostop")
-            }}</label>
+              }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.maxWorkHours" />
             <span class="form-hint">{{ $t("settings.hints.autostop") }}</span>
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.overtime_warn")
-            }}</label>
+              }}</label>
             <input class="form-input" type="number" step="0.5" min="1" max="16" v-model.number="form.warnWorkHours" />
           </div>
           <div class="form-group">
             <label class="form-label">{{
               $t("settings.fields.inactivity")
-            }}</label>
+              }}</label>
             <input class="form-input" type="number" step="5" min="5" max="120"
               v-model.number="form.inactivityMinutes" />
             <span class="form-hint">{{ $t("settings.hints.inactivity") }}</span>
@@ -1057,6 +1060,10 @@ const previewGrossDailyRate = computed(() => {
   -webkit-appearance: none;
 }
 
+.mobile-date-placeholder {
+  display: none;
+}
+
 .date-reset-btn {
   flex: 0 0 auto;
   white-space: nowrap;
@@ -1312,17 +1319,31 @@ select.form-input {
   .date-input-row {
     align-items: stretch;
     flex-direction: column;
+    position: relative;
     width: 100%;
     max-width: 100%;
     overflow: hidden;
   }
 
   .date-input-row .date-input {
-    display: block;
+    display: center;
     width: 100%;
     max-width: 100%;
     min-width: 0;
     flex: none;
+  }
+
+  .mobile-date-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 42px;
+    color: var(--color-text-muted);
+    pointer-events: none;
   }
 
   .date-reset-btn {

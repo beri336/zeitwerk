@@ -193,6 +193,54 @@
         </tfoot>
       </table>
     </div>
+
+    <!-- Mobile: card list instead of the wide table -->
+    <div v-if="store.entriesForMonth.length" class="entry-list">
+      <template v-for="group in store.weekGroups" :key="`m-${group.kw}`">
+        <div class="entry-list__week">
+          <span>{{ $t('monthTable.week_total', { week: group.kw }) }}</span>
+          <span :class="group.ActualDiff >= 0 ? 'cell-ok' : 'cell-warn'">
+            {{ formatHours(group.actual) }} / {{ formatHours(group.planned) }}
+          </span>
+        </div>
+
+        <button v-for="entry in group.entries" :key="`m-${entry.id}`" type="button" class="entry-card"
+          :style="{ '--type-color': absenceMeta(entry.typ || 'on-site').color, '--type-bg': absenceMeta(entry.typ || 'on-site').highlight }"
+          @click="emit('edit', entry)">
+          <span class="entry-card__icon">
+            <AbsenceIcon :type="entry.typ || 'on-site'" :size="18" />
+          </span>
+
+          <span class="entry-card__main">
+            <span class="entry-card__date">
+              {{ mobileDate(entry.date) }}
+              <span v-if="entry.typ && entry.typ !== 'on-site'" class="entry-card__type">
+                {{ absenceMeta(entry.typ).label }}
+              </span>
+            </span>
+            <span v-if="entry.timeEntries?.length" class="entry-card__meta">
+              {{entry.timeEntries.map((block) => `${block.start || '—'}–${block.end || '—'}`).join(' · ')}}
+              · {{$t('monthTable.pauses_value', {
+                minutes: entry.timeEntries.reduce((sum, block) => sum + (block.pause
+                  ?? 0), 0) }) }}
+            </span>
+            <span v-if="entry.notes" class="entry-card__notes">{{ entry.notes }}</span>
+          </span>
+
+          <span class="entry-card__hours">
+            <strong :class="actualVariant(entry)">{{ formatHours(store.effectiveActualHours(entry)) }}</strong>
+            <small>/ {{ formatHours(store.plannedHoursFor(entry)) }}</small>
+          </span>
+        </button>
+      </template>
+
+      <div class="entry-list__total">
+        <span>{{ $t('monthTable.month_total') }}</span>
+        <span :class="store.monthDiff >= 0 ? 'cell-ok' : 'cell-err'">
+          {{ store.monthDiff >= 0 ? '+' : '' }}{{ formatHours(store.monthDiff) }}
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -225,6 +273,14 @@ function absenceMeta(typ) {
     ...getAbsenceType(typ),
     label: t(`absence.${typ}`),
   };
+}
+
+function mobileDate(day) {
+  return new Date(`${day}T00:00:00`).toLocaleDateString(locale.value === "de" ? "de-DE" : "en-GB", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+  });
 }
 
 function startEdit(entry, field) {
@@ -675,6 +731,135 @@ tr[data-absence="true"]:hover td {
 
   .cell-truncate {
     max-width: 120px;
+  }
+}
+
+/* Mobile Entry List */
+.entry-list {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .table-scroll {
+    display: none;
+  }
+
+  .entry-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .entry-list__week,
+  .entry-list__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry-list__week {
+    background: var(--color-surface-offset);
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-divider);
+  }
+
+  .entry-list__total {
+    padding: var(--space-3) var(--space-4);
+    background: color-mix(in oklch, var(--color-primary) 6%, var(--color-surface-offset));
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .entry-card {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 60px;
+    padding: var(--space-3) var(--space-4);
+    border: none;
+    border-bottom: 1px solid var(--color-divider);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .entry-card:active {
+    background: var(--color-surface-offset);
+  }
+
+  .entry-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--type-bg);
+    color: var(--type-color);
+  }
+
+  .entry-card__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .entry-card__date {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .entry-card__type {
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--type-bg);
+    color: var(--type-color);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .entry-card__meta,
+  .entry-card__notes {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry-card__notes {
+    color: var(--color-text-faint);
+  }
+
+  .entry-card__hours {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry-card__hours strong {
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .entry-card__hours small {
+    color: var(--color-text-faint);
+    font-size: 11px;
   }
 }
 

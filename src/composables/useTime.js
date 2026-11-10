@@ -64,7 +64,7 @@ export function formatDate(day) {
         return '—'
 
     const date = new Date(day + 'T00:00:00')
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     const pad = input => String(input).padStart(2, '0')
 
     return `${days[date.getDay()]}, ${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`

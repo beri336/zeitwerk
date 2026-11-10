@@ -240,8 +240,8 @@
         "github": "View source on GitHub",
         "light_mode": "Light mode",
         "dark_mode": "Dark mode",
-        "privacy_show": "Show numbers",
-        "privacy_hide": "Hide numbers",
+        "privacy_show": "Show salary",
+        "privacy_hide": "Hide salary",
         "toast_export_ok": "Export successful.",
         "toast_export_err": "Export failed.",
         "toast_csv_ok": "CSV export successful.",
@@ -272,6 +272,10 @@
         "export": "Data management",
         "data": "Data management",
         "more": "More",
+        "live_short": "Live",
+        "quick_settings": "Quick settings",
+        "language": "Language",
+        "dark_theme": "Dark theme",
         "drawer_title": "Navigation",
         "week_overview": "Week Overview",
         "month_overview": "Month Overview",
@@ -373,6 +377,11 @@
         "toast_reset": "Settings reset.",
         "toast_deleted": "All entries deleted.",
         "toast_state": "State changed to {state} - Holidays updated.",
+        "mobile_date_placeholders": {
+            "start": "Choose start date",
+            "end": "Until today",
+            "extra_vacation": "Choose date"
+        },
         "employments": {
             "title": "Employments",
             "sub": "Each employment has its own hours, salary, and vacation. Changing periods does not delete existing entries.",
@@ -656,6 +665,7 @@
         }
     },
     "common": {
+        "close": "Close",
         "today": "Today",
         "no": "No",
         "yes": "Yes",

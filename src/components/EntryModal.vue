@@ -98,7 +98,7 @@
                       <div class="form-group">
                         <label class="form-label">{{
                           $t("entry.start")
-                          }}</label>
+                        }}</label>
                         <input class="form-input" type="time" v-model="block.start" />
                       </div>
 
@@ -109,7 +109,7 @@
                       <div class="form-group">
                         <label class="form-label">{{
                           $t("entry.pause")
-                          }}</label>
+                        }}</label>
                         <input class="form-input" type="number" min="0" max="240" v-model.number="block.pause" />
                       </div>
                     </div>
@@ -175,7 +175,7 @@
               <template v-if="pendingDelete">
                 <span class="delete-confirm-label">{{
                   $t("entry.delete_confirm")
-                  }}</span>
+                }}</span>
                 <button class="btn btn-danger btn-sm modal-action" @click="deleteAndClose">
                   {{ $t("common.delete_confirm_yes") }}
                 </button>
@@ -597,21 +597,46 @@ function save() {
     grid-template-columns: 1fr 1fr;
   }
 
+  .block-fields>.form-group:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .time-block {
+    padding: var(--space-3);
+  }
+
   .form-grid {
     gap: var(--space-3);
+    align-items: end;
   }
 
   .form-label {
-    white-space: nowrap;
     letter-spacing: 0.02em;
+    line-height: 1.25;
   }
 
   .actual-preview {
     padding: var(--space-3);
   }
 
+  .typ-selector {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
   .typ-btn {
-    min-height: 40px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-height: 60px;
+    padding: var(--space-2) var(--space-1);
+    border-radius: var(--radius-lg);
+    font-size: 12px;
+  }
+
+  .typ-btn.active {
+    box-shadow: 0 0 0 1px var(--type-color);
   }
 
   .add-block-btn {
@@ -632,19 +657,6 @@ function save() {
 
 /* Small Mobile */
 @media (max-width: 420px) {
-  .block-fields {
-    grid-template-columns: 1fr;
-  }
-
-  .typ-selector {
-    gap: var(--space-1);
-  }
-
-  .typ-btn {
-    padding: var(--space-2);
-    font-size: 10px;
-  }
-
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -125,16 +125,29 @@ watch(
     gap: var(--space-3);
   }
 
+  /* The topbar already names the page */
   .overview-header h1 {
-    font-size: var(--text-xl, 1.25rem);
+    display: none;
   }
 
   .overview-tabs {
     width: 100%;
+    border-radius: 999px;
   }
 
   .overview-tab {
     flex: 1;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .overview-tab--active {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
   }
 }
 

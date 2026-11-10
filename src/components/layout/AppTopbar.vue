@@ -4,15 +4,20 @@
   <header class="topbar">
 
     <!-- Logo: visible only on mobile; desktop displays the sidebar logo -->
-    <span class="topbar-logo">{{ t("title") }}</span>
+    <span class="topbar-logo" :aria-label="t('title')">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="24" height="24" rx="7" fill="currentColor" opacity="0.15" />
+        <circle cx="14" cy="14" r="8" stroke="currentColor" stroke-width="2" fill="none" />
+        <path d="M14 9v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
 
     <div class="topbar-title">{{ topbarTitle }}</div>
 
     <div class="topbar-right">
       <div ref="connectionStatusRef" class="connection-status-wrap">
-        <button class="connection-status" :class="{ 'connection-status--offline': !isOnline }"
-          type="button" :aria-expanded="statusPopoverOpen"
-          :aria-label="isOnline ? $t('pwa.online') : $t('pwa.offline')"
+        <button class="connection-status" :class="{ 'connection-status--offline': !isOnline }" type="button"
+          :aria-expanded="statusPopoverOpen" :aria-label="isOnline ? $t('pwa.online') : $t('pwa.offline')"
           @click="statusPopoverOpen = !statusPopoverOpen">
           <span class="connection-status__dot" aria-hidden="true"></span>
         </button>
@@ -154,12 +159,8 @@
 
   <ExportCsvModal v-model="showCsvModal" @confirm="handleCsvConfirm" />
 
-  <ImportConfirmModal
-    v-model="showImportModal"
-    :current-count="store.entries.length"
-    :import-count="pendingImport?.zeitwerk?.entries?.length ?? 0"
-    @confirm="confirmImport"
-  />
+  <ImportConfirmModal v-model="showImportModal" :current-count="store.entries.length"
+    :import-count="pendingImport?.zeitwerk?.entries?.length ?? 0" @confirm="confirmImport" />
 </template>
 
 <script setup>
@@ -210,7 +211,7 @@ const titleKeys = {
   "/diagrams": "topbar.diagrams",
   "/profile": "topbar.profile",
   "/settings": "topbar.settings",
-  "/exports": "topbar.export",
+  "/export": "topbar.export",
 };
 
 const topbarTitle = computed(() => {
@@ -523,20 +524,36 @@ function triggerExport(format) {
     min-height: 48px;
   }
 
+  .topbar {
+    min-height: calc(56px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    background: color-mix(in oklch, var(--color-surface) 92%, transparent);
+    backdrop-filter: saturate(1.4) blur(12px);
+    -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  }
+
   .topbar-logo {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    font-weight: 700;
     color: var(--color-primary);
-    font-size: var(--text-sm);
-    white-space: nowrap;
     flex-shrink: 0;
   }
 
+  .topbar-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* Language and theme live in the "More" sheet on mobile */
+  .topbar-right :deep(.lang-toggle),
+  .theme-btn {
+    display: none;
+  }
+
   .topbar-action-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     padding: var(--space-2);
     flex-shrink: 0;
   }
@@ -547,8 +564,8 @@ function triggerExport(format) {
 
   .theme-btn,
   .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .export-menu {

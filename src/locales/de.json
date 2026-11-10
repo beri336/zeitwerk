@@ -239,8 +239,8 @@
         "github": "Quellcode auf GitHub ansehen",
         "light_mode": "Heller Modus",
         "dark_mode": "Dunkler Modus",
-        "privacy_show": "Zahlen anzeigen",
-        "privacy_hide": "Zahlen ausblenden",
+        "privacy_show": "Gehalt anzeigen",
+        "privacy_hide": "Gehalt ausblenden",
         "toast_export_ok": "Export erfolgreich.",
         "toast_export_err": "Export fehlgeschlagen.",
         "toast_csv_ok": "CSV-Export erfolgreich.",
@@ -270,6 +270,10 @@
         "export": "Datenverwaltung",
         "data": "Datenverwaltung",
         "more": "Mehr",
+        "live_short": "Live",
+        "quick_settings": "Schnelleinstellungen",
+        "language": "Sprache",
+        "dark_theme": "Dunkles Design",
         "drawer_title": "Navigation",
         "week_overview": "Wochenübersicht",
         "month_overview": "Monatsübersicht",
@@ -371,6 +375,11 @@
         "toast_reset": "Einstellungen zurückgesetzt.",
         "toast_deleted": "Alle Einträge gelöscht.",
         "toast_state": "Bundesland auf {state} geändert - Feiertage aktualisiert.",
+        "mobile_date_placeholders": {
+            "start": "Startdatum wählen",
+            "end": "Bis heute",
+            "extra_vacation": "Datum wählen"
+        },
         "employments": {
             "title": "Beschäftigungen",
             "sub": "Jede Beschäftigung hat eigene Arbeitszeit, eigenes Gehalt und eigene Urlaubstage. Änderungen an Zeiträumen löschen keine vorhandenen Einträge.",
@@ -619,6 +628,7 @@
         }
     },
     "common": {
+        "close": "Schließen",
         "today": "Heute",
         "no": "Nein",
         "yes": "Ja",

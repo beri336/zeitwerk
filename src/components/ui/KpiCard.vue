@@ -80,4 +80,34 @@ const props = defineProps({
 .kpi-err {
   color: var(--color-error);
 }
+
+@media (max-width: 767px) {
+  .kpi-card {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    box-shadow: none;
+  }
+
+  .kpi-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    margin-bottom: var(--space-1);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.03em;
+    white-space: normal;
+    hyphens: auto;
+  }
+
+  .kpi-value {
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .kpi-sub {
+    font-size: 11px;
+  }
+}
 </style>

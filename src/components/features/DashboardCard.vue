@@ -2,15 +2,15 @@
 
 <template>
   <main class="main">
-    <nav class="dash-nav" :aria-label="$t('dashboard.jump.label')">
+    <nav ref="jumpNavRef" class="dash-nav" :aria-label="$t('dashboard.jump.label')">
       <button v-for="item in jumpItems" :key="item.id" type="button" class="dash-nav__item"
-        :class="{ 'dash-nav__item--active': activeJump === item.id }" @click="jumpTo(item.id)">
+        :class="{ 'dash-nav__item--active': activeJump === item.id }" :data-jump="item.id" @click="jumpTo(item.id)">
         {{ $t(item.label) }}
       </button>
     </nav>
 
     <!-- Device Chip -->
-    <DeviceChip />
+    <DeviceChip class="dash-device" />
 
     <!-- Today's Summary -->
     <section id="dash-today" data-dash-section class="today-summary" :class="`today-summary--${store.liveStatus}`">
@@ -88,7 +88,7 @@
           <span>{{ trackingLabel }}</span>
         </button>
 
-        <button class="quick-action" @click="openAdd">
+        <button class="quick-action quick-action--add" @click="openAdd">
           <span class="quick-action__icon" aria-hidden="true">+</span>
           <span>{{ $t("dashboard.quick_actions.add_entry") }}</span>
         </button>
@@ -143,7 +143,7 @@
 
       <div class="kpi-group">
         <h4>{{ $t("dashboard.groups.absence") }}</h4>
-        <div class="kpi-grid">
+        <div class="kpi-grid kpi-grid--compact">
           <KpiCard v-for="type in absenceTypes" :key="type" :label="absenceLabel(type)"
             :value="String(weekTypeCounts[type])" />
         </div>
@@ -182,7 +182,7 @@
 
       <div class="kpi-group">
         <h4>{{ $t("dashboard.groups.absence") }}</h4>
-        <div class="kpi-grid">
+        <div class="kpi-grid kpi-grid--compact">
           <KpiCard v-for="type in absenceTypes" :key="type" :label="absenceLabel(type)"
             :value="String(monthTypeCounts[type])" />
         </div>
@@ -220,7 +220,7 @@
 
       <div class="kpi-group">
         <h4>{{ $t("dashboard.groups.absence") }}</h4>
-        <div class="kpi-grid">
+        <div class="kpi-grid kpi-grid--compact">
           <KpiCard v-for="type in absenceTypes" :key="type" :label="absenceLabel(type)"
             :value="String(yearTypeCounts[type])" />
         </div>
@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useZeitwerkStore } from "@/stores/zeitwerk";
@@ -347,7 +347,9 @@ function vacationLeftText(job) {
 const nowTick = ref(Date.now());
 let todayTimer = null;
 
-let jumpObserver = null;
+let scrollRoot = null;
+let jumpLockUntil = 0;
+const jumpNavRef = ref(null);
 const activeJump = ref("dash-today");
 const jumpItems = [
   { id: "dash-today", label: "dashboard.jump.today" },
@@ -365,8 +367,41 @@ function absenceLabel(type) {
 
 function jumpTo(id) {
   activeJump.value = id;
+  // keep the tapped chip active while the smooth scroll passes other sections
+  jumpLockUntil = Date.now() + 700;
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+
+function updateActiveJump() {
+  if (!scrollRoot || Date.now() < jumpLockUntil) return;
+
+  const rootTop = scrollRoot.getBoundingClientRect().top;
+  const atBottom = scrollRoot.scrollTop + scrollRoot.clientHeight >= scrollRoot.scrollHeight - 4;
+  let current = jumpItems[0].id;
+
+  if (atBottom) {
+    current = jumpItems[jumpItems.length - 1].id;
+  } else {
+    for (const item of jumpItems) {
+      const section = document.getElementById(item.id);
+      if (section && section.getBoundingClientRect().top - rootTop <= 120) current = item.id;
+    }
+  }
+
+  activeJump.value = current;
+}
+
+watch(activeJump, async (id) => {
+  await nextTick();
+  const nav = jumpNavRef.value;
+  const chip = nav?.querySelector(`[data-jump="${id}"]`);
+  if (!nav || !chip) return;
+
+  nav.scrollTo({
+    left: chip.offsetLeft - (nav.clientWidth - chip.offsetWidth) / 2,
+    behavior: "smooth",
+  });
+});
 
 const todayWorkedHours = computed(() => {
   const entry = store.todayEntry;
@@ -444,22 +479,20 @@ onMounted(() => {
     nowTick.value = Date.now();
   }, 1_000);
 
-  jumpObserver = new IntersectionObserver((entries) => {
-    const visible = entries
-      .filter((entry) => entry.isIntersecting)
-      .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
-    if (visible?.target?.id) activeJump.value = visible.target.id;
-  }, {
-    root: document.querySelector(".app-content"),
-    rootMargin: "-15% 0px -55% 0px",
-    threshold: [0.2, 0.45],
-  });
-  document.querySelectorAll("[data-dash-section]").forEach((section) => jumpObserver.observe(section));
+  scrollRoot = document.querySelector(".app-content");
+  scrollRoot?.addEventListener("scroll", updateActiveJump, { passive: true });
+  scrollRoot?.addEventListener("scrollend", onScrollEnd);
 });
+
+function onScrollEnd() {
+  jumpLockUntil = 0;
+  updateActiveJump();
+}
 
 onUnmounted(() => {
   if (todayTimer) window.clearInterval(todayTimer);
-  jumpObserver?.disconnect();
+  scrollRoot?.removeEventListener("scroll", updateActiveJump);
+  scrollRoot?.removeEventListener("scrollend", onScrollEnd);
 });
 
 // Month KPIs
@@ -1272,24 +1305,121 @@ quick-action__icon:hover {
     min-height: 44px;
   }
 
+  .dash-device {
+    display: none;
+  }
+
+  .dash-nav {
+    top: 0;
+    margin: 0 calc(-1 * var(--space-3));
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid var(--color-divider);
+    background: color-mix(in oklch, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .dash-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dash-nav__item {
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 36px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font-size: var(--text-xs);
+    scroll-snap-align: center;
+  }
+
+  .dash-nav__item--active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    box-shadow: none;
+  }
+
+  [data-dash-section] {
+    scroll-margin-top: 60px;
+  }
+
   .quick-actions {
     display: block;
-    padding: var(--space-2);
+    padding: 0;
+    border: none;
+    background: none;
   }
 
   .quick-actions__heading {
-    margin-bottom: var(--space-2);
+    display: none;
   }
 
   .quick-actions__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .quick-action--primary {
+    grid-column: 1 / -1;
+    min-height: 56px;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-lg);
+  }
+
+  /* The floating add button covers manual entries on mobile */
+  .quick-action--add {
+    display: none;
+  }
+
   .quick-action {
     min-height: 48px;
-    flex-direction: column;
-    gap: var(--space-1);
-    font-size: 0.7rem;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .quick-action:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .today-summary__header h2 {
+    font-size: var(--text-base);
+  }
+
+  .today-metric--main strong {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .kpi-grid--compact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .kpi-grid--compact :deep(.kpi-card) {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .kpi-grid--compact :deep(.kpi-label) {
+    margin-bottom: 2px;
+    font-size: 10px;
+    letter-spacing: 0.02em;
+  }
+
+  .kpi-grid--compact :deep(.kpi-value) {
+    font-size: var(--text-base);
+  }
+
+  .section-link {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .mobile-add-time {
@@ -1319,9 +1449,13 @@ quick-action__icon:hover {
 }
 
 /* Small Mobile */
-@media (max-width: 420px) {
+@media (max-width: 340px) {
   .kpi-grid {
     grid-template-columns: 1fr;
+  }
+
+  .kpi-grid--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>

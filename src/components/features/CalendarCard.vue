@@ -9,7 +9,7 @@
           <h1 class="cal-title">{{ $t("calendar.appointments") }}</h1>
           <span class="cal-badge">{{
             $t("calendar.event", { count: monthEvents.length })
-            }}</span>
+          }}</span>
         </div>
         <div class="cal-header-right">
           <button class="btn btn-ghost btn-sm" @click="goToday">
@@ -52,7 +52,7 @@
         <div class="cal-grid-header">
           <span v-for="day in weekdays" :key="day" class="cal-weekday">{{
             day
-            }}</span>
+          }}</span>
         </div>
 
         <!-- Day Grid -->
@@ -97,7 +97,7 @@
                 borderLeft: `3px solid ${event.color}`,
               }" @click.stop="openModal(event.id)">
                 <span class="week-event-time" v-if="!event.allDay">{{ event.startTime
-                }}{{ event.endTime ? " – " + event.endTime : "" }}</span>
+                  }}{{ event.endTime ? " – " + event.endTime : "" }}</span>
                 <span class="week-event-title">{{ event.title }}</span>
               </div>
               <div v-if="day.events.length === 0" class="week-empty-hint"></div>
@@ -132,7 +132,7 @@
                 <div class="agenda-item-time">
                   <span v-if="event.allDay">{{ $t("calendar.all_day") }}</span>
                   <span v-else>{{ event.startTime
-                  }}{{ event.endTime ? " – " + event.endTime : "" }}</span>
+                    }}{{ event.endTime ? " – " + event.endTime : "" }}</span>
                 </div>
               </div>
             </div>
@@ -160,7 +160,7 @@
                 <span class="day-detail-title">{{ event.title }}</span>
                 <span v-if="event.description" class="day-detail-desc">{{
                   event.description
-                  }}</span>
+                }}</span>
                 <div class="day-detail-meta">
                   <span v-if="event.location" class="meta-item">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="11"
@@ -177,7 +177,7 @@
                   </span>
                   <span v-else class="meta-item">{{
                     $t("calendar.all_day")
-                    }}</span>
+                  }}</span>
                   <span v-for="tag in event.tags" :key="tag" class="tag tag--sm">{{ tag }}</span>
                 </div>
               </div>
@@ -219,7 +219,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.name")
-                  }}</label>
+                }}</label>
                 <input v-model="form.title" class="form-input" type="text"
                   :placeholder="$t('calendar.modal.name_hint')" />
               </div>
@@ -228,7 +228,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.desc")
-                  }}</label>
+                }}</label>
                 <textarea v-model="form.description" class="form-input form-textarea"
                   :placeholder="$t('calendar.modal.desc_hint')" rows="2"></textarea>
               </div>
@@ -238,13 +238,13 @@
                 <div class="field">
                   <label class="field-label">{{
                     $t("calendar.modal.date")
-                    }}</label>
+                  }}</label>
                   <input v-model="form.date" class="form-input" type="date" />
                 </div>
                 <div class="field field--checkbox">
                   <label class="field-label">{{
                     $t("calendar.modal.allday")
-                    }}</label>
+                  }}</label>
                   <button class="urgent-toggle" :class="{ active: form.allDay }" @click="form.allDay = !form.allDay">
                     {{ form.allDay ? $t("common.yes") : $t("common.no") }}
                   </button>
@@ -256,13 +256,13 @@
                 <div class="field">
                   <label class="field-label">{{
                     $t("calendar.modal.time_from")
-                    }}</label>
+                  }}</label>
                   <input v-model="form.startTime" class="form-input" type="time" />
                 </div>
                 <div class="field">
                   <label class="field-label">{{
                     $t("calendar.modal.time_to")
-                    }}</label>
+                  }}</label>
                   <input v-model="form.endTime" class="form-input" type="time" />
                 </div>
               </div>
@@ -271,7 +271,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.location")
-                  }}</label>
+                }}</label>
                 <input v-model="form.location" class="form-input" type="text"
                   :placeholder="$t('calendar.modal.location_hint')" />
               </div>
@@ -280,7 +280,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.color")
-                  }}</label>
+                }}</label>
                 <div class="color-selector">
                   <button v-for="colour in colorOptions" :key="colour" class="color-btn" :style="{
                     background: colour,
@@ -300,7 +300,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.tags")
-                  }}</label>
+                }}</label>
                 <div class="tag-input-wrapper">
                   <span v-for="tag in form.tags" :key="tag" class="tag tag--removable">
                     {{ tag }}
@@ -317,7 +317,7 @@
               <div class="field">
                 <label class="field-label">{{
                   $t("calendar.modal.reminder")
-                  }}</label>
+                }}</label>
                 <select v-model="form.reminder" class="form-input form-select">
                   <option value="">
                     {{ $t("calendar.modal.reminder_none") }}
@@ -539,7 +539,7 @@ const weekCells = computed(() => {
   });
 });
 
-const currentLocale = computed(() => currentLocale.value);
+const currentLocale = computed(() => (locale.value === "de" ? "de-DE" : "en-GB"));
 
 // Agenda Groups
 const agendaGroups = computed(() => {
@@ -677,7 +677,7 @@ function saveModal() {
         ...form,
         tags: [...form.tags],
       };
-      showToast(t("calendar.edited_text"), "ok");
+    showToast(t("calendar.edited_text"), "ok");
   } else {
     events.value.push({
       id: calendarStore.getNextId(),
